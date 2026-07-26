@@ -1,0 +1,118 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: auto; /* Lenis handles smoothing */
+}
+
+html,
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: var(--step-0);
+  line-height: 1.6;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  /* `clip` (not `hidden`) prevents horizontal scroll WITHOUT creating a scroll
+     container — so `position: sticky` sections (Services) still pin correctly. */
+  overflow-x: clip;
+}
+
+body {
+  min-height: 100vh;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+::selection {
+  background: var(--gold);
+  color: var(--offwhite);
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+}
+
+/* Eyebrow / label styling shared across sections */
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--gold-deep);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7em;
+}
+.eyebrow::before {
+  content: '';
+  width: 1.8em;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.7;
+}
+
+.lead {
+  font-size: var(--step-1);
+  line-height: 1.45;
+  color: var(--taupe);
+  font-weight: 400;
+}
+
+/* ── The fixed 3D canvas sits behind all DOM content ─────────────────── */
+.scene-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Sections stack above the canvas */
+.content-layer {
+  position: relative;
+  z-index: 1;
+}
+
+/* Reveal primitive used by useSectionReveal */
+.reveal {
+  will-change: transform, opacity;
+}
+
+/* Accessibility: kill heavy motion when requested */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

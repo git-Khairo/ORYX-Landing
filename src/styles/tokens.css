@@ -1,0 +1,48 @@
+:root {
+  /* ── Palette (extracted from ORYX_Brand_Strategy.pdf) ───────────────── */
+  --cream: #f4efe6;      /* primary background */
+  --offwhite: #fbf9f5;   /* raised panels / light text on dark */
+  --sand: #e9e2d4;       /* soft panels, dividers */
+  --charcoal: #1c1c1a;   /* primary text / dark sections */
+  --charcoal-soft: #26251f;
+
+  --gold: #b48a50;       /* primary accent — Arabic heritage / premium */
+  --tan: #c9a66b;        /* lighter accent, highlights */
+  --gold-deep: #9a723c;
+
+  --taupe: #6e6a62;      /* secondary text */
+  --taupe-2: #8a8478;    /* muted text */
+  --taupe-3: #b9b3a6;    /* hairlines, disabled */
+
+  --leaf: #7d8a5f;       /* sustainability accent (green-leaning) */
+
+  /* ── Semantic ───────────────────────────────────────────────────────── */
+  --bg: var(--cream);
+  --fg: var(--charcoal);
+  --muted: var(--taupe);
+  --line: rgba(28, 28, 26, 0.12);
+  --accent: var(--gold);
+
+  /* ── Type ───────────────────────────────────────────────────────────── */
+  --font-display: 'Fraunces Variable', 'Fraunces', Georgia, 'Times New Roman', serif;
+  --font-body: 'Inter Variable', 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', 'JetBrains Mono', 'Roboto Mono', Menlo, monospace;
+
+  /* Fluid type scale — deliberately restrained / minimal */
+  --step--1: clamp(0.68rem, 0.66rem + 0.1vw, 0.75rem);
+  --step-0: clamp(0.88rem, 0.85rem + 0.15vw, 0.98rem);
+  --step-1: clamp(1rem, 0.94rem + 0.3vw, 1.2rem);
+  --step-2: clamp(1.25rem, 1.1rem + 0.7vw, 1.8rem);
+  --step-3: clamp(1.55rem, 1.3rem + 1.3vw, 2.5rem);
+  --step-4: clamp(2rem, 1.6rem + 2vw, 3.4rem);
+  --step-5: clamp(2.4rem, 1.8rem + 3.4vw, 5rem);
+
+  /* ── Spacing / layout ───────────────────────────────────────────────── */
+  --gutter: clamp(1.1rem, 4vw, 4rem);
+  --maxw: 1180px;
+  --radius: 12px;
+
+  /* ── Motion ─────────────────────────────────────────────────────────── */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-inout: cubic-bezier(0.65, 0, 0.35, 1);
+}
