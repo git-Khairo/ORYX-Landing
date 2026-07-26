@@ -8,7 +8,7 @@ import DesertScene from '../components/illustrations/DesertScene'
 export default function OryxMoment() {
   const ref = useSectionReveal()
   return (
-    <section className="oryx-moment" ref={ref} aria-label="Beyond service">
+    <section id="beyond" className="oryx-moment" ref={ref} aria-label="Beyond service">
       <DesertScene className="oryx-moment-bg" />
       <div className="oryx-moment-inner">
         <p className="eyebrow" data-reveal style={{ color: 'var(--offwhite)' }}>The ORYX</p>

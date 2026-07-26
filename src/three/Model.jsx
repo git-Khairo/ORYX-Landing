@@ -65,7 +65,7 @@ export default function Model() {
   const geometry = useMemo(() => buildOryxGeometry(), [])
   const material = useMemo(() => createOryxMaterial(), [])
   const tmpColor = useMemo(() => new THREE.Color(), [])
-  const s = useRef({ form: 0.25, x: 0, y: 0, camZ: 6.4, spin: 0, tintAmt: 0 })
+  const s = useRef({ form: 0.25, x: 0, y: 0, sz: 1, camZ: 6.4, spin: 0, tintAmt: 0 })
 
   useFrame((rt, delta) => {
     const { progress, velocity } = getScrollState()
@@ -90,18 +90,19 @@ export default function Model() {
     st.tintAmt = lerp(st.tintAmt, i0 === 2 || i0 === 6 ? 0.4 : 0.12, 0.05)
     u.uTintAmount.value = st.tintAmt
 
-    // Calm, slow motion. Horns sit slightly high in the hero, then drift gently.
-    const p = THREE.MathUtils.smoothstep(progress, 0, 0.16)
-    const targetX = prefersReduced ? 0 : Math.sin(progress * Math.PI * 2) * 1.9
-    const journeyY = Math.sin(progress * Math.PI * 2) * 0.25
-    st.x = lerp(st.x, targetX, 0.05)
-    st.y = lerp(st.y, lerp(0.5, journeyY, p), 0.05)
+    // Section-anchored position: the oryx travels to sit at each section's
+    // illustration focal point (network hub, convergence, signal centre, …).
+    const a = blendedAnchor()
+    st.x = lerp(st.x, prefersReduced ? 0 : a.x, 0.045)
+    st.y = lerp(st.y, a.y, 0.045)
+    st.sz = lerp(st.sz, a.s, 0.045)
     st.spin += delta * 0.04
 
     if (group.current) {
       group.current.position.x = st.x
       group.current.position.y = st.y
-      group.current.rotation.y = st.spin + progress * Math.PI * 0.5
+      group.current.rotation.y = st.spin
+      group.current.scale.setScalar(st.sz)
     }
 
     // Camera dolly + gentle mouse parallax.
