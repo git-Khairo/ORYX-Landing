@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import Lenis from 'lenis'
+import Snap from 'lenis/snap'
 import gsap from 'gsap'
 import { setScroll } from './useScrollStore'
 import { getReady, subscribeReady } from './useAppReady'
@@ -45,14 +46,47 @@ export function useLenis() {
     gsap.ticker.add(raf)
     gsap.ticker.lagSmoothing(0)
 
-    // Hold scroll locked until the preloader curtain lifts.
-    if (!getReady()) lenis.stop()
-    const unsubReady = subscribeReady(() => {
-      if (getReady()) lenis.start()
+    // ── Full-screen section snapping ─────────────────────────────────────
+    // Each ~100vh section clicks to the top of the viewport when the user
+    // settles near its boundary. `proximity` (not `mandatory`) is deliberate:
+    // the Services section is intentionally multi-viewport (sticky horizontal
+    // showcase), so its middle must stay freely scrollable — proximity only
+    // snaps within a threshold of a section edge and leaves tall sections alone.
+    const snap = new Snap(lenis, {
+      type: 'proximity',
+      duration: 1.1,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
     })
+    const removeSnapElements = []
+    let started = false
+    const registerSnaps = () => {
+      const sections = document.querySelectorAll('.content-layer > section')
+      sections.forEach((el) => {
+        removeSnapElements.push(
+          snap.addElement(el, { align: 'start', ignoreSticky: true })
+        )
+      })
+    }
+
+    // Hold scroll (and snapping) locked until the preloader curtain lifts.
+    if (!getReady()) {
+      lenis.stop()
+      snap.stop()
+    }
+    const startWhenReady = () => {
+      if (started || !getReady()) return
+      started = true
+      lenis.start()
+      registerSnaps()
+      snap.start()
+    }
+    startWhenReady()
+    const unsubReady = subscribeReady(startWhenReady)
 
     return () => {
       unsubReady()
+      removeSnapElements.forEach((remove) => remove())
+      snap.destroy()
       gsap.ticker.remove(raf)
       lenis.destroy()
       delete window.__lenis
