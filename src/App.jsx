@@ -1,10 +1,12 @@
+import { useState } from 'react'
 import { useLenis } from './lib/useLenis'
+import { usePager } from './lib/usePager'
+import ContactGateway from './components/ContactGateway'
 import './styles/components.css'
 import './styles/sections.css'
 
-import Scene from './three/Scene'
+import Backdrop from './components/Backdrop'
 import Preloader from './components/Preloader'
-import Frame from './components/Frame'
 import Nav from './components/Nav'
 import ProgressRail from './components/ProgressRail'
 
@@ -21,27 +23,37 @@ import Statement from './sections/Statement'
 
 export default function App() {
   useLenis()
+  usePager()
+
+  // The contact experience is an overlay, not a place on the page — a service
+  // world can hand straight into it without the visitor losing their position.
+  // `null` = closed; a service id or '' (undecided) = open.
+  const [request, setRequest] = useState(null)
+  const openRequest = (serviceId = '') => setRequest(serviceId)
 
   return (
     <>
       <Preloader />
-      <Scene />
-      <Frame />
-      <Nav />
+      <Backdrop />
+      <Nav onContact={() => openRequest()} />
       <ProgressRail />
 
       <main className="content-layer">
         <Hero />
         <Discover />
         <Technology />
-        <Services />
+        <Services onRequest={openRequest} />
         <OryxMoment />
         <WhyOryx />
         <Sustainability />
         <Process />
-        <Contact />
-        <Statement />
+        <Contact onRequest={openRequest} />
+        <Statement onRequest={openRequest} />
       </main>
+
+      {request !== null && (
+        <ContactGateway initialService={request} onClose={() => setRequest(null)} />
+      )}
     </>
   )
 }

@@ -59,16 +59,19 @@ h2,
 h3 {
   font-family: var(--font-display);
   font-weight: 400;
-  line-height: 1.02;
-  letter-spacing: -0.02em;
+  line-height: 1.06;
+  /* Instrument Serif is already tightly fitted; the heavy negative tracking the
+     old grotesque needed would collide its thin strokes here. */
+  letter-spacing: -0.005em;
+  text-wrap: balance;
 }
 
 /* Eyebrow / label styling shared across sections */
 .eyebrow {
-  font-family: var(--font-mono);
+  font-family: var(--font-label);
   font-size: var(--step--1);
-  font-weight: 500;
-  letter-spacing: 0.24em;
+  font-weight: 600;
+  letter-spacing: var(--track-label-wide);
   text-transform: uppercase;
   color: var(--gold-deep);
   display: inline-flex;
@@ -85,23 +88,36 @@ h3 {
 
 .lead {
   font-size: var(--step-1);
-  line-height: 1.45;
+  line-height: 1.5;
   color: var(--taupe);
   font-weight: 400;
+  /* Keep the reading measure inside the comfortable band even when a parent
+     column is wider than the text wants to be. */
+  max-width: 68ch;
 }
 
-/* ── The fixed 3D canvas sits behind all DOM content ─────────────────── */
-.scene-layer {
+/* ── Three fixed layers, bottom to top ───────────────────────────────────
+   0  film backdrop — moving footage behind everything
+   1  the 3D canvas  — transparent, so the sculpture floats over the film
+   2  content        — sections, transparent where the layers should show */
+.backdrop-layer {
   position: fixed;
   inset: 0;
   z-index: 0;
   pointer-events: none;
+  background: var(--bg);
 }
 
-/* Sections stack above the canvas */
+.scene-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
 .content-layer {
   position: relative;
-  z-index: 1;
+  z-index: 2;
 }
 
 /* Reveal primitive used by useSectionReveal */

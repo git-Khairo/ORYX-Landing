@@ -10,11 +10,19 @@
   --tan: #c9a66b;        /* lighter accent, highlights */
   --gold-deep: #9a723c;
 
-  --taupe: #6e6a62;      /* secondary text */
-  --taupe-2: #8a8478;    /* muted text */
-  --taupe-3: #b9b3a6;    /* hairlines, disabled */
+  /* Secondary text runs darker than a conventional "muted grey" because almost
+     all of it sits over moving footage. At the old #6e6a62 body copy measured
+     ~4.8:1 on flat cream and failed outright over a bright video frame. */
+  --taupe: #514e47;      /* secondary text — 7.4:1 on cream */
+  --taupe-2: #6b675e;    /* muted text — 5.1:1 on cream */
+  --taupe-3: #b9b3a6;    /* hairlines and text on charcoal only */
 
   --leaf: #7d8a5f;       /* sustainability accent (green-leaning) */
+
+  /* The sculpture's own colour — burnt terracotta. Used only where the page
+     needs to echo the horns, never as a general-purpose accent. */
+  --rust: #9e4b2f;
+  --rust-light: #c2643a;
 
   /* ── Semantic ───────────────────────────────────────────────────────── */
   --bg: var(--cream);
@@ -24,21 +32,35 @@
   --accent: var(--gold);
 
   /* ── Type ───────────────────────────────────────────────────────────── */
-  --font-display: 'Fraunces Variable', 'Fraunces', Georgia, 'Times New Roman', serif;
-  --font-body: 'Inter Variable', 'Inter', system-ui, -apple-system, sans-serif;
-  --font-mono: ui-monospace, 'SF Mono', 'JetBrains Mono', 'Roboto Mono', Menlo, monospace;
+  /* Instrument Serif: one weight (400), high stroke contrast, tall and quiet.
+     It carries the display voice, so it is never asked to go bold — scale and
+     colour do that work instead. Manrope handles everything read at length. */
+  --font-display: 'Instrument Serif', Georgia, 'Times New Roman', serif;
+  --font-body: 'Geist Variable', 'Geist', ui-sans-serif, system-ui, sans-serif;
+  /* Reserved for genuine measurement — counts, indices, figures. Not a costume
+     for "technical". */
+  --font-mono: 'Geist Mono Variable', ui-monospace, monospace;
+  /* Labels/eyebrows are Manrope at tight weight + wide tracking, not monospace.
+     Mono would be a costume here — there is no code or measurement on the page. */
+  --font-label: var(--font-body);
 
-  /* Fluid type scale — deliberately restrained / minimal */
-  --step--1: clamp(0.68rem, 0.66rem + 0.1vw, 0.75rem);
-  --step-0: clamp(0.88rem, 0.85rem + 0.15vw, 0.98rem);
-  --step-1: clamp(1rem, 0.94rem + 0.3vw, 1.2rem);
-  --step-2: clamp(1.25rem, 1.1rem + 0.7vw, 1.8rem);
-  --step-3: clamp(1.55rem, 1.3rem + 1.3vw, 2.5rem);
-  --step-4: clamp(2rem, 1.6rem + 2vw, 3.4rem);
-  --step-5: clamp(2.4rem, 1.8rem + 3.4vw, 5rem);
+  /* Fluid type scale. The display steps run larger than before: Instrument
+     Serif has a small apparent size for its point size, and it earns the room. */
+  --step--1: clamp(0.7rem, 0.68rem + 0.1vw, 0.78rem);
+  --step-0: clamp(0.9rem, 0.87rem + 0.15vw, 1rem);
+  --step-1: clamp(1.05rem, 0.98rem + 0.3vw, 1.25rem);
+  --step-2: clamp(1.4rem, 1.2rem + 0.85vw, 2.05rem);
+  --step-3: clamp(1.8rem, 1.45rem + 1.6vw, 3rem);
+  --step-4: clamp(2.3rem, 1.8rem + 2.4vw, 4rem);
+  --step-5: clamp(2.8rem, 2rem + 4vw, 5.9rem);
+
+  /* Label tracking — one scale so every uppercase label agrees. */
+  --track-label: 0.18em;
+  --track-label-wide: 0.26em;
 
   /* ── Spacing / layout ───────────────────────────────────────────────── */
   --gutter: clamp(1.1rem, 4vw, 4rem);
+  --nav-h: 3.4rem;
   --maxw: 1180px;
   --radius: 12px;
 

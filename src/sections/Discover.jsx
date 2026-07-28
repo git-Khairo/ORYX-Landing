@@ -1,22 +1,33 @@
 import SectionShell from '../components/SectionShell'
 import SplitText from '../components/SplitText'
-import OryxMark from '../components/illustrations/OryxMark'
+import Horns from '../components/Horns'
+import VideoBackdrop from '../components/VideoBackdrop'
 import { discover } from '../content/copy'
+import { film } from '../content/media'
 
+/**
+ * The introduction, and the sculpture's first appearance.
+ *
+ * Copy holds the left third against a graded film of people at work; the
+ * sculpture occupies the right, drifting against the scroll. The two are on
+ * different depth planes on purpose — that separation is what keeps the object
+ * from reading as decoration sitting on a photograph.
+ */
 export default function Discover() {
   return (
-    <SectionShell id="discover" index={1} tone="cream">
-      <div className="discover-grid">
-        <figure className="discover-art" data-reveal="left">
-          <OryxMark />
-          <figcaption>The Oryx — our brand character</figcaption>
-        </figure>
-        <div className="col halo">
-          <p className="eyebrow" data-reveal>{discover.eyebrow}</p>
-          <SplitText as="h2" className="title-xl" text={discover.title} />
-          <p className="lead" data-reveal>{discover.body}</p>
-          <p className="mt" data-reveal style={{ color: 'var(--taupe)' }}>{discover.aim}</p>
-        </div>
+    <SectionShell
+      id="discover"
+      index={1}
+      tone="cream"
+      bg={<VideoBackdrop src={film.people.src} />}
+    >
+      <Horns align="right" />
+
+      <div className="col halo discover-col">
+        <p className="eyebrow" data-reveal>{discover.eyebrow}</p>
+        <SplitText as="h2" className="title-xl" text={discover.title} />
+        <p className="lead" data-reveal>{discover.body}</p>
+        <p className="discover-aim" data-reveal>{discover.aim}</p>
       </div>
     </SectionShell>
   )

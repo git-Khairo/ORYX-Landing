@@ -1,96 +1,48 @@
 import { useEffect } from 'react'
-import Lenis from 'lenis'
-import Snap from 'lenis/snap'
-import gsap from 'gsap'
 import { setScroll } from './useScrollStore'
-import { getReady, subscribeReady } from './useAppReady'
 
+/**
+ * Feeds the shared scroll store from the page's real scroll position.
+ *
+ * The name is historical — Lenis is gone. With the pager owning wheel input and
+ * scrollEngine owning the animation, a smooth-scroll library had nothing left
+ * to do except add a failure mode, and it did: its `scrollTo` stopped moving
+ * the page, which froze the site because the pager had already swallowed the
+ * gesture. A passive scroll listener is all this ever needed to be.
+ *
+ * The file keeps its path and its `prefersReduced` export because most of the
+ * app imports that from here.
+ */
 const prefersReduced =
   typeof window !== 'undefined' &&
   window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
-/**
- * Sets up Lenis smooth scrolling and pushes normalized scroll progress into the
- * shared store every frame (which the 3D scene reads). Reveal animations use
- * IntersectionObserver, so no ScrollTrigger position-sync is needed here.
- * Respects prefers-reduced-motion by disabling smoothing.
- */
 export function useLenis() {
   useEffect(() => {
-    if (prefersReduced) {
-      const onScroll = () => {
-        const max = document.documentElement.scrollHeight - window.innerHeight
-        setScroll({ progress: max > 0 ? window.scrollY / max : 0, velocity: 0 })
-      }
-      window.addEventListener('scroll', onScroll, { passive: true })
-      onScroll()
-      return () => window.removeEventListener('scroll', onScroll)
-    }
+    let last = window.scrollY
+    let lastTime = performance.now()
 
-    const lenis = new Lenis({
-      duration: 1.15,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      smoothWheel: true,
-      touchMultiplier: 1.6,
-    })
-    window.__lenis = lenis
+    const onScroll = () => {
+      const scroll = window.scrollY
+      const max = document.documentElement.scrollHeight - window.innerHeight
+      const now = performance.now()
+      const dt = Math.max(now - lastTime, 1)
 
-    lenis.on('scroll', ({ scroll, limit, velocity }) => {
+      // px/ms, roughly matching what the scene used to read from Lenis.
+      const velocity = (scroll - last) / dt
+      last = scroll
+      lastTime = now
+
       setScroll({
-        progress: limit > 0 ? scroll / limit : 0,
-        velocity: velocity || 0,
-      })
-    })
-
-    const raf = (time) => lenis.raf(time * 1000)
-    gsap.ticker.add(raf)
-    gsap.ticker.lagSmoothing(0)
-
-    // ── Full-screen section snapping ─────────────────────────────────────
-    // Each ~100vh section clicks to the top of the viewport when the user
-    // settles near its boundary. `proximity` (not `mandatory`) is deliberate:
-    // the Services section is intentionally multi-viewport (sticky horizontal
-    // showcase), so its middle must stay freely scrollable — proximity only
-    // snaps within a threshold of a section edge and leaves tall sections alone.
-    const snap = new Snap(lenis, {
-      type: 'proximity',
-      duration: 1.1,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-    })
-    const removeSnapElements = []
-    let started = false
-    const registerSnaps = () => {
-      const sections = document.querySelectorAll('.content-layer > section')
-      sections.forEach((el) => {
-        removeSnapElements.push(
-          snap.addElement(el, { align: 'start', ignoreSticky: true })
-        )
+        scroll,
+        progress: max > 0 ? scroll / max : 0,
+        velocity,
       })
     }
 
-    // Hold scroll (and snapping) locked until the preloader curtain lifts.
-    if (!getReady()) {
-      lenis.stop()
-      snap.stop()
-    }
-    const startWhenReady = () => {
-      if (started || !getReady()) return
-      started = true
-      lenis.start()
-      registerSnaps()
-      snap.start()
-    }
-    startWhenReady()
-    const unsubReady = subscribeReady(startWhenReady)
-
-    return () => {
-      unsubReady()
-      removeSnapElements.forEach((remove) => remove())
-      snap.destroy()
-      gsap.ticker.remove(raf)
-      lenis.destroy()
-      delete window.__lenis
-    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    onScroll()
+    return () => window.removeEventListener('scroll', onScroll)
   }, [])
 }
 

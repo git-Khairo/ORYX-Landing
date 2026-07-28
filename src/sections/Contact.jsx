@@ -1,103 +1,61 @@
-import { useState } from 'react'
 import SectionShell from '../components/SectionShell'
 import SplitText from '../components/SplitText'
 import CtaButton from '../components/CtaButton'
-import SignalRings from '../components/illustrations/SignalRings'
-import { contact } from '../content/copy'
+import VideoBackdrop from '../components/VideoBackdrop'
+import { contact, services } from '../content/copy'
+import { film } from '../content/media'
 
-const emptyErrors = {}
-
-export default function Contact() {
-  const [service, setService] = useState('cleaning')
-  const [values, setValues] = useState({ name: '', company: '', email: '', details: '' })
-  const [errors, setErrors] = useState(emptyErrors)
-  const [sent, setSent] = useState(false)
-
-  const update = (k) => (e) => setValues((v) => ({ ...v, [k]: e.target.value }))
-
-  const validate = () => {
-    const err = {}
-    if (!values.name.trim()) err.name = 'Please tell us your name.'
-    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(values.email)) err.email = 'Enter a valid email.'
-    if (!values.details.trim()) err.details = 'A few words about your needs, please.'
-    return err
-  }
-
-  const onSubmit = (e) => {
-    e.preventDefault()
-    const err = validate()
-    setErrors(err)
-    if (Object.keys(err).length === 0) setSent(true)
-  }
-
-  const serviceLabel = contact.options.find((o) => o.id === service)?.label
-
+/**
+ * The invitation, and a look through the doors.
+ *
+ * A single "Start a request" button gave no sense of what starting involves,
+ * which is the moment most enquiries are abandoned. The three routes are now
+ * shown as living plates — the same environments the gateway opens into — so
+ * pressing one is a continuation rather than a leap. Each goes straight to its
+ * own journey with the service already chosen.
+ */
+export default function Contact({ onRequest }) {
   return (
-    <SectionShell id="contact" index={9} tone="cream" bg={<SignalRings className="section-bg" />}>
-      <div className="col halo">
-        <p className="eyebrow" data-reveal>{contact.eyebrow}</p>
-        <SplitText as="h2" className="title-xl" text={contact.title} start="top 84%" />
-        <p className="lead" data-reveal>{contact.body}</p>
+    <SectionShell
+      id="contact"
+      index={9}
+      tone="cream"
+      className="start"
+      bg={<VideoBackdrop src={film.facility.src} className="section-bg" />}
+    >
+      <div className="start-grid">
+        <div className="start-lead halo">
+          <p className="eyebrow" data-reveal>{contact.eyebrow}</p>
+          <SplitText as="h2" className="start-title" text={contact.title} start="top 84%" />
+          <p className="lead" data-reveal>{contact.body}</p>
 
-        {!sent ? (
-          <>
-            <div className="picker" role="group" aria-label="Choose a service" data-reveal>
-              {contact.options.map((o) => (
-                <button
-                  key={o.id}
-                  type="button"
-                  className={service === o.id ? 'is-active' : ''}
-                  aria-pressed={service === o.id}
-                  onClick={() => setService(o.id)}
-                >
-                  {o.label}
-                </button>
-              ))}
-            </div>
-
-            <form className="form" onSubmit={onSubmit} noValidate data-reveal>
-              <div className="form-row">
-                <div className="field">
-                  <label htmlFor="c-name">Name</label>
-                  <input id="c-name" value={values.name} onChange={update('name')} autoComplete="name" />
-                  {errors.name && <span className="err">{errors.name}</span>}
-                </div>
-                <div className="field">
-                  <label htmlFor="c-company">Company</label>
-                  <input id="c-company" value={values.company} onChange={update('company')} autoComplete="organization" />
-                </div>
-              </div>
-              <div className="field">
-                <label htmlFor="c-email">Email</label>
-                <input id="c-email" type="email" value={values.email} onChange={update('email')} autoComplete="email" />
-                {errors.email && <span className="err">{errors.email}</span>}
-              </div>
-              <div className="field">
-                <label htmlFor="c-details">Tell us about your {serviceLabel?.toLowerCase()} needs</label>
-                <textarea id="c-details" rows={4} value={values.details} onChange={update('details')} />
-                {errors.details && <span className="err">{errors.details}</span>}
-              </div>
-              <div>
-                <CtaButton variant="solid" type="submit">Request {serviceLabel}</CtaButton>
-              </div>
-            </form>
-          </>
-        ) : (
-          <div className="form-success" data-reveal>
-            <h3>Thank you, {values.name.split(' ')[0]}.</h3>
-            <p className="mt" style={{ color: 'var(--taupe)' }}>
-              Your {serviceLabel} request has been prepared. An ORYX partner will be in touch — we’re
-              always ready.
-            </p>
-            <p className="form-note">
-              Demo form — no message is actually sent. Wire it to your email/CRM to go live, or reach us at{' '}
-              <a href="mailto:hello@oryx.example" style={{ color: 'var(--gold-deep)' }}>hello@oryx.example</a>.
-            </p>
-            <button className="mt" style={{ color: 'var(--gold-deep)', fontWeight: 600 }} onClick={() => setSent(false)}>
-              ← Send another request
-            </button>
+          <div className="start-actions" data-reveal>
+            <CtaButton variant="solid" onClick={() => onRequest?.('')}>
+              Start a request
+            </CtaButton>
+            <span className="start-hint">Four questions. About a minute.</span>
           </div>
-        )}
+        </div>
+
+        <div className="start-doors">
+          {services.map((s, i) => (
+            <button
+              key={s.id}
+              type="button"
+              className="start-door"
+              data-reveal="right"
+              style={{ '--i': i }}
+              onClick={() => onRequest?.(s.id)}
+              aria-label={`Start a ${s.title.toLowerCase()} request`}
+            >
+              <VideoBackdrop src={film[s.id]?.src} tone="territory" className="start-door-film" />
+              <span className="start-door-body">
+                <span className="start-door-name">{s.title}</span>
+                <span className="start-door-go" aria-hidden="true">→</span>
+              </span>
+            </button>
+          ))}
+        </div>
       </div>
     </SectionShell>
   )

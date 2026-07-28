@@ -30,7 +30,14 @@ export default function Preloader() {
     }
 
     // Safety net: never leave the site locked/hidden if the timeline stalls.
-    const safety = setTimeout(() => setReady(true), 5000)
+    // Critically this must ALSO drop `is-loading` — that class pins html and
+    // body to overflow:hidden, so setting ready alone would leave a page that
+    // looks finished but cannot be scrolled by any means.
+    const safety = setTimeout(() => {
+      document.documentElement.classList.remove('is-loading')
+      setReady(true)
+      setGone(true)
+    }, 5000)
 
     const counter = { v: 0 }
     const tl = gsap.timeline()

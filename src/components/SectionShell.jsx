@@ -11,6 +11,10 @@ export default function SectionShell({
   tone = 'cream',
   bg = null,
   className = '',
+  /* One scroll stop per section is the page's whole premise, so it is declared
+     here rather than measured. Pass a higher number only for a section that is
+     deliberately multi-screen. */
+  stops = 1,
   children,
 }) {
   const ref = useSectionReveal()
@@ -19,6 +23,7 @@ export default function SectionShell({
       id={id}
       ref={ref}
       data-section={index}
+      data-stops={stops}
       className={`section tone-${tone} ${bg ? 'has-bg' : ''} ${className}`}
     >
       {bg ? <div className="section-bg-wrap">{bg}</div> : null}
