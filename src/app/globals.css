@@ -1,0 +1,341 @@
+@import "tailwindcss";
+
+/* ============================================================
+   ORYX design tokens
+
+   Palette taken from the ORYX brand work (ORYX-Landing/tokens.css,
+   extracted from ORYX_Brand_Strategy.pdf). Cream is the world.
+   Charcoal is used for exactly two moments: the hero and the closing.
+   You enter through the dark, live in the warm, and leave through the
+   dark. Two transitions in the whole experience, which is a composed
+   colour story rather than sections disagreeing with each other.
+
+   The three service territories are dark objects standing on the
+   cream page. That is an object on a surface, not a theme flip, and
+   it is what makes a territory read as a doorway.
+
+   Radius rule (locked): surfaces and panels are sharp. Interactive
+   controls are pill. Media masks use 2px. Nothing else rounds.
+   ============================================================ */
+
+@theme {
+  --color-cream: #f4efe6;
+  --color-offwhite: #fbf9f5;
+  --color-sand: #e9e2d4;
+  --color-charcoal: #1c1c1a;
+  --color-charcoalsoft: #26251f;
+
+  --color-gold: #b48a50;
+  --color-tan: #c9a66b;
+  --color-golddeep: #9a723c;
+
+  --color-taupe: #6e6a62;
+  --color-taupe2: #8a8478;
+  --color-taupe3: #b9b3a6;
+
+  --color-leaf: #7d8a5f;
+  --color-rust: #9e4b2f;
+  --color-rustlight: #c2643a;
+
+  --font-display: var(--font-instrument), Georgia, serif;
+  --font-sans: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  --font-arabic: var(--font-plex-arabic), var(--font-geist), sans-serif;
+
+  --radius-control: 999px;
+  --radius-mask: 2px;
+
+  --ease-scene: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-glide: cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+:root {
+  color-scheme: light;
+
+  /* Exactly one accent is live per scene. Scenes set --accent on
+     themselves; nothing reads a service colour directly. */
+  --accent: #b48a50;
+
+  /* Tone defaults to cream. Scenes override by setting data-tone. */
+  --surface: #f4efe6;
+  --surface-raised: #fbf9f5;
+  --ink: #1c1c1a;
+  --ink-muted: #6e6a62;
+  --ink-faint: #8a8478;
+  --line: rgba(28, 28, 26, 0.14);
+  --line-soft: rgba(28, 28, 26, 0.08);
+
+  --nav-h: 4.5rem;
+
+  /* The colour every scrim is mixed from.
+     This exists because tone used to be declared twice: once on the
+     Scene and again on the SceneMedia inside it. Miss the second one
+     and a charcoal scene paints a cream veil over its own film, which
+     is exactly how the technology scene ended up washed out and
+     unreadable. Deriving the scrim from the scene's own tone makes
+     that disagreement impossible. */
+  --scrim-rgb: 244, 239, 230;
+}
+
+[data-tone="charcoal"] {
+  --scrim-rgb: 28, 28, 26;
+  --surface: #1c1c1a;
+  --surface-raised: #26251f;
+  --ink: #f4efe6;
+  --ink-muted: #b9b3a6;
+  --ink-faint: #8a8478;
+  --line: rgba(244, 239, 230, 0.16);
+  --line-soft: rgba(244, 239, 230, 0.08);
+}
+
+* {
+  min-width: 0;
+}
+
+html {
+  background: #f4efe6;
+  /* Reserved so locking the page behind an overlay never shifts
+     layout mid shared-element transition. */
+  scrollbar-gutter: stable;
+}
+
+body {
+  background: var(--surface);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-synthesis-weight: none;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+body[data-locked="true"] {
+  position: fixed;
+  inset-inline: 0;
+  overflow: hidden;
+}
+
+/* ---------- Scrolling ----------
+   Desktop paging is handled in JS (lib/pager.ts) so one gesture moves
+   exactly one scene with a real eased transition. CSS snapping stays
+   on touch, where it is proximity only and never traps anyone. */
+@media (max-width: 1023px), (pointer: coarse) {
+  html {
+    scroll-snap-type: y proximity;
+    scroll-behavior: smooth;
+  }
+  .scene {
+    scroll-snap-align: start;
+  }
+  .scene--free {
+    scroll-snap-align: none;
+  }
+}
+
+/* ---------- Type ----------
+   Instrument Serif carries the display voice at one weight: scale and
+   colour do the emphasis, never bold. Geist handles everything read at
+   length and everything operational. */
+/* Every display step is bounded by viewport HEIGHT as well as width.
+   Sizing display type on vw alone is what was cutting scenes off: on a
+   wide, short laptop screen (1536x730 is the common one) the headline
+   grows with the width while the room it has to live in does not, so a
+   scene that fits perfectly at 1280x720 overflows by 250px at 1536x730.
+   The min() ties the type to whichever axis is scarcer. */
+.t-display {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(2.75rem, min(8.4vw, 11.5vh), 8.5rem);
+  line-height: 0.94;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+.t-display-sm {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(2rem, min(5.2vw, 7.2vh), 4.5rem);
+  line-height: 1;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+
+.t-display-xs {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(1.5rem, min(2.6vw, 3.6vh), 2.5rem);
+  line-height: 1.08;
+  letter-spacing: -0.01em;
+}
+
+/* Scenes breathe on tall screens and tighten on short ones. Padding is
+   the other half of the same problem. */
+@media (max-height: 820px) and (min-width: 1024px) {
+  .scene .t-lede {
+    font-size: 1rem;
+  }
+}
+
+/* Italic in Instrument Serif drops below the baseline further than the
+   roman. Anything italic gets the extra leading and reserve. */
+.t-em {
+  font-style: italic;
+  line-height: 1.12;
+  padding-bottom: 0.06em;
+}
+
+.t-lede {
+  font-size: clamp(1rem, 1.1vw, 1.1875rem);
+  line-height: 1.6;
+  letter-spacing: -0.005em;
+  color: var(--ink-muted);
+  max-width: 42ch;
+}
+
+/* Muted, not faint. At 11px these labels are body sized as far as
+   contrast is concerned, and --ink-faint only reaches 3.25:1 on
+   cream. --ink-muted is 4.77:1 and clears AA. */
+.t-label {
+  font-family: var(--font-sans);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+
+.t-index {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+/* ---------- Structure ---------- */
+.field-grid {
+  background-image:
+    linear-gradient(to right, var(--line-soft) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--line-soft) 1px, transparent 1px);
+  background-size: 7.5rem 7.5rem;
+  mask-image: radial-gradient(120% 90% at 50% 40%, #000 20%, transparent 78%);
+}
+
+.rule {
+  background: var(--line);
+}
+
+/* ---------- Controls ---------- */
+.control {
+  border-radius: var(--radius-control);
+  transition:
+    transform 0.35s var(--ease-scene),
+    background-color 0.35s var(--ease-scene),
+    border-color 0.35s var(--ease-scene),
+    color 0.35s var(--ease-scene),
+    opacity 0.35s var(--ease-scene);
+}
+.control:active {
+  transform: translateY(1px) scale(0.985);
+}
+
+:where(a, button, [tabindex], input, select, textarea):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+::selection {
+  background: var(--accent);
+  color: #fbf9f5;
+}
+
+/* ---------- Media ---------- */
+.scene-media {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  z-index: 0;
+}
+.scene-media video,
+.scene-media canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+/* Cinematic grade. Footage is delivered neutral and graded here, so
+   every clip agrees regardless of where it came from.
+
+   The grade is deliberately light. Earlier values pushed cream scenes
+   to brightness 1.06 and saturation 0.3, which combined with a heavy
+   scrim left the film as a pale ghost. Legibility is the scrim's job,
+   and the scrim now protects only where copy actually sits, so the
+   picture is allowed to read as a picture. */
+.scene-media video {
+  filter: saturate(0.62) contrast(1.06) brightness(0.78);
+  opacity: 0;
+  transition: opacity 1.4s var(--ease-scene);
+}
+.scene-media video[data-ready="true"] {
+  opacity: 1;
+}
+[data-tone="cream"] .scene-media video {
+  filter: saturate(0.68) contrast(1.04) brightness(0.99);
+}
+.scene-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* ---------- Grain: fixed layer only, never on scrolling nodes ---------- */
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  pointer-events: none;
+  opacity: 0.035;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ---------- Kinetic primitives ---------- */
+.mask-line {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.14em;
+  margin-bottom: -0.14em;
+}
+
+@keyframes oryx-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* ---------- Reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+    scroll-snap-type: none;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.12s !important;
+  }
+  .scene-media video {
+    opacity: 1;
+    transition: none;
+  }
+}
+
+.noscript-note {
+  padding: 2rem;
+  text-align: center;
+  color: var(--ink-muted);
+}
