@@ -6,14 +6,23 @@ export interface Chapter {
   nav?: boolean;
 }
 
+/**
+ * Five chapters, down from nine.
+ *
+ * The client's "felt like reading a newspaper" was a word-count
+ * complaint, and nine chapters each carrying a headline, a lede and a
+ * list is how a page becomes a document. Technology, Why, Values and
+ * Sustainability were four separate arguments for the same thing, so
+ * they are now one, and the detail that survives moved behind a click
+ * into the service worlds where it is opt in.
+ *
+ * The order is load-bearing. Stage3D's camera poses and Mark's split
+ * behaviour are indexed by chapter, so Services must stay at index 1.
+ */
 export const CHAPTERS: Chapter[] = [
   { id: "hero", index: "01", label: "Always ready" },
-  { id: "partner", index: "02", label: "Partner" },
-  { id: "technology", index: "03", label: "Technology", nav: true },
-  { id: "services", index: "04", label: "Services", nav: true },
-  { id: "why", index: "05", label: "Why ORYX", nav: true },
-  { id: "sustainability", index: "06", label: "Sustainability", nav: true },
-  { id: "process", index: "07", label: "Partnership" },
-  { id: "values", index: "08", label: "Values" },
-  { id: "contact", index: "09", label: "Contact", nav: true },
+  { id: "services", index: "02", label: "Services", nav: true },
+  { id: "standard", index: "03", label: "Standard", nav: true },
+  { id: "process", index: "04", label: "Process", nav: true },
+  { id: "contact", index: "05", label: "Contact", nav: true },
 ];

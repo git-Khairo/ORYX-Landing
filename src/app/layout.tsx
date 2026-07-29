@@ -1,44 +1,31 @@
 import type { Metadata, Viewport } from "next";
-import {
-  Geist,
-  Geist_Mono,
-  IBM_Plex_Sans_Arabic,
-  Instrument_Serif,
-} from "next/font/google";
+import { Archivo } from "next/font/google";
 import "./globals.css";
 
-/* Display voice. One weight, plus italic for emphasis inside a
-   headline: emphasis stays in the same family, it never switches to a
-   second typeface. */
-const instrument = Instrument_Serif({
+/**
+ * One family, three jobs.
+ *
+ * Instrument Serif plus Geist plus Geist Mono was three typefaces
+ * doing the work of one, and that particular stack is a very legible
+ * design-agency signature, which is part of what read as corporate.
+ *
+ * Archivo is variable on both weight (100-900) and width (62-125).
+ * The width axis is what makes it a system rather than a font:
+ * expanded carries display, normal carries reading, condensed carries
+ * operational labels and numerals. That last one replaces the
+ * monospace without wearing a monospace costume.
+ *
+ * `wght` is variable by default; `wdth` has to be asked for.
+ */
+const archivo = Archivo({
   subsets: ["latin"],
-  variable: "--font-instrument",
+  variable: "--font-archivo",
+  axes: ["wdth"],
   display: "swap",
-  weight: ["400"],
-  style: ["normal", "italic"],
 });
 
-const geist = Geist({
-  subsets: ["latin"],
-  variable: "--font-geist",
-  display: "swap",
-  weight: ["300", "400", "500", "600"],
-});
-
-const geistMono = Geist_Mono({
-  subsets: ["latin"],
-  variable: "--font-geist-mono",
-  display: "swap",
-  weight: ["400", "500"],
-});
-
-// Loaded now so Arabic can be switched on without a type migration.
-const plexArabic = IBM_Plex_Sans_Arabic({
-  subsets: ["arabic"],
-  variable: "--font-plex-arabic",
-  display: "swap",
-  weight: ["300", "400", "500"],
-});
+/* IBM Plex Sans Arabic was being downloaded on every page load and
+   rendered nowhere. It comes back when Arabic actually ships. */
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://oryx.nl"),
@@ -66,8 +53,8 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#1c1c1a",
-  colorScheme: "light",
+  themeColor: "#07080a",
+  colorScheme: "dark",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
@@ -79,15 +66,48 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
+    /* data-palette selects one of the three candidate palettes in
+       tokens.css. It is deliberately server-rendered rather than set
+       by script, so the first paint is already the right colour and
+       there is no flash. Swapping this one attribute restyles the DOM
+       and recolours the 3D in the same frame. */
+    /* suppressHydrationWarning is required, not lazy.
+       The script below deliberately rewrites data-palette before React
+       hydrates, so the server markup and the live DOM genuinely differ
+       on that one attribute. This is the standard escape hatch for a
+       pre-paint theme script, and it is scoped to this element only:
+       mismatches anywhere inside still warn normally. */
     <html
       lang="en"
       dir="ltr"
-      className={`${instrument.variable} ${geist.variable} ${geistMono.variable} ${plexArabic.variable}`}
+      data-palette="steel"
+      className={archivo.variable}
+      suppressHydrationWarning
     >
-      <body data-tone="cream">
+      <head>
+        {/*
+          Palette override from the URL, for the review gate.
+          ?palette=steel | acid | amber
+
+          Inline and blocking on purpose. Doing this in an effect would
+          paint the default palette first and then snap, which is
+          exactly the wrong impression to give someone who is being
+          asked to choose between three. It runs before first paint,
+          so each link simply opens in its own colour.
+
+          It only ever writes one of three known values onto an
+          attribute, so there is nothing here a URL can inject.
+        */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var p=new URLSearchParams(location.search).get('palette');if(p==='steel'||p==='acid'||p==='amber'){document.documentElement.setAttribute('data-palette',p);}}catch(e){}})();`,
+          }}
+        />
+      </head>
+      <body>
         <a
           href="#main"
-          className="control sr-only focus:not-sr-only focus:fixed focus:left-6 focus:top-6 focus:z-[200] focus:bg-charcoal focus:px-5 focus:py-3 focus:text-sm focus:text-cream"
+          className="control sr-only focus:not-sr-only focus:fixed focus:left-6 focus:top-6 focus:z-[200] focus:bg-[color:var(--accent)] focus:px-5 focus:py-3 focus:text-sm focus:text-[color:var(--accent-ink)]"
         >
           Skip to content
         </a>

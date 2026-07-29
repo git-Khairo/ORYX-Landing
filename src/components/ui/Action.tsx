@@ -6,18 +6,19 @@ import { ArrowRight, ArrowLeft } from "@phosphor-icons/react";
 type Variant = "primary" | "ghost" | "quiet";
 
 /**
- * The only button in the system. Pill radius, contrast checked against
- * both tones of the world, the cream scenes and the three charcoal
- * moments.
+ * The only button in the system. Pill radius, one dark stage.
  *
- * The primary fill is pinned to brand gold with charcoal text, and it
- * does not follow the scene accent. That is a contrast decision, not a
- * stylistic one: no single text colour clears AA against all four
- * accents. Gold on charcoal is 5.44:1 and leaf is 4.61:1, but rust
- * with charcoal is 2.85:1, while flipping to light text breaks gold
- * (2.98:1) and leaf (3.52:1). So the accent lives in rules, numerals
- * and underlines, and the one filled control in the system stays gold
- * with charcoal type everywhere. Ghost and quiet follow the scene.
+ * The old note here described gold on cream and a rule that no single
+ * text colour cleared AA against four accents. Inverting the world
+ * dissolved that problem: every accent now sits on a near black base,
+ * and the filled control pairs `--accent` with `--accent-ink`, which
+ * is the token that exists precisely so a fill always knows what
+ * colour its own label should be. Each palette declares that pairing
+ * once, so a filled button is correct in all three by construction
+ * rather than by audit.
+ *
+ * The accent still never carries body text. It carries fills, rules,
+ * numerals and edges.
  */
 export function Action({
   variant = "primary",
@@ -32,9 +33,9 @@ export function Action({
 } & ButtonHTMLAttributes<HTMLButtonElement>) {
   const styles: Record<Variant, string> = {
     primary:
-      "bg-gold text-charcoal hover:bg-tan border border-transparent",
+      "bg-[color:var(--accent)] text-[color:var(--accent-ink)] border border-transparent hover:brightness-110",
     ghost:
-      "border border-[color:color-mix(in_oklab,var(--ink)_34%,transparent)] text-[color:var(--ink)] hover:border-[color:var(--accent)] hover:text-[color:var(--accent)] bg-[color:color-mix(in_oklab,var(--surface)_55%,transparent)] backdrop-blur-sm",
+      "border border-[color:color-mix(in_oklab,var(--ink)_34%,transparent)] text-[color:var(--ink)] hover:border-[color:var(--accent)] hover:text-[color:var(--accent)] bg-[color:color-mix(in_oklab,var(--base)_55%,transparent)] backdrop-blur-sm",
     quiet:
       "border border-transparent text-[color:var(--ink-muted)] hover:text-[color:var(--ink)]",
   };

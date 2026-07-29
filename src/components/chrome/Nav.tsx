@@ -30,7 +30,7 @@ export function Nav() {
   const pauseTimer = useRef<number | null>(null);
   const last = useRef(0);
 
-  const tone = useExperience((s) => s.sceneTone);
+  
   const activeScene = useExperience((s) => s.activeScene);
   const openContact = useExperience((s) => s.openContact);
   const serviceOpen = useExperience((s) => s.activeService !== null);
@@ -67,7 +67,8 @@ export function Nav() {
 
   // The bar has no surface of its own, so it borrows the ink of the
   // scene it is floating over.
-  const ink = tone === "charcoal" ? "#f4efe6" : "#1c1c1a";
+  // One tone now, so the chrome no longer has to guess.
+  const ink = "var(--ink)";
 
   return (
     <>
@@ -81,10 +82,10 @@ export function Nav() {
           className="pointer-events-none absolute inset-0 transition-opacity duration-500"
           style={{
             opacity: lifted && !menuOpen ? 1 : 0,
+            /* One tone, so one gradient. It fades the stage out under
+               the bar rather than covering it. */
             background:
-              tone === "charcoal"
-                ? "linear-gradient(to bottom, rgba(28,28,26,0.86), rgba(28,28,26,0))"
-                : "linear-gradient(to bottom, rgba(244,239,230,0.92), rgba(244,239,230,0))",
+              "linear-gradient(to bottom, color-mix(in oklab, var(--base) 88%, transparent), transparent)",
             backdropFilter: "blur(6px)",
             maskImage: "linear-gradient(to bottom, #000 55%, transparent)",
           }}
@@ -162,7 +163,7 @@ export function Nav() {
                         role="menuitem"
                         type="button"
                         disabled={!l.ready}
-                        className="flex w-full items-center justify-between px-3 py-2.5 text-left text-[0.8125rem] transition-colors hover:bg-sand disabled:cursor-not-allowed disabled:opacity-45"
+                        className="flex w-full items-center justify-between px-3 py-2.5 text-left text-[0.8125rem] transition-colors hover:bg-[color:var(--surface-raised)] disabled:cursor-not-allowed disabled:opacity-45"
                       >
                         <span>{l.label}</span>
                         {l.ready ? (
@@ -209,8 +210,8 @@ export function Nav() {
       <AnimatePresence>
         {menuOpen && (
           <motion.div
-            data-tone="charcoal"
-            className="fixed inset-0 z-[95] bg-charcoal text-[color:var(--ink)] lg:hidden"
+            
+            className="fixed inset-0 z-[95] bg-[color:var(--base)] text-[color:var(--ink)] lg:hidden"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}

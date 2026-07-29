@@ -2,8 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { Check, PencilSimple, ArrowClockwise } from "@phosphor-icons/react";
-import { OperationalCanvas } from "@/components/media/OperationalCanvas";
+import { Check, PencilSimple, Warning } from "@phosphor-icons/react";
 import { OryxMark } from "@/components/brand/OryxMark";
 import { Action } from "@/components/ui/Action";
 import { JOURNEYS, type Service, type Step } from "@/lib/content";
@@ -17,19 +16,21 @@ const pad = (n: number) => String(n).padStart(2, "0");
 /**
  * One question per screen, shaped to the service.
  *
- * The environment responds to progress: the operational drawing behind
- * the questions resolves as the brief becomes complete. Transportation
- * moves between steps, cleaning clears, facility connects.
+ * The journey sits on the dark stage with no picture behind it. The
+ * only thing that responds to progress is a low accent wash rising from
+ * the foot of the screen, so the surface warms as the brief becomes
+ * complete without ever competing with the question.
  *
- * The journey is a cream surface with charcoal ink, so the drawing
- * behind it is painted in its light tone and washed back with cream.
+ * Composition: the question holds a column of its own at display scale,
+ * with the step numeral set in the display face beside it, and the
+ * options answer it from the wider column. Position is carried by a
+ * segmented rail across the top edge, one segment per question, so the
+ * visitor can see where they are and how much is left without reading
+ * a number.
  *
- * Composition: the question holds a column of its own at display
- * scale, with the step numeral set in the display face beside it, and
- * the options answer it from the wider column. Position is carried by
- * a segmented rail across the top edge, one segment per question, so
- * the visitor can see where they are and how much is left without
- * reading a number.
+ * Colour note. Every value below resolves from the palette variables.
+ * The accent carries rules, numerals, edges and fills, never a word,
+ * because none of the three accents clears 4.5:1 as text on its base.
  */
 export function Journey({ service }: { service: Service }) {
   const steps = JOURNEYS[service.id];
@@ -134,7 +135,6 @@ export function Journey({ service }: { service: Service }) {
   if (status === "success") {
     return (
       <Success
-        service={service}
         reference={reference}
         onClose={() => {
           closeContact();
@@ -146,22 +146,23 @@ export function Journey({ service }: { service: Service }) {
 
   return (
     <div className="relative flex h-full flex-col">
-      {/* The environment responds to how complete the brief is. */}
-      <div className="pointer-events-none absolute inset-0 z-0" aria-hidden="true">
+      {/* The environment responds to how complete the brief is. One
+          wash, rising from the foot of the screen, built from the
+          palette accent so it is correct in every palette. */}
+      <div
+        className="pointer-events-none absolute inset-0 z-0"
+        aria-hidden="true"
+      >
         <motion.div
           className="absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(130% 68% at 50% 118%, rgba(var(--accent-rgb), 0.5), transparent 70%)",
+          }}
           initial={false}
-          animate={{ opacity: 0.14 + progress * 0.4 }}
-          transition={{ duration: 1.1, ease: EASE }}
-        >
-          <OperationalCanvas
-            variant={service.media}
-            accent={service.accent}
-            tone="light"
-            className="h-full w-full"
-          />
-        </motion.div>
-        <div className="absolute inset-0 bg-gradient-to-t from-cream via-cream/85 to-cream/70" />
+          animate={{ opacity: 0.06 + progress * 0.16 }}
+          transition={{ duration: reduce ? 0.2 : 1.1, ease: EASE }}
+        />
       </div>
 
       {/* Position and remainder, read as a shape before it is read as a
@@ -171,16 +172,17 @@ export function Journey({ service }: { service: Service }) {
           {steps.map((s, i) => {
             const done = reviewing || i <= index;
             return (
-              <motion.span
+              <span
                 key={s.id}
-                className="block h-[3px] flex-1 origin-left"
-                initial={false}
-                animate={{
-                  backgroundColor: done ? service.accent : "rgba(28,28,26,0.12)",
-                  opacity: done || i === index + 1 ? 1 : 0.75,
-                }}
-                transition={{ duration: reduce ? 0.15 : 0.55, ease: EASE }}
-              />
+                className="block h-[2px] flex-1 bg-[color:var(--line)]"
+              >
+                <motion.span
+                  className="block h-full w-full origin-left bg-[color:var(--accent)]"
+                  initial={false}
+                  animate={{ scaleX: done ? 1 : 0 }}
+                  transition={{ duration: reduce ? 0.15 : 0.55, ease: EASE }}
+                />
+              </span>
             );
           })}
         </div>
@@ -197,7 +199,7 @@ export function Journey({ service }: { service: Service }) {
         </div>
       </div>
 
-      <div className="relative z-10 min-h-0 flex-1 overflow-y-auto overscroll-contain px-6 py-10 sm:px-10 lg:px-14 lg:py-14">
+      <div className="relative z-10 min-h-0 flex-1 overflow-y-auto overscroll-contain px-6 py-10 sm:px-10 lg:px-14 lg:py-16">
         <div className="mx-auto w-full max-w-[104rem]">
           <AnimatePresence mode="wait">
             {reviewing ? (
@@ -228,19 +230,18 @@ export function Journey({ service }: { service: Service }) {
               >
                 <div className="lg:col-span-5">
                   <div className="flex items-start gap-5">
-                    {/* The step numeral in the display face. Large type,
-                        so the accent clears the 3:1 a display size needs
-                        on cream even at leaf. It repeats the counter in
-                        the rail, so nothing depends on reading it. */}
+                    {/* The step numeral in the display face. A numeral
+                        is one of the few things the accent is allowed to
+                        carry, and it repeats the counter in the rail, so
+                        nothing depends on reading it. */}
                     <span
-                      className="t-display-xs shrink-0 pt-1 text-[clamp(1.5rem,2.2vw,2.1rem)] leading-none"
-                      style={{ color: service.accent }}
+                      className="t-display-xs shrink-0 pt-1 text-[clamp(1.5rem,2.2vw,2.1rem)] leading-none text-[color:var(--accent)]"
                       aria-hidden="true"
                     >
                       {pad(index + 1)}
                     </span>
                     <div className="min-w-0">
-                      <h2 className="t-display-sm max-w-[18ch] text-[clamp(1.9rem,4.2vw,3.6rem)]">
+                      <h2 className="t-display-sm max-w-[18ch] text-[clamp(1.9rem,4vw,3.4rem)]">
                         {current.prompt}
                       </h2>
 
@@ -262,7 +263,6 @@ export function Journey({ service }: { service: Service }) {
                         setAnswer(current.id, v);
                         window.setTimeout(() => setStep(index + 1), 180);
                       }}
-                      accent={service.accent}
                     />
                   ) : null}
 
@@ -272,7 +272,6 @@ export function Journey({ service }: { service: Service }) {
                       multi
                       selectedMany={(answers[current.id] as string[]) ?? []}
                       onSelect={(v) => toggleAnswer(current.id, v)}
-                      accent={service.accent}
                     />
                   ) : null}
 
@@ -284,7 +283,6 @@ export function Journey({ service }: { service: Service }) {
                         setDetails(patch);
                         setFieldErrors({});
                       }}
-                      accent={service.accent}
                     />
                   ) : null}
                 </div>
@@ -295,17 +293,9 @@ export function Journey({ service }: { service: Service }) {
       </div>
 
       {/* Controls */}
-      <div className="relative z-10 shrink-0 border-t border-[color:var(--line-soft)] bg-[color:color-mix(in_oklab,var(--surface)_88%,transparent)] px-6 py-5 backdrop-blur-sm sm:px-10 lg:px-14">
+      <div className="relative z-10 shrink-0 border-t border-[color:var(--line-soft)] bg-[color:color-mix(in_oklab,var(--base)_88%,transparent)] px-6 py-5 backdrop-blur-sm sm:px-10 lg:px-14">
         <div className="mx-auto w-full max-w-[104rem]">
-          {status === "error" ? (
-            <p
-              role="alert"
-              className="mb-4 flex items-center gap-2 text-sm text-[#9e4b2f]"
-            >
-              <ArrowClockwise size={15} />
-              {errorMessage}
-            </p>
-          ) : null}
+          {status === "error" ? <Alert>{errorMessage}</Alert> : null}
 
           <div className="flex items-center justify-between gap-4">
             <Action variant="quiet" arrow="left" onClick={back}>
@@ -313,7 +303,11 @@ export function Journey({ service }: { service: Service }) {
             </Action>
 
             {reviewing ? (
-              <Action onClick={submit} disabled={status === "submitting"}>
+              <Action
+                onClick={submit}
+                disabled={status === "submitting"}
+                style={{ color: "var(--accent-ink)" }}
+              >
                 {status === "submitting" ? "Sending" : "Send request"}
               </Action>
             ) : current.kind === "single" ? (
@@ -321,7 +315,11 @@ export function Journey({ service }: { service: Service }) {
                 Choose one to continue
               </p>
             ) : (
-              <Action onClick={advance} disabled={!canContinue}>
+              <Action
+                onClick={advance}
+                disabled={!canContinue}
+                style={{ color: "var(--accent-ink)" }}
+              >
                 {current.kind === "details" ? "Review request" : "Continue"}
               </Action>
             )}
@@ -335,6 +333,32 @@ export function Journey({ service }: { service: Service }) {
 /* ------------------------------------------------------------------ */
 
 /**
+ * The error voice.
+ *
+ * There is no red in this system, and inventing one would break the
+ * two palettes it was not picked against. So the accent carries the
+ * signal through the icon and the edge rule, and the words themselves
+ * stay in --ink at roughly 17:1. Accent text would sit near 3.6:1 in
+ * the steel palette and fail outright. role="alert" and the icon mean
+ * the state never depends on colour at all.
+ */
+function Alert({ children }: { children: React.ReactNode }) {
+  return (
+    <p
+      role="alert"
+      className="mb-4 flex items-start gap-2.5 border-l-2 border-[color:var(--accent)] py-0.5 pl-3.5 text-sm leading-relaxed text-[color:var(--ink)]"
+    >
+      <Warning
+        size={16}
+        weight="fill"
+        className="mt-0.5 shrink-0 text-[color:var(--accent)]"
+      />
+      {children}
+    </p>
+  );
+}
+
+/**
  * The selector.
  *
  * Each option is a sharp panel with an index gutter, which is what
@@ -342,7 +366,8 @@ export function Journey({ service }: { service: Service }) {
  * control. Selection is carried three ways at once: the edge bar, the
  * border colour and the marker fill, so it never depends on colour
  * alone. Borders are --ink-faint rather than --line, because a form
- * control needs a 3:1 boundary against the surface.
+ * control needs a 3:1 boundary against the surface and a 14% hairline
+ * does not reach it.
  */
 function SelectorGrid({
   step,
@@ -350,14 +375,12 @@ function SelectorGrid({
   selectedMany = [],
   multi = false,
   onSelect,
-  accent,
 }: {
   step: Step;
   selected?: string;
   selectedMany?: string[];
   multi?: boolean;
   onSelect: (value: string) => void;
-  accent: string;
 }) {
   const reduce = useReducedMotion();
 
@@ -384,19 +407,16 @@ function SelectorGrid({
               ease: EASE,
             }}
             whileTap={reduce ? undefined : { scale: 0.99 }}
-            className="group relative flex min-h-[4.75rem] items-stretch overflow-hidden border text-left transition-colors duration-300"
+            className="group relative flex min-h-[4.5rem] items-stretch overflow-hidden border text-left transition-colors duration-300"
             style={{
-              borderColor: on ? accent : "var(--ink-faint)",
+              borderColor: on ? "var(--accent)" : "var(--ink-faint)",
               background: on
-                ? `color-mix(in oklab, ${accent} 11%, var(--surface-raised))`
-                : "var(--surface-raised)",
+                ? "color-mix(in oklab, var(--accent) 12%, var(--raised))"
+                : "var(--raised)",
             }}
           >
             <span
-              className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100"
-              style={{
-                background: `color-mix(in oklab, ${accent} 7%, transparent)`,
-              }}
+              className="pointer-events-none absolute inset-0 bg-[color:color-mix(in_oklab,var(--accent)_7%,transparent)] opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100"
               aria-hidden="true"
             />
 
@@ -405,7 +425,7 @@ function SelectorGrid({
               className="relative z-10 flex w-10 shrink-0 items-center justify-center border-r text-[0.625rem] transition-colors duration-300"
               style={{
                 borderColor: on
-                  ? `color-mix(in oklab, ${accent} 45%, transparent)`
+                  ? "color-mix(in oklab, var(--accent) 45%, transparent)"
                   : "var(--line)",
                 color: on ? "var(--ink)" : "var(--ink-muted)",
                 fontFamily: "var(--font-mono)",
@@ -429,25 +449,26 @@ function SelectorGrid({
                 ) : null}
               </span>
 
+              {/* Marker. Filled it becomes an accent chip, and the tick
+                  inside it is --accent-ink through currentColor, which
+                  is the one pairing guaranteed to read on the fill. */}
               <span
                 className="flex h-[1.125rem] w-[1.125rem] shrink-0 items-center justify-center border transition-colors duration-300"
                 style={{
-                  borderColor: on ? accent : "var(--ink-faint)",
-                  background: on ? accent : "transparent",
+                  borderColor: on ? "var(--accent)" : "var(--ink-faint)",
+                  background: on ? "var(--accent)" : "transparent",
+                  color: "var(--accent-ink)",
                   borderRadius: multi ? 2 : 999,
                 }}
                 aria-hidden="true"
               >
-                {on ? <Check size={11} weight="bold" color="#f4efe6" /> : null}
+                {on ? <Check size={11} weight="bold" /> : null}
               </span>
             </span>
 
             <span
-              className="absolute inset-y-0 left-0 z-10 block w-[2px] origin-top transition-transform duration-300"
-              style={{
-                background: accent,
-                transform: `scaleY(${on ? 1 : 0})`,
-              }}
+              className="absolute inset-y-0 left-0 z-10 block w-[2px] origin-top bg-[color:var(--accent)] transition-transform duration-300"
+              style={{ transform: `scaleY(${on ? 1 : 0})` }}
               aria-hidden="true"
             />
           </motion.button>
@@ -476,7 +497,15 @@ function Field({
         <span className="text-xs text-[color:var(--ink-muted)]">{hint}</span>
       ) : null}
       {error ? (
-        <span role="alert" className="text-xs text-[#9e4b2f]">
+        <span
+          role="alert"
+          className="flex items-start gap-1.5 text-xs leading-relaxed text-[color:var(--ink)]"
+        >
+          <Warning
+            size={13}
+            weight="fill"
+            className="mt-[0.15rem] shrink-0 text-[color:var(--accent)]"
+          />
           {error}
         </span>
       ) : null}
@@ -484,23 +513,21 @@ function Field({
   );
 }
 
-/* Field borders use --ink-faint rather than --line: on cream a 14%
-   hairline is below the 3:1 a form control needs. The placeholder is
-   --ink-muted for the same reason, it was tuned for a dark field and
-   was far too light on this surface. */
+/* Field borders use --ink-faint rather than --line: a 14% hairline is
+   below the 3:1 a form control needs against the raised surface. The
+   placeholder is --ink-muted for the same reason, --ink-faint is for
+   rules and disabled states and never for text that has to be read. */
 const inputClass =
-  "w-full border border-[color:var(--ink-faint)] bg-[color:var(--surface-raised)] px-4 py-3.5 text-base text-[color:var(--ink)] placeholder:text-[color:var(--ink-muted)] transition-colors focus:border-[color:var(--accent)] focus:outline-none";
+  "w-full border border-[color:var(--ink-faint)] bg-[color:var(--raised)] px-4 py-3.5 text-base text-[color:var(--ink)] placeholder:text-[color:var(--ink-muted)] transition-colors focus:border-[color:var(--accent)] focus:outline-none";
 
 function DetailsForm({
   details,
   errors,
   onChange,
-  accent,
 }: {
   details: Details;
   errors: Record<string, string>;
   onChange: (patch: Partial<Details>) => void;
-  accent: string;
 }) {
   return (
     <div className="grid gap-6 sm:grid-cols-2">
@@ -536,7 +563,11 @@ function DetailsForm({
         />
       </Field>
 
-      <Field label="Phone" error={errors.phone} hint="Optional unless you prefer a call.">
+      <Field
+        label="Phone"
+        error={errors.phone}
+        hint="Optional unless you prefer a call."
+      >
         <input
           className={inputClass}
           type="tel"
@@ -561,14 +592,15 @@ function DetailsForm({
                 aria-pressed={on}
                 className="px-6 py-2.5 text-sm capitalize transition-colors duration-300"
                 style={{
-                  // Selected reads as an accent tint under charcoal type.
-                  // A solid accent fill cannot carry legible label text at
-                  // this size against any of the three service colours.
+                  // Selected is an accent tint under --ink type, not a
+                  // solid accent fill. A fill would force --accent-ink
+                  // at 14px, which is legible but reads as a second
+                  // primary button next to the real one.
                   background: on
-                    ? `color-mix(in oklab, ${accent} 16%, transparent)`
+                    ? "color-mix(in oklab, var(--accent) 16%, transparent)"
                     : "transparent",
                   color: on ? "var(--ink)" : "var(--ink-muted)",
-                  boxShadow: on ? `inset 0 0 0 1px ${accent}` : "none",
+                  boxShadow: on ? "inset 0 0 0 1px var(--accent)" : "none",
                 }}
               >
                 {k}
@@ -600,10 +632,11 @@ function DetailsForm({
 /**
  * The brief.
  *
- * Not a definition list with buttons on it. A document: a header strip
- * that names the service and the company it is for, numbered lines in
- * the order they were asked, and the contact block set apart at the
- * foot the way a real operational sheet carries its sender.
+ * Not a definition list with buttons on it, and no longer a boxed card
+ * either. A document set straight on the stage: numbered lines in the
+ * order they were asked, separated by hairlines, with the contact block
+ * set apart at the foot the way an operational sheet carries its
+ * sender.
  */
 function Summary({
   service,
@@ -640,7 +673,7 @@ function Summary({
   return (
     <div className="grid gap-10 lg:grid-cols-12 lg:gap-16">
       <div className="lg:col-span-4">
-        <h2 className="t-display-sm max-w-[14ch] text-[clamp(1.9rem,4.2vw,3.6rem)]">
+        <h2 className="t-display-sm max-w-[14ch] text-[clamp(1.9rem,4vw,3.4rem)]">
           Your operational brief.
         </h2>
         <p className="mt-5 max-w-[36ch] text-sm leading-relaxed text-[color:var(--ink-muted)]">
@@ -648,8 +681,7 @@ function Summary({
         </p>
 
         <div
-          className="mt-8 h-px w-16"
-          style={{ background: service.accent }}
+          className="mt-8 h-px w-16 bg-[color:var(--accent)]"
           aria-hidden="true"
         />
 
@@ -676,26 +708,12 @@ function Summary({
       </div>
 
       <div className="lg:col-span-8">
-        <div className="border border-[color:var(--line)] bg-[color:var(--surface-raised)]">
-          <div className="flex items-center justify-between gap-4 border-b border-[color:var(--line)] px-5 py-3.5">
-            <span className="flex items-center gap-3">
-              <span
-                className="block h-1.5 w-1.5"
-                style={{ background: service.accent }}
-                aria-hidden="true"
-              />
-              <span className="t-label">{service.name}</span>
-            </span>
-            <span className="t-index truncate text-[0.6875rem] text-[color:var(--ink-muted)]">
-              {details.company || "Company"}
-            </span>
-          </div>
-
+        <div className="border-t border-[color:var(--line)]">
           <dl>
             {questions.map((s, i) => (
               <div
                 key={s.id}
-                className="border-b border-[color:var(--line-soft)] px-5 py-5"
+                className="border-b border-[color:var(--line-soft)] py-5"
               >
                 <dt className="t-label flex items-baseline gap-4">
                   <span className="t-index w-6 shrink-0" aria-hidden="true">
@@ -712,8 +730,7 @@ function Summary({
                           className="flex items-center gap-2 text-[0.9375rem] leading-snug text-[color:var(--ink)]"
                         >
                           <span
-                            className="block h-px w-3 shrink-0"
-                            style={{ background: service.accent }}
+                            className="block h-px w-3 shrink-0 bg-[color:var(--accent)]"
                             aria-hidden="true"
                           />
                           {v}
@@ -734,7 +751,7 @@ function Summary({
               </div>
             ))}
 
-            <div className="bg-[color:var(--surface)] px-5 py-5">
+            <div className="border-b border-[color:var(--line)] py-5">
               <dt className="t-label flex items-baseline gap-4">
                 <span className="t-index w-6 shrink-0" aria-hidden="true">
                   {pad(questions.length + 1)}
@@ -752,10 +769,7 @@ function Summary({
                       : details.email}
                   </span>
                   {details.notes ? (
-                    <span
-                      className="mt-4 block max-w-[52ch] border-l-2 pl-4 text-sm leading-relaxed text-[color:var(--ink-muted)]"
-                      style={{ borderColor: service.accent }}
-                    >
+                    <span className="mt-4 block max-w-[52ch] border-l-2 border-[color:var(--accent)] pl-4 text-sm leading-relaxed text-[color:var(--ink-muted)]">
                       {details.notes}
                     </span>
                   ) : null}
@@ -806,14 +820,13 @@ function EditButton({
  *
  * The line is the whole moment, so it is set at the scale the rest of
  * the experience gives a closing statement, and everything else
- * arrives after it in sequence.
+ * arrives after it in sequence. Nothing is drawn behind it: an empty
+ * dark stage is the calmest way to end a form.
  */
 function Success({
-  service,
   reference,
   onClose,
 }: {
-  service: Service;
   reference: string;
   onClose: () => void;
 }) {
@@ -831,16 +844,13 @@ function Success({
 
   return (
     <div className="relative flex h-full items-center justify-center overflow-hidden px-6 py-12 sm:px-10">
-      <div className="pointer-events-none absolute inset-0 opacity-45" aria-hidden="true">
-        <OperationalCanvas
-          variant="routes"
-          accent={service.accent}
-          tone="light"
-          className="h-full w-full"
-        />
-      </div>
       <div
-        className="absolute inset-0 bg-gradient-to-b from-cream/90 via-cream/70 to-cream/95"
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(120% 60% at 50% 108%, rgba(var(--accent-rgb), 0.5), transparent 68%)",
+          opacity: 0.16,
+        }}
         aria-hidden="true"
       />
 
@@ -857,14 +867,13 @@ function Success({
         </motion.span>
 
         <motion.span
-          className="mt-9 block h-px w-14"
-          style={{ background: service.accent }}
+          className="mt-9 block h-px w-14 bg-[color:var(--accent)]"
           {...rise(0.12)}
           aria-hidden="true"
         />
 
         <motion.h2
-          className="t-display-sm mt-9 text-[clamp(2.1rem,5vw,4.25rem)]"
+          className="t-display-sm mt-9 text-[clamp(2.1rem,4.6vw,4rem)]"
           {...rise(0.2)}
         >
           Your request is in motion.
@@ -880,7 +889,7 @@ function Success({
 
         {reference ? (
           <motion.p
-            className="mt-10 inline-flex items-center gap-3 border border-[color:var(--line)] bg-[color:var(--surface-raised)] px-5 py-3"
+            className="mt-10 inline-flex items-center gap-3 border border-[color:var(--line)] bg-[color:var(--raised)] px-5 py-3"
             {...rise(0.42)}
           >
             <span className="t-label">Reference</span>

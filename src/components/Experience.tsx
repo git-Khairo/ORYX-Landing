@@ -7,19 +7,16 @@ import { Nav } from "@/components/chrome/Nav";
 import { JourneyRail } from "@/components/chrome/JourneyRail";
 import { SceneTracker } from "@/components/chrome/SceneTracker";
 import { Hero } from "@/components/scenes/Hero";
-import { Partner } from "@/components/scenes/Partner";
-import { Technology } from "@/components/scenes/Technology";
-import { WhyOryx } from "@/components/scenes/WhyOryx";
-import { Sustainability } from "@/components/scenes/Sustainability";
+import { Standard } from "@/components/scenes/Standard";
 import { Process } from "@/components/scenes/Process";
-import { Values } from "@/components/scenes/Values";
-import { Closing } from "@/components/scenes/Closing";
+import { Contact } from "@/components/scenes/Contact";
 import { ServiceSelector } from "@/components/services/ServiceSelector";
 import { ServiceWorld } from "@/components/services/ServiceWorld";
 import { ContactGateway } from "@/components/contact/ContactGateway";
 import { SERVICES, serviceById, type ServiceId } from "@/lib/content";
 import { useExperience } from "@/lib/store";
 import { usePager } from "@/lib/pager";
+import { Particles } from "@/components/art/Particles";
 
 const isServiceId = (v: string): v is ServiceId =>
   SERVICES.some((s) => s.id === v);
@@ -87,21 +84,22 @@ export function Experience() {
 
   return (
     <>
+      {/* Ambient dust in the live accent, behind everything. */}
+      <Particles />
       <Opening />
       <SceneTracker />
       <Nav />
       <JourneyRail />
 
+      {/* Five chapters. The order matches lib/chapters.ts and is read
+          by the stage: Stage3D indexes its camera poses by chapter and
+          Mark splits the object at index 1, so Services stays second. */}
       <main id="main">
         <Hero />
-        <Partner />
-        <Technology />
         <ServiceSelector onOpen={open} />
-        <WhyOryx />
-        <Sustainability />
+        <Standard />
         <Process />
-        <Values />
-        <Closing />
+        <Contact />
       </main>
 
       <AnimatePresence>

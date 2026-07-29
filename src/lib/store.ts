@@ -21,8 +21,7 @@ interface ExperienceState {
   /* Where the visitor is in the journey. Fed by SceneTracker, read by
      the navigation and the journey rail so both stay in one truth. */
   activeScene: string;
-  sceneTone: "charcoal" | "cream";
-  setScene: (id: string, tone: "charcoal" | "cream") => void;
+  setScene: (id: string) => void;
 
   /* Expanded service world */
   activeService: ServiceId | null;
@@ -65,8 +64,7 @@ export const useExperience = create<ExperienceState>()(
   persist(
     (set) => ({
       activeScene: "hero",
-      sceneTone: "cream",
-      setScene: (activeScene, sceneTone) => set({ activeScene, sceneTone }),
+      setScene: (activeScene) => set({ activeScene }),
 
       activeService: null,
       openService: (id) => set({ activeService: id }),

@@ -3,15 +3,15 @@
 import { motion, useReducedMotion } from "motion/react";
 import type { ReactNode } from "react";
 
+/** Kept for the Scene signature. There is one tone now. */
 export type Tone = "cream" | "charcoal";
 
 /**
  * A scene is one moment in the ORYX world.
  *
- * It owns its tone and its accent. Exactly one accent is live at a
- * time, and tone is either the warm world or one of the three
- * charcoal moments. Everything downstream reads `--ink`, `--surface`
- * and `--accent`, so no component ever hard codes a colour.
+ * It owns its accent. Exactly one is live at a time, and everything
+ * downstream reads `--ink`, `--surface` and `--accent`, so no
+ * component ever hard codes a colour.
  *
  * `free` opts a scene out of snapping when its story needs scroll
  * length, so the visitor is never held inside a tall section.
@@ -39,13 +39,17 @@ export function Scene({
       aria-label={label}
       data-scene={id}
       data-tone={tone}
-      className={`scene ${free ? "scene--free" : ""} relative isolate w-full ${
+      /* Transparent, and no `isolate`.
+         Each scene carries its own illustration behind its copy at
+         -z-10. A background here would cover it, and `isolate` would
+         create a stacking context the art could not sit beneath. The
+         base colour lives on <body>. */
+      className={`scene ${free ? "scene--free" : ""} relative z-10 w-full ${
         free ? "" : "min-h-[100svh]"
       } ${className}`}
       style={
         {
           ...(accent ? { ["--accent" as string]: accent } : {}),
-          background: "var(--surface)",
           color: "var(--ink)",
         } as React.CSSProperties
       }
@@ -100,13 +104,22 @@ export function Marker({
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
-/** Entrance. Fades only under reduced motion. */
+/**
+ * Entrance, and exit.
+ *
+ * `once` now defaults to false, so content reveals as a scene arrives
+ * and unwinds as it leaves. Scrolling back up is as alive as scrolling
+ * down, which is what stops a long page feeling like a document you
+ * have already read. Pass `once` where a thing should stay put.
+ *
+ * Fades only under reduced motion.
+ */
 export function Reveal({
   children,
   delay = 0,
   y = 24,
   className = "",
-  once = true,
+  once = false,
 }: {
   children: ReactNode;
   delay?: number;
@@ -152,7 +165,7 @@ export function MaskLines({
             className="block"
             initial={reduce ? { opacity: 0 } : { opacity: 0, y: "108%" }}
             whileInView={{ opacity: 1, y: "0%" }}
-            viewport={{ once: true, amount: 0.4 }}
+            viewport={{ once: false, amount: 0.4 }}
             transition={{
               duration: reduce ? 0.35 : 1.15,
               delay: delay + i * stagger,

@@ -1,0 +1,105 @@
+/* ============================================================
+   ORYX token layer
+
+   One rule governs this file: no component anywhere may write a
+   colour. Everything resolves through the semantic variables below.
+
+   The previous build had 36 hardcoded hex literals across 17 files,
+   which is why changing the palette was a day of work instead of one
+   line. Three palettes now ship side by side and are switched with a
+   single `data-palette` attribute on <html>, so the client can choose
+   from rendered output rather than from hex codes.
+
+   The 3D canvas reads these same variables through lib/palette.ts, so
+   the WebGL materials and the DOM can never disagree.
+   ============================================================ */
+
+:root {
+  /* Structure, shared by every palette. */
+  --nav-h: 4.5rem;
+  --radius-control: 999px;
+  --radius-mask: 2px;
+
+  --ease-scene: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-glide: cubic-bezier(0.65, 0, 0.35, 1);
+
+  /* Set by the active palette block below. Declared here so a missing
+     data-palette attribute still renders something legible rather
+     than transparent text on a transparent page. */
+  --base: #07080a;
+  --raised: #12151a;
+  --ink: #e8ecef;
+  --ink-muted: #9aa4ad;
+  --ink-faint: #6c757e;
+  --accent: #2e6bff;
+  --accent-ink: #05070c;
+  --line: rgba(232, 236, 239, 0.14);
+  --line-soft: rgba(232, 236, 239, 0.07);
+  --base-rgb: 7, 8, 10;
+  --accent-rgb: 46, 107, 255;
+}
+
+/* ---------- A. Cold steel and electric blue ----------
+   Engineered and precise. The safest read for a B2B audience, and the
+   closest to what a lot of technical product sites already look like. */
+[data-palette="steel"] {
+  --base: #07080a;
+  --raised: #12151a;
+  --ink: #e8ecef;
+  --ink-muted: #9aa4ad; /* 7.4:1 on base */
+  --ink-faint: #6c757e; /* rules and disabled only, never text */
+  --accent: #2e6bff;
+  --accent-ink: #ffffff; /* on an accent fill */
+  --line: rgba(232, 236, 239, 0.14);
+  --line-soft: rgba(232, 236, 239, 0.07);
+  --base-rgb: 7, 8, 10;
+  --accent-rgb: 46, 107, 255;
+}
+
+/* ---------- B. Ink and acid ----------
+   Highest energy and furthest from corporate, which is the actual
+   complaint being answered. Acid green holds up unusually well as
+   emissive geometry against near black. */
+[data-palette="acid"] {
+  --base: #0a0a0b;
+  --raised: #141416;
+  --ink: #ededed;
+  --ink-muted: #9c9c9e;
+  --ink-faint: #6e6e70;
+  --accent: #c6f24e;
+  --accent-ink: #0a0a0b; /* dark text on the bright fill */
+  --line: rgba(237, 237, 237, 0.14);
+  --line-soft: rgba(237, 237, 237, 0.07);
+  --base-rgb: 10, 10, 11;
+  --accent-rgb: 198, 242, 78;
+}
+
+/* ---------- C. Black and molten amber ----------
+   Keeps a thread of warmth and some continuity with the gold in the
+   logo work, with none of the rejected cream. */
+[data-palette="amber"] {
+  --base: #08070a;
+  --raised: #16131a;
+  --ink: #f0ebe4;
+  --ink-muted: #a49d94;
+  --ink-faint: #746d65;
+  --accent: #ff6a2b;
+  --accent-ink: #0a0709;
+  --line: rgba(240, 235, 228, 0.14);
+  --line-soft: rgba(240, 235, 228, 0.07);
+  --base-rgb: 8, 7, 10;
+  --accent-rgb: 255, 106, 43;
+}
+
+/* ============================================================
+   Governance, carried forward from the previous system because it
+   was the one colour rule that kept the build honest:
+
+   An accent may carry rules, numerals, edges, focus rings and
+   emissive 3D geometry. It may NOT carry body text.
+
+   None of the three accents clears 4.5:1 as small text on its own
+   base. Electric blue is about 3.6:1, acid green is bright enough to
+   pass but vibrates badly at text sizes, and amber is about 4.4:1.
+   Use --ink or --ink-muted for anything read at length, always.
+   ============================================================ */

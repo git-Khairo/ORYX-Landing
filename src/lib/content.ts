@@ -6,6 +6,8 @@
  * No em-dashes anywhere in visible strings.
  */
 
+import { SERVICE_TINT } from "./palette";
+
 export type ServiceId = "transportation" | "cleaning" | "facility";
 
 export type CanvasVariant =
@@ -37,7 +39,6 @@ export interface Service {
   /** Revealed when the territory becomes active. */
   detail: string;
   accent: string;
-  accentVarName: string;
   media: CanvasVariant;
   headline: string;
   lede: string;
@@ -53,8 +54,7 @@ export const SERVICES: Service[] = [
     promise: "Movement without operational friction.",
     detail:
       "Scheduled and on demand movement, coordinated end to end, with clear visibility at every handover.",
-    accent: "#9e4b2f",
-    accentVarName: "--color-transport",
+    accent: SERVICE_TINT.transportation,
     media: "routes",
     headline: "Movement without\noperational friction.",
     lede: "Goods, documents and equipment move on plan. Your team stops chasing updates.",
@@ -109,8 +109,7 @@ export const SERVICES: Service[] = [
     promise: "A better environment for better work.",
     detail:
       "Structured cleaning operations with defined standards, quality checks and respect for the working day.",
-    accent: "#7d8a5f",
-    accentVarName: "--color-cleaning",
+    accent: SERVICE_TINT.cleaning,
     media: "sweep",
     headline: "A better environment\nfor better work.",
     lede: "A workplace that is consistently right removes a background distraction nobody should have to manage.",
@@ -165,8 +164,7 @@ export const SERVICES: Service[] = [
     promise: "Every facility. One accountable partner.",
     detail:
       "Coordination across services, preventive planning and one accountable line for everything the building needs.",
-    accent: "#9a723c",
-    accentVarName: "--color-facility",
+    accent: SERVICE_TINT.facility,
     media: "plan",
     headline: "Every facility.\nOne accountable partner.",
     lede: "One agreement, one contact, one standard across every service the building depends on.",

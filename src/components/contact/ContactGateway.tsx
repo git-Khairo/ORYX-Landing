@@ -19,11 +19,14 @@ const EASE = [0.16, 1, 0.3, 1] as const;
  * Closing keeps every answer, so leaving to check something is not a
  * punishment.
  *
- * The overlay is a cream surface with charcoal ink, so arriving here
- * feels like staying in the same world rather than falling into a
- * separate application. It arrives the way a scene does: the surface
- * fades, then the contents settle a beat later. Under reduced motion
- * both are a plain fade.
+ * The overlay is the same dark stage as the rest of the site, one step
+ * closer to the viewer. It covers the 3D canvas on purpose: the request
+ * is the subject while it is open, so the stage goes quiet and the type
+ * carries the moment. Colour is inherited from the active palette and
+ * never declared here, so all three palettes render this correctly.
+ *
+ * It arrives the way a scene does: the surface fades, then the contents
+ * settle a beat later. Under reduced motion both are a plain fade.
  */
 export function ContactGateway() {
   const open = useExperience((s) => s.contactOpen);
@@ -42,12 +45,7 @@ export function ContactGateway() {
     <AnimatePresence>
       {open && (
         <motion.div
-          className="fixed inset-0 z-[110] bg-[color:var(--surface)] text-[color:var(--ink)]"
-          style={
-            {
-              ["--accent" as string]: service?.accent ?? "#b48a50",
-            } as React.CSSProperties
-          }
+          className="fixed inset-0 z-[110] bg-[color:var(--base)] text-[color:var(--ink)]"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -56,9 +54,17 @@ export function ContactGateway() {
           aria-modal="true"
           aria-label="Contact ORYX"
         >
+          {/* One quiet texture for the whole overlay rather than a
+              separate treatment per surface. Drawn from --line-soft, so
+              it is a hairline field and never a panel. */}
+          <div
+            className="field-grid pointer-events-none absolute inset-0 z-0"
+            aria-hidden="true"
+          />
+
           <motion.div
             ref={trap}
-            className="flex h-full flex-col"
+            className="relative z-10 flex h-full flex-col"
             initial={reduce ? { opacity: 0 } : { opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{
@@ -68,15 +74,14 @@ export function ContactGateway() {
             }}
           >
             <header className="relative z-20 flex h-[var(--nav-h)] shrink-0 items-center justify-between border-b border-[color:var(--line-soft)] px-6 sm:px-10 lg:px-14">
-              <div className="flex items-center gap-3 text-[color:var(--accent)]">
-                <OryxMark size={24} strokeWidth={2.4} />
+              <div className="flex items-center gap-3.5 text-[color:var(--accent)]">
+                <OryxMark size={22} strokeWidth={2.2} />
                 <span
-                  className="block h-4 w-px"
-                  style={{ background: "var(--line)" }}
+                  className="block h-3.5 w-px bg-[color:var(--line)]"
                   aria-hidden="true"
                 />
-                <span className="font-mono text-[0.625rem] tracking-[0.2em] text-[color:var(--ink-muted)]">
-                  {status === "success" ? "REQUEST SENT" : "NEW REQUEST"}
+                <span className="t-label">
+                  {status === "success" ? "Request sent" : "New request"}
                 </span>
               </div>
               <button

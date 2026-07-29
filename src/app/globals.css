@@ -1,46 +1,28 @@
 @import "tailwindcss";
+@import "./tokens.css";
 
 /* ============================================================
-   ORYX design tokens
+   ORYX stylesheet
 
-   Palette taken from the ORYX brand work (ORYX-Landing/tokens.css,
-   extracted from ORYX_Brand_Strategy.pdf). Cream is the world.
-   Charcoal is used for exactly two moments: the hero and the closing.
-   You enter through the dark, live in the warm, and leave through the
-   dark. Two transitions in the whole experience, which is a composed
-   colour story rather than sections disagreeing with each other.
+   Colour lives in tokens.css, imported above, and nowhere else.
+   This file holds structure, type and behaviour only.
 
-   The three service territories are dark objects standing on the
-   cream page. That is an object on a surface, not a theme flip, and
-   it is what makes a territory read as a doorway.
+   The world is now a single dark stage with one accent, because the
+   subject is a lit 3D object and a lit object needs somewhere dark to
+   stand. There is no second tone and no per-scene palette; scenes are
+   transparent and the stage shows through them.
 
    Radius rule (locked): surfaces and panels are sharp. Interactive
    controls are pill. Media masks use 2px. Nothing else rounds.
    ============================================================ */
 
 @theme {
-  --color-cream: #f4efe6;
-  --color-offwhite: #fbf9f5;
-  --color-sand: #e9e2d4;
-  --color-charcoal: #1c1c1a;
-  --color-charcoalsoft: #26251f;
-
-  --color-gold: #b48a50;
-  --color-tan: #c9a66b;
-  --color-golddeep: #9a723c;
-
-  --color-taupe: #6e6a62;
-  --color-taupe2: #8a8478;
-  --color-taupe3: #b9b3a6;
-
-  --color-leaf: #7d8a5f;
-  --color-rust: #9e4b2f;
-  --color-rustlight: #c2643a;
-
-  --font-display: var(--font-instrument), Georgia, serif;
-  --font-sans: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
-  --font-arabic: var(--font-plex-arabic), var(--font-geist), sans-serif;
+  /* One family everywhere. The old stack pointed at three different
+     typefaces; these three names now resolve to Archivo at three
+     different widths, set by the type classes below. */
+  --font-display: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
 
   --radius-control: 999px;
   --radius-mask: 2px;
@@ -49,43 +31,12 @@
   --ease-glide: cubic-bezier(0.65, 0, 0.35, 1);
 }
 
+/* One tone, so the surface tokens are simply the palette. Kept as
+   aliases because several components read --surface by name. */
 :root {
-  color-scheme: light;
-
-  /* Exactly one accent is live per scene. Scenes set --accent on
-     themselves; nothing reads a service colour directly. */
-  --accent: #b48a50;
-
-  /* Tone defaults to cream. Scenes override by setting data-tone. */
-  --surface: #f4efe6;
-  --surface-raised: #fbf9f5;
-  --ink: #1c1c1a;
-  --ink-muted: #6e6a62;
-  --ink-faint: #8a8478;
-  --line: rgba(28, 28, 26, 0.14);
-  --line-soft: rgba(28, 28, 26, 0.08);
-
-  --nav-h: 4.5rem;
-
-  /* The colour every scrim is mixed from.
-     This exists because tone used to be declared twice: once on the
-     Scene and again on the SceneMedia inside it. Miss the second one
-     and a charcoal scene paints a cream veil over its own film, which
-     is exactly how the technology scene ended up washed out and
-     unreadable. Deriving the scrim from the scene's own tone makes
-     that disagreement impossible. */
-  --scrim-rgb: 244, 239, 230;
-}
-
-[data-tone="charcoal"] {
-  --scrim-rgb: 28, 28, 26;
-  --surface: #1c1c1a;
-  --surface-raised: #26251f;
-  --ink: #f4efe6;
-  --ink-muted: #b9b3a6;
-  --ink-faint: #8a8478;
-  --line: rgba(244, 239, 230, 0.16);
-  --line-soft: rgba(244, 239, 230, 0.08);
+  color-scheme: dark;
+  --surface: var(--base);
+  --surface-raised: var(--raised);
 }
 
 * {
@@ -93,7 +44,7 @@
 }
 
 html {
-  background: #f4efe6;
+  background: var(--base);
   /* Reserved so locking the page behind an overlay never shifts
      layout mid shared-element transition. */
   scrollbar-gutter: stable;
@@ -133,39 +84,68 @@ body[data-locked="true"] {
 }
 
 /* ---------- Type ----------
-   Instrument Serif carries the display voice at one weight: scale and
-   colour do the emphasis, never bold. Geist handles everything read at
-   length and everything operational. */
-/* Every display step is bounded by viewport HEIGHT as well as width.
+   Every display step is bounded by viewport HEIGHT as well as width.
    Sizing display type on vw alone is what was cutting scenes off: on a
    wide, short laptop screen (1536x730 is the common one) the headline
    grows with the width while the room it has to live in does not, so a
    scene that fits perfectly at 1280x720 overflows by 250px at 1536x730.
    The min() ties the type to whichever axis is scarcer. */
+/* Width is the system.
+   Display runs expanded, reading runs normal, operational labels run
+   condensed. One family, three voices, and the axis is animatable so
+   the type can take part in the motion rather than sitting still. */
 .t-display {
   font-family: var(--font-display);
-  font-weight: 400;
+  font-variation-settings: "wdth" 118;
+  font-weight: 600;
   font-size: clamp(2.75rem, min(8.4vw, 11.5vh), 8.5rem);
-  line-height: 0.94;
-  letter-spacing: -0.02em;
+  line-height: 0.92;
+  letter-spacing: -0.035em;
   text-wrap: balance;
 }
 
 .t-display-sm {
   font-family: var(--font-display);
-  font-weight: 400;
+  font-variation-settings: "wdth" 112;
+  font-weight: 600;
   font-size: clamp(2rem, min(5.2vw, 7.2vh), 4.5rem);
-  line-height: 1;
-  letter-spacing: -0.015em;
+  line-height: 0.98;
+  letter-spacing: -0.03em;
   text-wrap: balance;
 }
 
 .t-display-xs {
   font-family: var(--font-display);
-  font-weight: 400;
+  font-variation-settings: "wdth" 108;
+  font-weight: 600;
   font-size: clamp(1.5rem, min(2.6vw, 3.6vh), 2.5rem);
-  line-height: 1.08;
-  letter-spacing: -0.01em;
+  line-height: 1.06;
+  letter-spacing: -0.02em;
+}
+
+/* The kinetic moment. Width animates from condensed to expanded as
+   the hero mark locks into place: the word resolves as the object
+   resolves. Used once, on one element.
+
+   It is a transition, never a scroll scrub. Animating wdth changes
+   text metrics, which reflows, and pager.ts derives its scroll stops
+   from offsetTop/offsetHeight. Continuously reflowing display type
+   would silently invalidate the stop table, and because the wheel is
+   preventDefault-ed, a stop that moves out from under the pager takes
+   its content out of reach with it. */
+.t-kinetic {
+  font-variation-settings: "wdth" 62;
+  transition: font-variation-settings 1.1s var(--ease-scene);
+}
+.t-kinetic[data-resolved="true"] {
+  font-variation-settings: "wdth" 125;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .t-kinetic {
+    font-variation-settings: "wdth" 125;
+    transition: none;
+  }
 }
 
 /* Scenes breathe on tall screens and tighten on short ones. Padding is
@@ -176,8 +156,8 @@ body[data-locked="true"] {
   }
 }
 
-/* Italic in Instrument Serif drops below the baseline further than the
-   roman. Anything italic gets the extra leading and reserve. */
+/* Italic descenders in Archivo clear the baseline further than the
+   roman, so anything italic gets extra leading and a reserve. */
 .t-em {
   font-style: italic;
   line-height: 1.12;
@@ -192,22 +172,28 @@ body[data-locked="true"] {
   max-width: 42ch;
 }
 
-/* Muted, not faint. At 11px these labels are body sized as far as
-   contrast is concerned, and --ink-faint only reaches 3.25:1 on
-   cream. --ink-muted is 4.77:1 and clears AA. */
+/* The operational voice: condensed Archivo instead of a monospace,
+   same precision without the costume.
+
+   Muted, not faint. At 11px these count as body text for contrast, and
+   --ink-faint is a rules-and-disabled colour. --ink-muted clears AA on
+   every palette. */
 .t-label {
   font-family: var(--font-sans);
+  font-variation-settings: "wdth" 68;
   font-size: 0.6875rem;
   font-weight: 500;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--ink-muted);
 }
 
 .t-index {
   font-family: var(--font-mono);
+  font-variation-settings: "wdth" 72;
   font-variant-numeric: tabular-nums;
-  letter-spacing: -0.02em;
+  font-weight: 500;
+  letter-spacing: 0.02em;
 }
 
 /* ---------- Structure ---------- */
@@ -245,49 +231,7 @@ body[data-locked="true"] {
 
 ::selection {
   background: var(--accent);
-  color: #fbf9f5;
-}
-
-/* ---------- Media ---------- */
-.scene-media {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  z-index: 0;
-}
-.scene-media video,
-.scene-media canvas {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-/* Cinematic grade. Footage is delivered neutral and graded here, so
-   every clip agrees regardless of where it came from.
-
-   The grade is deliberately light. Earlier values pushed cream scenes
-   to brightness 1.06 and saturation 0.3, which combined with a heavy
-   scrim left the film as a pale ghost. Legibility is the scrim's job,
-   and the scrim now protects only where copy actually sits, so the
-   picture is allowed to read as a picture. */
-.scene-media video {
-  filter: saturate(0.62) contrast(1.06) brightness(0.78);
-  opacity: 0;
-  transition: opacity 1.4s var(--ease-scene);
-}
-.scene-media video[data-ready="true"] {
-  opacity: 1;
-}
-[data-tone="cream"] .scene-media video {
-  filter: saturate(0.68) contrast(1.04) brightness(0.99);
-}
-.scene-scrim {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
+  color: var(--accent-ink);
 }
 
 /* ---------- Grain: fixed layer only, never on scrolling nodes ---------- */
@@ -327,10 +271,6 @@ body[data-locked="true"] {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.12s !important;
-  }
-  .scene-media video {
-    opacity: 1;
-    transition: none;
   }
 }
 

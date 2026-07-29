@@ -3,27 +3,24 @@
 import { useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { ArrowRight } from "@phosphor-icons/react";
-import { OperationalCanvas } from "@/components/media/OperationalCanvas";
 import { SERVICES, type ServiceId } from "@/lib/content";
 import { useExperience } from "@/lib/store";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
 /**
- * The gateway question, answered by walking into one of three
- * environments rather than picking from a list.
+ * The gateway question, answered by choosing one of three doors.
  *
- * The doors reuse the territory treatment from the selector: charcoal
- * objects standing on the cream gateway, with literal cream type
- * inside them. Here they are separated by cream gutters and given a
- * cast shadow, an inset frame line and a threshold rule, so they read
- * as three standing objects on a surface rather than three regions of
- * one image.
+ * The previous version stood three filled panels side by side, each
+ * with its own drawing, its own gradient and its own cast shadow. On a
+ * dark stage that is three competing pictures. The doors are now three
+ * full width thresholds separated by hairlines: index, name, promise,
+ * arrow. Nothing is filled, so the question above them stays the
+ * loudest thing on the screen.
  *
- * Accent discipline inside a door: the service colours are rust, leaf
- * and deep gold, and none of them clears AA as text on charcoal. So
- * the accent is carried by the threshold rule, the frame edge and the
- * arrow disc, never by a word or a numeral.
+ * Accent discipline: the accent carries the edge bar and the arrow
+ * ring, never a word. Every colour resolves from the palette variables,
+ * so the surface is correct in all three palettes without a branch.
  */
 export function Doors() {
   const choose = useExperience((s) => s.chooseContactService);
@@ -34,15 +31,10 @@ export function Doors() {
 
   return (
     <div className="relative flex h-full flex-col overflow-y-auto overscroll-contain lg:overflow-hidden">
-      <div
-        className="field-grid pointer-events-none absolute inset-0 z-0"
-        aria-hidden="true"
-      />
-
       {/* Composition. A marker, then the question at display scale,
           each line rising out of its own mask like every other piece of
           display type in the experience. */}
-      <div className="relative z-10 shrink-0 px-6 pb-9 pt-1 sm:px-10 lg:px-14 lg:pb-14">
+      <div className="shrink-0 px-6 pb-10 pt-10 sm:px-10 lg:px-14 lg:pb-14 lg:pt-14">
         <div className="mx-auto w-full max-w-[104rem]">
           <motion.p
             className="t-label flex items-center gap-3"
@@ -51,21 +43,18 @@ export function Doors() {
             transition={{ duration: 0.6, ease: EASE }}
           >
             <span
-              className="rule h-px w-10"
-              style={{ background: "var(--accent)", opacity: 0.55 }}
+              className="block h-px w-10 bg-[color:var(--accent)]"
               aria-hidden="true"
             />
             <span>Three environments</span>
           </motion.p>
 
-          <h2 className="t-display mt-7 max-w-[15ch] text-[clamp(2.3rem,6vw,5.5rem)]">
+          <h2 className="t-display mt-7 max-w-[15ch] text-[clamp(2.3rem,5.6vw,5rem)]">
             {question.map((line, i) => (
               <span key={line} className="mask-line">
                 <motion.span
                   className="block"
-                  initial={
-                    reduce ? { opacity: 0 } : { opacity: 0, y: "106%" }
-                  }
+                  initial={reduce ? { opacity: 0 } : { opacity: 0, y: "106%" }}
                   animate={{ opacity: 1, y: "0%" }}
                   transition={{
                     duration: reduce ? 0.35 : 1.05,
@@ -81,138 +70,77 @@ export function Doors() {
         </div>
       </div>
 
-      <div className="relative z-10 flex min-h-0 flex-1 flex-col gap-3 px-6 pb-6 sm:px-10 lg:flex-row lg:gap-4 lg:px-14 lg:pb-10">
-        {SERVICES.map((s, i) => {
-          const active = hovered === s.id;
-          const dimmed = hovered !== null && !active;
-          return (
-            <motion.button
-              key={s.id}
-              type="button"
-              onClick={() => choose(s.id)}
-              onMouseEnter={() => setHovered(s.id)}
-              onMouseLeave={() => setHovered(null)}
-              onFocus={() => setHovered(s.id)}
-              onBlur={() => setHovered(null)}
-              className="group relative flex min-h-[13.5rem] flex-1 overflow-hidden bg-charcoal text-left lg:min-h-[16rem]"
-              style={{
-                boxShadow: active
-                  ? "0 34px 76px -36px rgba(28,28,26,0.7)"
-                  : "0 18px 46px -32px rgba(28,28,26,0.55)",
-                transition: "box-shadow 0.7s cubic-bezier(0.16,1,0.3,1)",
-              }}
-              initial={
-                reduce
-                  ? { opacity: 0 }
-                  : { opacity: 0, y: 34, clipPath: "inset(0% 0% 100% 0%)" }
-              }
-              animate={
-                reduce
-                  ? { opacity: 1 }
-                  : {
-                      opacity: 1,
-                      y: 0,
-                      clipPath: "inset(0% 0% 0% 0%)",
-                      flexGrow: active ? 1.42 : dimmed ? 0.9 : 1,
-                    }
-              }
-              transition={{
-                default: {
-                  duration: reduce ? 0.4 : 0.95,
-                  delay: reduce ? 0 : 0.16 + i * 0.09,
+      <div className="flex min-h-0 flex-1 flex-col justify-end px-6 pb-6 sm:px-10 lg:px-14 lg:pb-10">
+        <div className="mx-auto w-full max-w-[104rem] border-t border-[color:var(--line-soft)]">
+          {SERVICES.map((s, i) => {
+            const active = hovered === s.id;
+            return (
+              <motion.button
+                key={s.id}
+                type="button"
+                onClick={() => choose(s.id)}
+                onMouseEnter={() => setHovered(s.id)}
+                onMouseLeave={() => setHovered(null)}
+                onFocus={() => setHovered(s.id)}
+                onBlur={() => setHovered(null)}
+                className="group relative flex w-full items-center gap-5 border-b border-[color:var(--line-soft)] py-6 pl-5 pr-1 text-left transition-colors duration-500 sm:gap-8 sm:py-7 lg:py-8"
+                style={{
+                  background: active
+                    ? "color-mix(in oklab, var(--accent) 6%, transparent)"
+                    : "transparent",
+                }}
+                initial={reduce ? { opacity: 0 } : { opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{
+                  duration: reduce ? 0.35 : 0.8,
+                  delay: reduce ? 0 : 0.16 + i * 0.08,
                   ease: EASE,
-                },
-                flexGrow: { duration: 0.7, ease: EASE },
-              }}
-              aria-label={`${s.name}. ${s.promise} Start this request.`}
-            >
-              <span className="absolute inset-0 z-0" aria-hidden="true">
-                <span
-                  className="absolute inset-0 block transition-opacity duration-1000"
-                  style={{ opacity: active ? 1 : 0.72 }}
-                >
-                  <OperationalCanvas
-                    variant={s.media}
-                    accent={s.accent}
-                    className="absolute inset-0 h-full w-full"
-                  />
-                </span>
-
-                <span
-                  className="absolute inset-0 block transition-opacity duration-700"
-                  style={{
-                    opacity: active ? 0.52 : 0.87,
-                    background:
-                      "linear-gradient(to top, rgba(28,28,26,0.97) 12%, rgba(28,28,26,0.58) 62%, rgba(28,28,26,0.88) 100%)",
-                  }}
-                />
-
-                {/* The frame inside the frame. Depth without a shadow
-                    stack, and it is what makes the panel read as a door
-                    rather than a picture. */}
-                <span className="absolute inset-3 block border border-[rgba(244,239,230,0.10)] sm:inset-4" />
-
-                {/* Threshold. The one accent that is allowed to be a
+                }}
+                aria-label={`${s.name}. ${s.promise} Start this request.`}
+              >
+                {/* Edge bar. The one accent that is allowed to be a
                     colour here, because it carries no text. */}
-                <span className="absolute inset-x-0 top-0 block h-px bg-[rgba(244,239,230,0.16)]" />
                 <span
-                  className="absolute inset-x-0 top-0 block h-[2px] origin-left transition-transform duration-700"
-                  style={{
-                    background: s.accent,
-                    transform: `scaleX(${active ? 1 : 0})`,
-                  }}
+                  className="absolute inset-y-0 left-0 block w-[2px] origin-center bg-[color:var(--accent)] transition-transform duration-500"
+                  style={{ transform: `scaleY(${active ? 1 : 0})` }}
+                  aria-hidden="true"
                 />
-              </span>
 
-              <span className="relative z-10 flex w-full flex-col justify-between gap-8 p-6 text-[#f4efe6] sm:p-8 lg:p-10">
-                <span className="flex items-center gap-3">
-                  <span className="t-index text-[0.6875rem] tracking-[0.2em] text-[#b9b3a6]">
-                    {s.index}
-                  </span>
-                  <span
-                    className="block h-px w-8 transition-all duration-700"
-                    style={{
-                      background: active ? s.accent : "rgba(244,239,230,0.24)",
-                      width: active ? "3.5rem" : "2rem",
-                    }}
-                    aria-hidden="true"
-                  />
+                <span
+                  className="t-index shrink-0 text-[0.6875rem] tracking-[0.2em] transition-colors duration-500"
+                  style={{ color: active ? "var(--ink)" : "var(--ink-muted)" }}
+                  aria-hidden="true"
+                >
+                  {s.index}
                 </span>
 
-                <span className="block">
-                  <span className="block max-w-[13ch] text-[clamp(1.5rem,2.3vw,2.4rem)] leading-[1.04] tracking-tight">
+                <span className="flex min-w-0 flex-1 flex-col gap-2 lg:flex-row lg:items-baseline lg:gap-10">
+                  <span className="t-display-xs block min-w-0 flex-1 text-[color:var(--ink)]">
                     {s.name}
                   </span>
-                  <span className="mt-3.5 block max-w-[27ch] text-sm leading-relaxed text-[#b9b3a6]">
+                  <span className="block max-w-[34ch] text-sm leading-relaxed text-[color:var(--ink-muted)] lg:text-right">
                     {s.promise}
                   </span>
-
-                  <span className="mt-7 inline-flex items-center gap-3 text-[0.8125rem] text-[#f4efe6]">
-                    <span
-                      className="control flex h-9 w-9 items-center justify-center border transition-colors duration-500"
-                      style={{
-                        borderColor: active
-                          ? s.accent
-                          : "rgba(244,239,230,0.3)",
-                        background: active
-                          ? `color-mix(in oklab, ${s.accent} 22%, transparent)`
-                          : "transparent",
-                      }}
-                      aria-hidden="true"
-                    >
-                      <ArrowRight
-                        size={13}
-                        weight="bold"
-                        className="transition-transform duration-500 group-hover:translate-x-0.5"
-                      />
-                    </span>
-                    Start here
-                  </span>
                 </span>
-              </span>
-            </motion.button>
-          );
-        })}
+
+                <span
+                  className="control flex h-10 w-10 shrink-0 items-center justify-center border transition-colors duration-500"
+                  style={{
+                    borderColor: active ? "var(--accent)" : "var(--line)",
+                    color: active ? "var(--accent)" : "var(--ink-muted)",
+                  }}
+                  aria-hidden="true"
+                >
+                  <ArrowRight
+                    size={14}
+                    weight="bold"
+                    className="transition-transform duration-500 group-hover:translate-x-0.5"
+                  />
+                </span>
+              </motion.button>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

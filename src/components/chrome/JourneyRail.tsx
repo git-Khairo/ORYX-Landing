@@ -12,7 +12,7 @@ import { useMounted } from "@/lib/hooks";
  */
 export function JourneyRail() {
   const activeScene = useExperience((s) => s.activeScene);
-  const tone = useExperience((s) => s.sceneTone);
+  
   const hidden = useExperience((s) => s.activeService !== null || s.contactOpen);
   const { scrollYProgress } = useScroll();
   const progress = useSpring(scrollYProgress, {
@@ -23,7 +23,8 @@ export function JourneyRail() {
   const mounted = useMounted();
 
   // The rail floats over the scene, so it borrows that scene's ink.
-  const ink = tone === "charcoal" ? "#f4efe6" : "#1c1c1a";
+  // One tone now, so the chrome no longer has to guess.
+  const ink = "var(--ink)";
 
   return (
     <>

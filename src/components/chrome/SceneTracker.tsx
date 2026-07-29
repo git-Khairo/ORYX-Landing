@@ -5,7 +5,7 @@ import { useExperience } from "@/lib/store";
 
 /**
  * One observer for the whole page. Reports which scene owns the top of
- * the viewport and whether its tone is charcoal or cream, so the
+ * the viewport, so the
  * navigation can adapt and the journey rail can show position. No
  * scroll listeners.
  */
@@ -36,8 +36,7 @@ export function SceneTracker() {
           }
         }
         if (!best) return;
-        const el = sections.find((s) => s.dataset.scene === best);
-        setScene(best, (el?.dataset.tone as "charcoal" | "cream") ?? "cream");
+        setScene(best);
       },
       { threshold: [0.2, 0.4, 0.6, 0.8] },
     );
