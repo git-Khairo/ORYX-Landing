@@ -3,8 +3,15 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { Scene, Marker } from "@/components/layout/Scene";
-import { ReadyFigure } from "@/components/art/figures";
 import { VALUES } from "@/lib/content";
+
+/* Placeholder background footage: a night city traffic timelapse,
+   web hosted for now (Pexels, royalty free). Swap this for an ORYX
+   owned clip in /public/media when one is graded. If it fails to load
+   the scene falls back to the light base, so a blocked or missing file
+   can never leave a hole. */
+const STANDARD_VIDEO =
+  "https://videos.pexels.com/video-files/5533766/5533766-hd_1280_720_30fps.mp4";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 const DWELL = 4200;
@@ -68,13 +75,9 @@ export function Standard() {
 
   return (
     <Scene id="standard" label="The ORYX standard">
-      {/* The radar: everything the sweep passes, answers. */}
-      <div
-        className="pointer-events-none absolute inset-y-0 right-[-4%] -z-10 hidden w-[46%] items-center opacity-80 lg:flex"
-        aria-hidden="true"
-      >
-        <ReadyFigure className="h-full max-h-[72svh] w-full" />
-      </div>
+      {/* Soft moving footage behind the standard, blurred and scrimmed
+          so the type stays the subject. */}
+      <StandardBackdrop reduce={!!reduce} />
       <div className="mx-auto flex min-h-[100svh] w-full max-w-[100rem] flex-col justify-center px-6 py-20 sm:px-10 lg:px-16">
         <Marker index="03">The standard</Marker>
 
@@ -174,5 +177,51 @@ export function Standard() {
         </ul>
       </div>
     </Scene>
+  );
+}
+
+/**
+ * The Standard scene backdrop.
+ *
+ * A muted, looping clip pushed well back: blurred, lightly desaturated
+ * and scaled up so the blur has no soft edge, then covered by a wash of
+ * the base colour so dark type keeps its contrast on a light stage.
+ * Under reduced motion the video is not mounted at all and the scene
+ * rests on the plain base.
+ */
+function StandardBackdrop({ reduce }: { reduce: boolean }) {
+  const [failed, setFailed] = useState(false);
+
+  return (
+    <div
+      className="pointer-events-none absolute inset-0 -z-10 overflow-hidden"
+      aria-hidden="true"
+    >
+      {!reduce && !failed ? (
+        <video
+          className="absolute inset-0 h-full w-full object-cover"
+          style={{
+            filter: "blur(2px) saturate(0.7) contrast(1.02)",
+            transform: "scale(1.04)",
+          }}
+          src={STANDARD_VIDEO}
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="metadata"
+          onError={() => setFailed(true)}
+        />
+      ) : null}
+      {/* Legibility wash: a light veil over the whole frame, a touch
+          stronger at the left where the tablist and copy sit. */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background:
+            "linear-gradient(to right, color-mix(in oklab, var(--base) 78%, transparent) 0%, color-mix(in oklab, var(--base) 62%, transparent) 46%, color-mix(in oklab, var(--base) 48%, transparent) 100%)",
+        }}
+      />
+    </div>
   );
 }

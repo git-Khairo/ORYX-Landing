@@ -186,8 +186,10 @@ export function TransportFigure({ className = "" }: { className?: string }) {
         strokeWidth="1.4"
         strokeDasharray="14 12"
       >
+        {/* Dashes stream left under a right-facing van, so the road
+            reads as passing backward and the van as moving forward. */}
         {!reduce ? (
-          <animate attributeName="stroke-dashoffset" from="0" to="-52" dur="1.6s" repeatCount="indefinite" />
+          <animate attributeName="stroke-dashoffset" from="0" to="52" dur="1.6s" repeatCount="indefinite" />
         ) : null}
       </line>
 

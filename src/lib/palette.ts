@@ -16,9 +16,9 @@ import { useEffect, useState } from "react";
  * an effect and callers get the fallback until it resolves.
  */
 
-export type PaletteName = "steel" | "acid" | "amber";
+export type PaletteName = "sand" | "steel" | "paper";
 
-export const PALETTES: PaletteName[] = ["steel", "acid", "amber"];
+export const PALETTES: PaletteName[] = ["sand", "steel", "paper"];
 
 /**
  * The three service tints.
@@ -29,13 +29,15 @@ export const PALETTES: PaletteName[] = ["steel", "acid", "amber"];
  * live here rather than in the content model, because a colour is not
  * copy and Three needs a literal hex, not a CSS variable.
  *
- * All three clear 4.5:1 against every palette base, so they may carry
- * a service name at display size. They still may not carry body text.
+ * All three clear 4.5:1 against every light palette base, so they may
+ * carry a service name at display size. They still may not carry body
+ * text. Deepened from their original dark-stage values so they read on
+ * a light background.
  */
 export const SERVICE_TINT = {
-  transportation: "#4de3d0",
-  cleaning: "#8ce35a",
-  facility: "#5aa8f0",
+  transportation: "#0f8a7d",
+  cleaning: "#4f8f22",
+  facility: "#2f6fce",
 } as const;
 
 export interface Palette {
@@ -48,11 +50,11 @@ export interface Palette {
 
 /** Matches the :root declaration in tokens.css. */
 const FALLBACK: Palette = {
-  base: "#07080a",
-  raised: "#12151a",
-  ink: "#e8ecef",
-  inkMuted: "#9aa4ad",
-  accent: "#2e6bff",
+  base: "#f2f1ef",
+  raised: "#fbfaf8",
+  ink: "#17141a",
+  inkMuted: "#5b5650",
+  accent: "#e8641e",
 };
 
 function readVar(styles: CSSStyleDeclaration, name: string, fallback: string) {

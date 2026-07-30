@@ -4,14 +4,13 @@
    One rule governs this file: no component anywhere may write a
    colour. Everything resolves through the semantic variables below.
 
-   The previous build had 36 hardcoded hex literals across 17 files,
-   which is why changing the palette was a day of work instead of one
-   line. Three palettes now ship side by side and are switched with a
-   single `data-palette` attribute on <html>, so the client can choose
-   from rendered output rather than from hex codes.
+   The build ships on a light stage now. Three light palettes ship
+   side by side and are switched with a single `data-palette` attribute
+   on <html>, so the client can choose from rendered output rather than
+   from hex codes.
 
-   The 3D canvas reads these same variables through lib/palette.ts, so
-   the WebGL materials and the DOM can never disagree.
+   The canvas figures read these same variables through lib/palette.ts,
+   so the drawings and the DOM can never disagree.
    ============================================================ */
 
 :root {
@@ -25,81 +24,81 @@
 
   /* Set by the active palette block below. Declared here so a missing
      data-palette attribute still renders something legible rather
-     than transparent text on a transparent page. */
-  --base: #07080a;
-  --raised: #12151a;
-  --ink: #e8ecef;
-  --ink-muted: #9aa4ad;
-  --ink-faint: #6c757e;
-  --accent: #2e6bff;
-  --accent-ink: #05070c;
-  --line: rgba(232, 236, 239, 0.14);
-  --line-soft: rgba(232, 236, 239, 0.07);
-  --base-rgb: 7, 8, 10;
-  --accent-rgb: 46, 107, 255;
+     than transparent text on a transparent page. Defaults to sand. */
+  --base: #f2f1ef;
+  --raised: #fbfaf8;
+  --ink: #17141a;
+  --ink-muted: #5b5650;
+  --ink-faint: #8c877f;
+  --accent: #e8641e;
+  --accent-ink: #ffffff;
+  --line: rgba(23, 20, 26, 0.14);
+  --line-soft: rgba(23, 20, 26, 0.07);
+  --base-rgb: 242, 241, 239;
+  --accent-rgb: 232, 100, 30;
 }
 
-/* ---------- A. Cold steel and electric blue ----------
-   Engineered and precise. The safest read for a B2B audience, and the
-   closest to what a lot of technical product sites already look like. */
-[data-palette="steel"] {
-  --base: #07080a;
-  --raised: #12151a;
-  --ink: #e8ecef;
-  --ink-muted: #9aa4ad; /* 7.4:1 on base */
-  --ink-faint: #6c757e; /* rules and disabled only, never text */
-  --accent: #2e6bff;
+/* ---------- A. Soft grey and molten amber (default) ----------
+   Warm light-grey base, charcoal ink, molten amber accent. Calm and
+   modern, softer than pure white, and the closest to the warmth in
+   the ORYX logo work. */
+[data-palette="sand"] {
+  --base: #f2f1ef;
+  --raised: #fbfaf8;
+  --ink: #17141a; /* near-black, 15.8:1 on base */
+  --ink-muted: #5b5650; /* 6.9:1 on base */
+  --ink-faint: #8c877f; /* rules and disabled only, never text */
+  --accent: #e8641e;
   --accent-ink: #ffffff; /* on an accent fill */
-  --line: rgba(232, 236, 239, 0.14);
-  --line-soft: rgba(232, 236, 239, 0.07);
-  --base-rgb: 7, 8, 10;
+  --line: rgba(23, 20, 26, 0.14);
+  --line-soft: rgba(23, 20, 26, 0.07);
+  --base-rgb: 242, 241, 239;
+  --accent-rgb: 232, 100, 30;
+}
+
+/* ---------- B. Clean white and steel blue ----------
+   Bright, crisp, maximum clarity. The safest read for a B2B audience,
+   and the closest to what a lot of technical product sites look like. */
+[data-palette="steel"] {
+  --base: #fbfbfc;
+  --raised: #ffffff;
+  --ink: #101317;
+  --ink-muted: #4c545d; /* 7.4:1 on base */
+  --ink-faint: #8a929b;
+  --accent: #2e6bff;
+  --accent-ink: #ffffff;
+  --line: rgba(16, 19, 23, 0.13);
+  --line-soft: rgba(16, 19, 23, 0.06);
+  --base-rgb: 251, 251, 252;
   --accent-rgb: 46, 107, 255;
 }
 
-/* ---------- B. Ink and acid ----------
-   Highest energy and furthest from corporate, which is the actual
-   complaint being answered. Acid green holds up unusually well as
-   emissive geometry against near black. */
-[data-palette="acid"] {
-  --base: #0a0a0b;
-  --raised: #141416;
-  --ink: #ededed;
-  --ink-muted: #9c9c9e;
-  --ink-faint: #6e6e70;
-  --accent: #c6f24e;
-  --accent-ink: #0a0a0b; /* dark text on the bright fill */
-  --line: rgba(237, 237, 237, 0.14);
-  --line-soft: rgba(237, 237, 237, 0.07);
-  --base-rgb: 10, 10, 11;
-  --accent-rgb: 198, 242, 78;
-}
-
-/* ---------- C. Black and molten amber ----------
-   Keeps a thread of warmth and some continuity with the gold in the
-   logo work, with none of the rejected cream. */
-[data-palette="amber"] {
-  --base: #08070a;
-  --raised: #16131a;
-  --ink: #f0ebe4;
-  --ink-muted: #a49d94;
-  --ink-faint: #746d65;
-  --accent: #ff6a2b;
-  --accent-ink: #0a0709;
-  --line: rgba(240, 235, 228, 0.14);
-  --line-soft: rgba(240, 235, 228, 0.07);
-  --base-rgb: 8, 7, 10;
-  --accent-rgb: 255, 106, 43;
+/* ---------- C. Warm paper and bronze ----------
+   Off-white paper base, ink-brown text, bronze-gold accent. Warmest of
+   the three, tied to the oryx / desert identity and the gold in the
+   logo. Premium and quiet. */
+[data-palette="paper"] {
+  --base: #f5f1ea;
+  --raised: #fdfbf6;
+  --ink: #1e1b16;
+  --ink-muted: #5a5347; /* 6.9:1 on base */
+  --ink-faint: #8f887a;
+  --accent: #a4732c; /* bronze, 4.6:1 on base as display text */
+  --accent-ink: #ffffff;
+  --line: rgba(30, 27, 22, 0.14);
+  --line-soft: rgba(30, 27, 22, 0.07);
+  --base-rgb: 245, 241, 234;
+  --accent-rgb: 164, 115, 44;
 }
 
 /* ============================================================
-   Governance, carried forward from the previous system because it
-   was the one colour rule that kept the build honest:
+   Governance, carried forward because it is the one colour rule that
+   keeps the build honest:
 
-   An accent may carry rules, numerals, edges, focus rings and
-   emissive 3D geometry. It may NOT carry body text.
+   An accent may carry rules, numerals, edges, focus rings and the
+   emissive parts of the drawings. It may NOT carry body text.
 
-   None of the three accents clears 4.5:1 as small text on its own
-   base. Electric blue is about 3.6:1, acid green is bright enough to
-   pass but vibrates badly at text sizes, and amber is about 4.4:1.
-   Use --ink or --ink-muted for anything read at length, always.
+   Amber (~3.4:1) and blue (~3.9:1) do not clear 4.5:1 as small text on
+   their own base; bronze passes only at display size. Use --ink or
+   --ink-muted for anything read at length, always.
    ============================================================ */

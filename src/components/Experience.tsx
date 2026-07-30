@@ -95,7 +95,7 @@ export function Experience() {
           by the stage: Stage3D indexes its camera poses by chapter and
           Mark splits the object at index 1, so Services stays second. */}
       <main id="main">
-        <Hero />
+        <Hero onOpenService={open} />
         <ServiceSelector onOpen={open} />
         <Standard />
         <Process />

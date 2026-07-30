@@ -10,7 +10,8 @@ import {
 import { List, X, Check } from "@phosphor-icons/react";
 import { CHAPTERS } from "@/lib/chapters";
 import { useExperience } from "@/lib/store";
-import { OryxMark, Wordmark } from "@/components/brand/OryxMark";
+import { Wordmark } from "@/components/brand/OryxMark";
+import { BrandLogo } from "@/components/brand/BrandLogo";
 import { Action } from "@/components/ui/Action";
 
 const NAV_ITEMS = CHAPTERS.filter((c) => c.nav && c.id !== "contact");
@@ -105,7 +106,7 @@ export function Nav() {
             className="flex items-center gap-3 text-current"
             aria-label="ORYX, back to the start"
           >
-            <OryxMark size={26} strokeWidth={2.4} />
+            <BrandLogo alt="" className="h-7" />
             <Wordmark className="text-[0.9rem]" />
           </a>
 
@@ -221,7 +222,7 @@ export function Nav() {
             aria-label="Menu"
           >
             <div className="flex h-[var(--nav-h)] items-center justify-between px-6">
-              <OryxMark size={26} strokeWidth={2.4} />
+              <BrandLogo alt="" className="h-7" />
               <button
                 type="button"
                 onClick={() => setMenuOpen(false)}

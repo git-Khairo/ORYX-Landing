@@ -7,10 +7,9 @@
    Colour lives in tokens.css, imported above, and nowhere else.
    This file holds structure, type and behaviour only.
 
-   The world is now a single dark stage with one accent, because the
-   subject is a lit 3D object and a lit object needs somewhere dark to
-   stand. There is no second tone and no per-scene palette; scenes are
-   transparent and the stage shows through them.
+   The world is a single light stage with one accent. There is no
+   second tone and no per-scene palette; scenes are transparent and the
+   stage shows through them.
 
    Radius rule (locked): surfaces and panels are sharp. Interactive
    controls are pill. Media masks use 2px. Nothing else rounds.
@@ -34,7 +33,7 @@
 /* One tone, so the surface tokens are simply the palette. Kept as
    aliases because several components read --surface by name. */
 :root {
-  color-scheme: dark;
+  color-scheme: light;
   --surface: var(--base);
   --surface-raised: var(--raised);
 }

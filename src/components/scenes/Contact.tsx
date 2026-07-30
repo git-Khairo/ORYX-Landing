@@ -5,6 +5,7 @@ import { Scene } from "@/components/layout/Scene";
 import { SignalFigure } from "@/components/art/figures";
 import { Action } from "@/components/ui/Action";
 import { Wordmark } from "@/components/brand/OryxMark";
+import { BrandLogo } from "@/components/brand/BrandLogo";
 import { SERVICES } from "@/lib/content";
 import { useExperience } from "@/lib/store";
 
@@ -75,6 +76,7 @@ export function Contact() {
         <footer className="mt-16 border-t border-[color:var(--line-soft)] pt-8 lg:pr-16 xl:pr-20">
           <div className="flex flex-col gap-8 sm:flex-row sm:items-end sm:justify-between">
             <div className="leading-tight">
+              <BrandLogo alt="ORYX" className="mb-4 h-10" />
               <Wordmark className="text-sm" />
               <p className="t-label mt-2">Always ready.</p>
             </div>

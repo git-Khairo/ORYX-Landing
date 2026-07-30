@@ -6,10 +6,10 @@ import { ArrowUpRight } from "@phosphor-icons/react";
 import { Scene, Marker } from "@/components/layout/Scene";
 import { SERVICES, type ServiceId } from "@/lib/content";
 import {
-  TransportFigure,
-  CleaningFigure,
-  FacilityFigure,
-} from "@/components/art/figures";
+  TransportMark,
+  CleaningMark,
+  FacilityMark,
+} from "@/components/art/serviceMarks";
 import { useExperience } from "@/lib/store";
 
 /**
@@ -28,9 +28,9 @@ import { useExperience } from "@/lib/store";
    var(--accent), and each panel scopes that to its service tint, so
    the same discipline that colours the type colours the scene. */
 const PANEL: Record<ServiceId, React.ComponentType<{ className?: string }>> = {
-  transportation: TransportFigure,
-  cleaning: CleaningFigure,
-  facility: FacilityFigure,
+  transportation: TransportMark,
+  cleaning: CleaningMark,
+  facility: FacilityMark,
 };
 
 export function ServiceSelector({

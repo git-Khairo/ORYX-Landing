@@ -34,7 +34,7 @@ export function Particles() {
     const ctx = canvas.getContext("2d", { alpha: true });
     if (!ctx) return;
 
-    let accent = "46, 107, 255";
+    let accent = "232, 100, 30";
     const readAccent = () => {
       const v = getComputedStyle(document.documentElement)
         .getPropertyValue("--accent-rgb")
@@ -96,7 +96,9 @@ export function Particles() {
       last = now;
 
       ctx.clearRect(0, 0, w, h);
-      ctx.globalCompositeOperation = "lighter";
+      // Normal compositing on a light stage: additive blending would
+      // wash amber motes into the near-white base and leave nothing to
+      // see. Here each mote sits gently on top of the surface instead.
       for (const p of motes) {
         p.x += p.vx;
         p.y += p.vy;
@@ -116,12 +118,11 @@ export function Particles() {
         ctx.arc(p.x, p.y, p.r * 6, 0, Math.PI * 2);
         ctx.fill();
 
-        ctx.fillStyle = `rgba(${accent}, ${Math.min(1, a * 1.3)})`;
+        ctx.fillStyle = `rgba(${accent}, ${Math.min(0.8, a)})`;
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
         ctx.fill();
       }
-      ctx.globalCompositeOperation = "source-over";
     };
 
     const start = () => {
@@ -150,7 +151,7 @@ export function Particles() {
   return (
     <canvas
       ref={ref}
-      className="pointer-events-none fixed inset-0 -z-10 opacity-70"
+      className="pointer-events-none fixed inset-0 -z-10 opacity-60"
       aria-hidden="true"
     />
   );

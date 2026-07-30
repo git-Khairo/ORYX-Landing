@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     template: "%s. ORYX",
   },
   description:
-    "Transportation, cleaning and facility management, managed as one reliable operational partnership for businesses in the Netherlands.",
+    "One operational partner for transportation, cleaning and facility management: people, operations and reporting, run as one agreement for businesses in the Netherlands.",
   keywords: [
     "facility management Netherlands",
     "commercial cleaning Netherlands",
@@ -50,11 +50,16 @@ export const metadata: Metadata = {
     siteName: "ORYX",
   },
   robots: { index: true, follow: true },
+  icons: {
+    icon: "/brand/logo.jpg",
+    shortcut: "/brand/logo.jpg",
+    apple: "/brand/logo.jpg",
+  },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#07080a",
-  colorScheme: "dark",
+  themeColor: "#f2f1ef",
+  colorScheme: "light",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
@@ -80,14 +85,14 @@ export default function RootLayout({
     <html
       lang="en"
       dir="ltr"
-      data-palette="steel"
+      data-palette="sand"
       className={archivo.variable}
       suppressHydrationWarning
     >
       <head>
         {/*
           Palette override from the URL, for the review gate.
-          ?palette=steel | acid | amber
+          ?palette=sand | steel | paper
 
           Inline and blocking on purpose. Doing this in an effect would
           paint the default palette first and then snap, which is
@@ -100,7 +105,7 @@ export default function RootLayout({
         */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var p=new URLSearchParams(location.search).get('palette');if(p==='steel'||p==='acid'||p==='amber'){document.documentElement.setAttribute('data-palette',p);}}catch(e){}})();`,
+            __html: `(function(){try{var p=new URLSearchParams(location.search).get('palette');if(p==='sand'||p==='steel'||p==='paper'){document.documentElement.setAttribute('data-palette',p);}}catch(e){}})();`,
           }}
         />
       </head>

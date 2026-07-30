@@ -87,14 +87,21 @@ export function Marker({
   index?: string;
   children: ReactNode;
 }) {
+  const reduce = useReducedMotion();
   return (
     <p className="t-label flex items-center gap-3">
       {index ? (
         <span className="t-index text-[color:var(--accent)]">{index}</span>
       ) : null}
-      <span
-        className="rule h-px w-10"
+      {/* The rule wipes in from its left edge as the scene arrives, a
+          single quiet accent gesture that marks the section opening. */}
+      <motion.span
+        className="rule h-px w-10 origin-left"
         style={{ background: "var(--accent)", opacity: 0.5 }}
+        initial={reduce ? { opacity: 0.5 } : { scaleX: 0 }}
+        whileInView={{ scaleX: 1 }}
+        viewport={{ once: false, amount: 0.6 }}
+        transition={{ duration: reduce ? 0 : 0.9, ease: EASE }}
         aria-hidden="true"
       />
       <span>{children}</span>
