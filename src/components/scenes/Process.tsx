@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { Scene, Marker } from "@/components/layout/Scene";
-import { ProcessFigure } from "@/components/art/figures";
+import { ProcessStage } from "@/components/art/oryx3d/ProcessStage";
 import { PROCESS } from "@/lib/content";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -42,13 +42,15 @@ export function Process() {
 
   return (
     <Scene id="process" label="How the partnership works">
-      {/* The route builds one station per stage, in step with the
-          copy below. */}
+      {/* Four steps in space, the active one lifted and lit, in step
+          with the copy below. Replaces the old flat route drawing. */}
       <div
-        className="pointer-events-none absolute inset-x-0 top-[6%] -z-10 hidden justify-center opacity-70 lg:flex"
+        className="pointer-events-none absolute inset-x-0 top-[8%] -z-10 hidden h-[42svh] justify-center lg:flex"
         aria-hidden="true"
       >
-        <ProcessFigure step={i + 1} className="h-[34svh] w-auto" />
+        <div className="h-full w-full max-w-[70rem]">
+          <ProcessStage active={i} />
+        </div>
       </div>
       <div
         className="mx-auto flex min-h-[100svh] w-full max-w-[100rem] flex-col justify-center px-6 py-20 sm:px-10 lg:px-16"

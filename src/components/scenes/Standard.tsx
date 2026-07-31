@@ -3,34 +3,27 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { Scene, Marker } from "@/components/layout/Scene";
+import { MarkStage } from "@/components/art/oryx3d/MarkStage";
 import { VALUES } from "@/lib/content";
 
-/* Placeholder background footage: a night city traffic timelapse,
-   web hosted for now (Pexels, royalty free). Swap this for an ORYX
-   owned clip in /public/media when one is graded. If it fails to load
-   the scene falls back to the light base, so a blocked or missing file
-   can never leave a hole. */
-const STANDARD_VIDEO =
-  "https://videos.pexels.com/video-files/5533766/5533766-hd_1280_720_30fps.mp4";
-
 const EASE = [0.22, 1, 0.36, 1] as const;
-const DWELL = 4200;
+const DWELL = 3800;
 
 /**
  * Scene 03. What ORYX holds itself to.
  *
- * This one chapter replaces four: Technology, Why ORYX, Values and
+ * One chapter replaces four: Technology, Why ORYX, Values and
  * Sustainability were all making the same argument in four different
- * layouts, which is exactly how a site starts reading as a document.
- * One directory, seven entries, one statement at a time.
+ * layouts. One directory, seven entries, one statement at a time, shown
+ * large, with the mark turning quietly behind it in the brand accent so
+ * the standard has a presence and not just a list.
  *
- * The tablist below is ported wholesale from the old Values scene
- * rather than rewritten. It is a complete APG implementation and it
- * was the best accessibility work in the previous build, so it moves
- * across intact: roving tabindex, arrow and Home and End with
- * wraparound, auto advance that stops permanently on any interaction,
- * a reserved-height panel so cycling never moves the page, and every
- * statement in the document regardless of what is on screen.
+ * The tablist is the previous build's APG implementation, kept intact:
+ * roving tabindex, arrow / Home / End with wraparound, auto advance that
+ * stops permanently on any interaction, and every statement in the
+ * document regardless of what is on screen. What changed is the look:
+ * the words are a horizontal rail, and the active one is stated at
+ * display size rather than tucked in a side panel.
  */
 export function Standard() {
   const reduce = useReducedMotion();
@@ -52,11 +45,6 @@ export function Standard() {
     setHeld(true);
   }, []);
 
-  /**
-   * Arrows belong to the tablist while focus is inside it. pager.ts
-   * also listens for arrow keys on window, so a handled key has to be
-   * stopped here or the page pages instead of the list advancing.
-   */
   const onKey = (e: React.KeyboardEvent) => {
     const last = VALUES.length - 1;
     let next: number | null = null;
@@ -75,99 +63,104 @@ export function Standard() {
 
   return (
     <Scene id="standard" label="The ORYX standard">
-      {/* Soft moving footage behind the standard, blurred and scrimmed
-          so the type stays the subject. */}
-      <StandardBackdrop reduce={!!reduce} />
+      {/* The mark, turning quietly in the brand accent, held back behind
+          a wash so the type stays the subject. On-brand and built in
+          code, in place of the old stock traffic clip. */}
+      <div
+        className="pointer-events-none absolute inset-y-0 right-0 -z-10 hidden w-[54%] items-center lg:flex"
+        aria-hidden="true"
+      >
+        <div className="h-[70svh] max-h-[640px] w-full">
+          <MarkStage variant="ambient" />
+        </div>
+      </div>
+      <div
+        className="pointer-events-none absolute inset-0 -z-10"
+        aria-hidden="true"
+        style={{
+          background:
+            "linear-gradient(to right, var(--base) 0%, color-mix(in oklab, var(--base) 82%, transparent) 42%, color-mix(in oklab, var(--base) 40%, transparent) 100%)",
+        }}
+      />
+
       <div className="mx-auto flex min-h-[100svh] w-full max-w-[100rem] flex-col justify-center px-6 py-20 sm:px-10 lg:px-16">
         <Marker index="03">The standard</Marker>
 
-        <div className="mt-10 grid grid-cols-1 gap-10 lg:mt-14 lg:grid-cols-12 lg:items-start lg:gap-16">
-          <div
-            role="tablist"
-            aria-label="What we hold to"
-            aria-orientation="vertical"
-            onKeyDown={onKey}
-            onMouseLeave={() => setHeld(false)}
-            className="order-2 lg:order-1 lg:col-span-4"
-          >
-            {VALUES.map((v, idx) => {
-              const on = idx === i;
-              return (
-                <button
-                  key={v.word}
-                  ref={(el) => {
-                    tabs.current[idx] = el;
-                  }}
-                  type="button"
-                  role="tab"
-                  id={`standard-tab-${idx}`}
-                  aria-selected={on}
-                  aria-controls="standard-panel"
-                  tabIndex={on ? 0 : -1}
-                  onMouseEnter={() => take(idx)}
-                  onFocus={() => take(idx)}
-                  onClick={() => take(idx)}
-                  className="flex w-full items-baseline gap-5 border-b border-[color:var(--line-soft)] py-3 text-left first:border-t"
-                >
-                  <span
-                    className="t-index w-6 shrink-0 text-[0.6875rem] transition-colors duration-500"
-                    style={{ color: on ? "var(--ink)" : "var(--ink-muted)" }}
-                  >
-                    {String(idx + 1).padStart(2, "0")}
-                  </span>
-                  {/* The accent arrives as a rule, not as coloured
-                      text, so it never has to clear a text contrast
-                      bar it cannot reach on every palette. */}
-                  <span
-                    className="block h-px shrink-0 self-center transition-all duration-500"
-                    style={{
-                      width: on ? "2.5rem" : "0.75rem",
-                      background: on ? "var(--accent)" : "var(--line)",
-                    }}
-                    aria-hidden="true"
-                  />
-                  <span
-                    className="block text-base tracking-tight transition-colors duration-500"
-                    style={{ color: on ? "var(--ink)" : "var(--ink-muted)" }}
-                  >
-                    {v.word}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-
-          <div
-            role="tabpanel"
-            id="standard-panel"
-            aria-labelledby={`standard-tab-${i}`}
-            tabIndex={-1}
-            className="order-1 flex min-h-[13rem] flex-col justify-center lg:order-2 lg:col-span-8 lg:min-h-[24rem] lg:border-l lg:border-[color:var(--line-soft)] lg:pl-16"
-          >
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={current.word}
-                initial={reduce ? { opacity: 0 } : { opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={reduce ? { opacity: 0 } : { opacity: 0, y: -12 }}
-                transition={{ duration: reduce ? 0.2 : 0.5, ease: EASE }}
-              >
-                <p className="t-display-sm">{current.word}</p>
-                <p className="mt-6 max-w-[32ch] text-lg leading-snug tracking-tight lg:text-xl">
-                  {current.line}
-                </p>
-              </motion.div>
-            </AnimatePresence>
-          </div>
+        {/* The active value, stated large. */}
+        <div
+          role="tabpanel"
+          id="standard-panel"
+          aria-labelledby={`standard-tab-${i}`}
+          tabIndex={-1}
+          className="mt-10 min-h-[13rem] lg:mt-14 lg:min-h-[18rem]"
+        >
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={current.word}
+              initial={reduce ? { opacity: 0 } : { opacity: 0, y: 18 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={reduce ? { opacity: 0 } : { opacity: 0, y: -14 }}
+              transition={{ duration: reduce ? 0.2 : 0.55, ease: EASE }}
+            >
+              <p className="t-display max-w-[16ch]">{current.word}</p>
+              <p className="mt-6 max-w-[34ch] text-lg leading-snug tracking-tight text-[color:var(--ink-muted)] lg:text-xl">
+                {current.line}
+              </p>
+            </motion.div>
+          </AnimatePresence>
         </div>
 
-        <p className="mt-12 text-sm text-[color:var(--ink-muted)] lg:mt-16">
+        {/* The seven, as a rail. */}
+        <div
+          role="tablist"
+          aria-label="What we hold to"
+          onKeyDown={onKey}
+          onMouseLeave={() => setHeld(false)}
+          className="mt-12 flex flex-wrap gap-x-6 gap-y-3 border-t border-[color:var(--line-soft)] pt-6 lg:mt-16"
+        >
+          {VALUES.map((v, idx) => {
+            const on = idx === i;
+            return (
+              <button
+                key={v.word}
+                ref={(el) => {
+                  tabs.current[idx] = el;
+                }}
+                type="button"
+                role="tab"
+                id={`standard-tab-${idx}`}
+                aria-selected={on}
+                aria-controls="standard-panel"
+                tabIndex={on ? 0 : -1}
+                onMouseEnter={() => take(idx)}
+                onFocus={() => take(idx)}
+                onClick={() => take(idx)}
+                className="group inline-flex items-center gap-2.5 text-left"
+              >
+                <span
+                  className="block h-1.5 w-1.5 rounded-full transition-all duration-500"
+                  style={{
+                    background: on ? "var(--accent)" : "var(--line)",
+                    transform: on ? "scale(1.4)" : "scale(1)",
+                  }}
+                  aria-hidden="true"
+                />
+                <span
+                  className="text-sm tracking-tight transition-colors duration-500"
+                  style={{ color: on ? "var(--ink)" : "var(--ink-muted)" }}
+                >
+                  {v.word}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        <p className="mt-10 text-sm text-[color:var(--ink-muted)]">
           Set it once. Trust it continuously.
         </p>
 
-        {/* Every statement is in the document whatever the panel is
-            showing, so nothing depends on catching the rotation or on
-            being able to hover. */}
+        {/* Every statement stays in the document whatever is on screen. */}
         <ul className="sr-only">
           {VALUES.map((v) => (
             <li key={v.word}>
@@ -177,51 +170,5 @@ export function Standard() {
         </ul>
       </div>
     </Scene>
-  );
-}
-
-/**
- * The Standard scene backdrop.
- *
- * A muted, looping clip pushed well back: blurred, lightly desaturated
- * and scaled up so the blur has no soft edge, then covered by a wash of
- * the base colour so dark type keeps its contrast on a light stage.
- * Under reduced motion the video is not mounted at all and the scene
- * rests on the plain base.
- */
-function StandardBackdrop({ reduce }: { reduce: boolean }) {
-  const [failed, setFailed] = useState(false);
-
-  return (
-    <div
-      className="pointer-events-none absolute inset-0 -z-10 overflow-hidden"
-      aria-hidden="true"
-    >
-      {!reduce && !failed ? (
-        <video
-          className="absolute inset-0 h-full w-full object-cover"
-          style={{
-            filter: "blur(2px) saturate(0.7) contrast(1.02)",
-            transform: "scale(1.04)",
-          }}
-          src={STANDARD_VIDEO}
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="metadata"
-          onError={() => setFailed(true)}
-        />
-      ) : null}
-      {/* Legibility wash: a light veil over the whole frame, a touch
-          stronger at the left where the tablist and copy sit. */}
-      <div
-        className="absolute inset-0"
-        style={{
-          background:
-            "linear-gradient(to right, color-mix(in oklab, var(--base) 78%, transparent) 0%, color-mix(in oklab, var(--base) 62%, transparent) 46%, color-mix(in oklab, var(--base) 48%, transparent) 100%)",
-        }}
-      />
-    </div>
   );
 }

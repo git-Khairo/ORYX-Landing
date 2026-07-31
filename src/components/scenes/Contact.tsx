@@ -2,7 +2,7 @@
 
 import { motion, useReducedMotion } from "motion/react";
 import { Scene } from "@/components/layout/Scene";
-import { SignalFigure } from "@/components/art/figures";
+import { MarkStage } from "@/components/art/oryx3d/MarkStage";
 import { Action } from "@/components/ui/Action";
 import { Wordmark } from "@/components/brand/OryxMark";
 import { BrandLogo } from "@/components/brand/BrandLogo";
@@ -26,12 +26,15 @@ export function Contact() {
 
   return (
     <Scene id="contact" label="Contact ORYX">
-      {/* The light left on. */}
+      {/* The mark faces the viewer for the close, in the brand accent:
+          the guide, turned to meet you. */}
       <div
-        className="pointer-events-none absolute inset-y-0 right-0 -z-10 hidden w-[52%] items-center opacity-90 lg:flex"
+        className="pointer-events-none absolute inset-y-0 right-0 -z-10 hidden w-[48%] items-center lg:flex"
         aria-hidden="true"
       >
-        <SignalFigure className="h-full max-h-[80svh] w-full" />
+        <div className="h-[72svh] max-h-[660px] w-full">
+          <MarkStage variant="front" />
+        </div>
       </div>
       <div className="mx-auto flex min-h-[100svh] w-full max-w-[100rem] flex-col justify-between px-6 pb-10 pt-[calc(var(--nav-h)+3rem)] sm:px-10 lg:px-16">
         <div className="flex flex-1 flex-col justify-center">
