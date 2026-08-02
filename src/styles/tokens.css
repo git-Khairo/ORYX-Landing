@@ -19,6 +19,24 @@
 
   --leaf: #7d8a5f;       /* sustainability accent (green-leaning) */
 
+  /* ── Desert Dawn ──────────────────────────────────────────────────────
+     The old palette sat inside a few steps of itself — cream, sand, taupe and
+     a muted gold — so nothing in it could carry energy. These are the notes
+     that give the hero range: a warm rise from sand through apricot to coral,
+     and an ash-violet to cool the far end so the gradient has somewhere to go
+     other than "more orange". */
+  --apricot: #f0b48a;
+  --coral: #e08767;
+  --coral-deep: #c9603f;
+  --violet-ash: #6d6382;
+  --violet-mist: #cfc6d8;
+
+  /* The light that runs the hero's rails. Brighter than --tan so it reads as
+     illumination against the gold the rails are drawn in, but still the same
+     amber family — it is the brand's own accent turned up, not a new hue. */
+  --amber: #e2a34d;
+  --amber-hot: #f6c979;
+
   /* The sculpture's own colour — burnt terracotta. Used only where the page
      needs to echo the horns, never as a general-purpose accent. */
   --rust: #9e4b2f;
@@ -32,10 +50,11 @@
   --accent: var(--gold);
 
   /* ── Type ───────────────────────────────────────────────────────────── */
-  /* Instrument Serif: one weight (400), high stroke contrast, tall and quiet.
-     It carries the display voice, so it is never asked to go bold — scale and
-     colour do that work instead. Manrope handles everything read at length. */
-  --font-display: 'Instrument Serif', Georgia, 'Times New Roman', serif;
+  /* Fraunces: variable, with `SOFT` and `WONK` axes. It replaced Instrument
+     Serif, which was quiet to the point of being inert — this has warmth and a
+     little strangeness in the letterforms, which is what carries the display
+     voice now. Geist still handles everything read at length. */
+  --font-display: 'Fraunces Variable', 'Fraunces', Georgia, serif;
   --font-body: 'Geist Variable', 'Geist', ui-sans-serif, system-ui, sans-serif;
   /* Reserved for genuine measurement — counts, indices, figures. Not a costume
      for "technical". */

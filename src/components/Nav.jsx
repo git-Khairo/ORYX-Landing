@@ -1,41 +1,117 @@
+import { useEffect, useRef, useState } from 'react'
 import { useScroll } from '../lib/useScrollStore'
 import { scrollToId } from '../lib/scrollTo'
 import { useOverlayOpen } from '../lib/useOverlay'
 import OryxMark, { Wordmark } from './OryxMark'
 import { brand } from '../content/copy'
+import { catalog } from '../content/catalog'
 
 /**
- * A single hairline row: wordmark left, one action right.
+ * A floating pill — the AI-Studio nav shape, rebuilt in ORYX materials.
  *
- * The bar is fixed, so on a page of full-screen sections it would otherwise sit
- * permanently on top of whatever you just landed on. It belongs to the top of
- * the page and to the intent to go back up — visible at the top, visible when
- * you scroll up, out of the way the rest of the time.
+ * Wordmark inside the pill on the left, a short set of links in the middle, one
+ * filled action on the right. The bar is fixed and centred; it belongs to the
+ * top of the page and to the intent to go back up, so it retires while reading
+ * down and returns on scroll-up.
  *
- * Mark plus wordmark, both taken from the brand system rather than redrawn, so
- * the lockup here is the same object as the one in the footer and the request
- * gateway.
+ * Services is a menu rather than a link, because the services are not a place
+ * on the page — they are three panels that open over it. Choosing one opens the
+ * same panel a card press opens, so there is one service page, reachable two
+ * ways.
  */
-export default function Nav({ onContact }) {
+const LINKS = [
+  { id: 'standard', label: 'The Standard' },
+  { id: 'how', label: 'How it works' },
+  { id: 'statement', label: 'ORYX' },
+]
+
+export default function Nav({ onContact, onOpenService }) {
   const scrolled = useScroll((s) => s.progress > 0.015)
-  const scrolledPast = useScroll((s) => s.scroll > 120 && s.direction === 1)
-  // A full-screen overlay owns the page; the page's own chrome retires.
   const overlay = useOverlayOpen()
-  const hidden = scrolledPast || overlay
+  // The bar stays put for the whole page now. It only stands down for a
+  // full-screen overlay, which covers it anyway and must not leave a focusable
+  // bar behind it.
+  const hidden = overlay
+
+  const [menuOpen, setMenuOpen] = useState(false)
+  const menuRef = useRef(null)
+
+  // A menu that cannot be dismissed by looking away is a trap: close on outside
+  // press and on Escape, and whenever the bar itself retires.
+  useEffect(() => {
+    if (!menuOpen) return
+    const onDown = (e) => {
+      if (!menuRef.current?.contains(e.target)) setMenuOpen(false)
+    }
+    const onKey = (e) => {
+      if (e.key === 'Escape') setMenuOpen(false)
+    }
+    window.addEventListener('pointerdown', onDown)
+    window.addEventListener('keydown', onKey)
+    return () => {
+      window.removeEventListener('pointerdown', onDown)
+      window.removeEventListener('keydown', onKey)
+    }
+  }, [menuOpen])
+
+  useEffect(() => {
+    if (hidden) setMenuOpen(false)
+  }, [hidden])
 
   return (
     <header
       className={`nav ${scrolled ? 'is-scrolled' : ''} ${hidden ? 'is-hidden' : ''}`}
       aria-hidden={overlay || undefined}
     >
-      <button className="nav-logo" onClick={() => scrollToId('hero')} aria-label={`${brand.name} — back to top`}>
-        <OryxMark size={20} strokeWidth={2.8} className="nav-mark" />
-        <Wordmark />
-      </button>
+      <div className="nav-pill">
+        <button className="nav-logo" onClick={() => scrollToId('hero')} aria-label={`${brand.name} — back to top`}>
+          <OryxMark size={20} strokeWidth={2.8} className="nav-mark" />
+          <Wordmark />
+        </button>
 
-      <button className="nav-cta" onClick={onContact}>
-        Start a request
-      </button>
+        <nav className="nav-links" aria-label="Sections">
+          <div className="nav-menu" ref={menuRef}>
+            <button
+              className={`nav-link nav-link--menu ${menuOpen ? 'is-open' : ''}`}
+              onClick={() => setMenuOpen((v) => !v)}
+              aria-expanded={menuOpen}
+              aria-haspopup="true"
+            >
+              Services
+              <i className="nav-caret" aria-hidden="true" />
+            </button>
+
+            {menuOpen && (
+              <div className="nav-dropdown" role="menu">
+                {catalog.map((s) => (
+                  <button
+                    key={s.id}
+                    role="menuitem"
+                    className="nav-dropdown-item"
+                    onClick={() => {
+                      setMenuOpen(false)
+                      onOpenService?.(s.id)
+                    }}
+                  >
+                    <span className="nav-dropdown-title">{s.title}</span>
+                    <span className="nav-dropdown-sub">{s.pillar}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {LINKS.map((l) => (
+            <button key={l.id} className="nav-link" onClick={() => scrollToId(l.id)}>
+              {l.label}
+            </button>
+          ))}
+        </nav>
+
+        <button className="nav-cta" onClick={onContact}>
+          Get Started
+        </button>
+      </div>
     </header>
   )
 }

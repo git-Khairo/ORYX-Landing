@@ -1,0 +1,653 @@
+/* ── Acts 1–4: the pinned cinema ─────────────────────────────────────────────
+   The section is tall; the stage inside it is pinned and is the only thing on
+   screen for the whole run. Scroll length is what buys the sequence its time,
+   so it is expressed in viewport heights rather than pixels. */
+.cinema {
+  /* The field the zoom opens into. Kept close to the mark's own black so that
+     when the fill takes over from the grown logo there is no step in tone. */
+  --cinema-fill: #131211;
+  position: relative;
+  /* The scrub budget for logo → morph → rotate → zoom → the Standard's build.
+     The last act was added to this run rather than to the page below it, so the
+     budget grew with it. */
+  height: 520svh;
+  background: var(--cream);
+}
+/* A zero-size anchor at the scroll depth where the Standard's build starts —
+   ACT.standard's lower bound, expressed as a share of this section's height. */
+.cinema-anchor {
+  position: absolute;
+  top: 86%;
+  left: 0;
+  width: 1px;
+  height: 1px;
+}
+.cinema-stage {
+  position: relative;
+  height: 100svh;
+  width: 100%;
+  overflow: hidden;
+}
+/* Full bleed. Act 1 is a rectangle that must cover the screen edge to edge, so
+   the canvas owns the whole stage and the brand lines are overlaid on top of it
+   rather than sharing a grid with it and squeezing it into a middle row. */
+.cinema-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+}
+.cinema-canvas .svc-stage { height: 100%; min-height: 0; }
+
+/* ── The ring's world ────────────────────────────────────────────────────────
+   The dark field the whole run happens on: the hero is inset now, so this is
+   visible from the first frame as the ground the hero panel floats on, and it
+   is what the carousel turns in once that panel has shrunk.
+
+   Deliberately a different language from the hero. The hero is warm paper with
+   flowing rails; this is a dark technical field — a measured dot grid, a slow
+   ember behind it, and a vignette holding the edges. Same palette, different
+   place, so moving between them reads as travel rather than as a colour change. */
+.cinema-atmos {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: #100f0d;
+  pointer-events: none;
+}
+/* A slow warm mass behind everything, so the field is lit rather than merely
+   dark. It breathes, which is most of what keeps a static backdrop alive. */
+.cinema-atmos-ember {
+  --ex: 50%;
+  --ey: 58%;
+  position: absolute;
+  inset: -12%;
+  /* The warm mass follows the cursor (--ex/--ey, written each frame); a cooler
+     violet counter-light sits opposite it, so the field has a light and a
+     shadow side that swing with the pointer rather than a static glow. */
+  background:
+    radial-gradient(42% 42% at var(--ex) var(--ey), rgba(226, 120, 70, 0.55) 0%, rgba(226, 120, 70, 0) 66%),
+    radial-gradient(38% 38% at calc(100% - var(--ex)) calc(100% - var(--ey)), rgba(109, 99, 130, 0.4) 0%, rgba(109, 99, 130, 0) 70%);
+  animation: atmos-breathe 22s ease-in-out infinite alternate;
+}
+@keyframes atmos-breathe {
+  from { transform: scale(1) translate3d(0, 0, 0); opacity: 0.85; }
+  to { transform: scale(1.12) translate3d(2%, -2%, 0); opacity: 1; }
+}
+/* The measured grid — the counterpart to the hero's curves: where that is
+   organic and flowing, this is regular and surveyed. */
+.cinema-atmos-grid {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle, rgba(226, 163, 77, 0.22) 1px, transparent 1.2px);
+  background-size: 38px 38px;
+  -webkit-mask-image: radial-gradient(72% 66% at 50% 50%, #000 20%, transparent 100%);
+  mask-image: radial-gradient(72% 66% at 50% 50%, #000 20%, transparent 100%);
+}
+.cinema-atmos-grain {
+  position: absolute;
+  inset: 0;
+  opacity: 0.3;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+  background-size: 140px 140px;
+}
+.cinema-atmos-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(78% 70% at 50% 50%, transparent 40%, rgba(0, 0, 0, 0.6) 100%);
+}
+@media (prefers-reduced-motion: reduce) {
+  .cinema-atmos-ember { animation: none; }
+}
+
+/* Behind everything, and only present once the ring is. */
+.cinema-marquee {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ── The brand station: hero → card → zoom, one element ──────────────────────
+   `--m` runs 0 (hero, full screen) → 1 (settled card). The element's width and
+   height are set in pixels by the stage, so this is a real reflow, not a scaled
+   screenshot of a hero. Everything below is a function of `--m`. */
+.brand-card {
+  --m: 0;
+  --card-face: 1;
+  position: relative;
+  overflow: var(--card-overflow, hidden);
+  color: var(--charcoal);
+  user-select: none;
+  /* drei's <Html transform> wrapper is `transform-style: preserve-3d`. Inside a
+     3D context children paint by depth rather than by z-index, and when two
+     card planes intersect the browser sorts them as whole planes — a card built
+     from several stacked layers loses its contents in the split. So this card
+     is deliberately ONE painted box, exactly like `.svc-card`: the surface is
+     this element's own background, not a layer over the children. */
+  transform-style: flat;
+
+  /* Card chrome arrives with `--m`, so Act 1 has no edges to give the game
+     away; the alpha rides `--card-face` so the zoom can take the card away
+     while leaving the mark untouched. Fading the element itself would fade the
+     mark with it — hence alpha in the paint rather than opacity on the box. */
+  /* Rounded from the first frame: the hero is an inset panel now, not a full
+     bleed, so it has visible corners to round. It tightens as it becomes a
+     card rather than appearing from nothing. */
+  border-radius: calc(30px + (16px - 30px) * var(--m));
+  /* Desert Dawn. Two washes over the paper: a warm rise from the lower left
+     and a cool ash-violet from the upper right, so the field has range instead
+     of sitting in one temperature. Both alphas ride `--card-face` so the whole
+     surface still retires under the zoom while the mark stays solid. */
+  background:
+    radial-gradient(
+      120% 95% at 12% 108%,
+      rgba(224, 135, 103, calc(0.5 * var(--card-face))) 0%,
+      rgba(240, 180, 138, calc(0.32 * var(--card-face))) 34%,
+      rgba(240, 180, 138, 0) 68%
+    ),
+    radial-gradient(
+      90% 80% at 96% -8%,
+      rgba(109, 99, 130, calc(0.22 * var(--card-face))) 0%,
+      rgba(109, 99, 130, 0) 62%
+    ),
+    linear-gradient(
+      158deg,
+      rgba(251, 249, 245, var(--card-face)) 0%,
+      rgba(233, 226, 212, var(--card-face)) 100%
+    );
+  /* It is lifted off the dark field throughout, so the shadow no longer waits
+     for `--m`; it only tightens as the panel shrinks. */
+  box-shadow: 0 calc(30px - 8px * var(--m)) calc(80px - 24px * var(--m)) -28px
+    rgba(0, 0, 0, calc(0.75 * var(--card-face)));
+  border: 1px solid rgba(180, 138, 80, calc(0.28 * var(--card-face)));
+}
+/* ── The light travelling the rails ──────────────────────────────────────────
+   `pathLength="1"` normalises every curve, so one dash pattern and one set of
+   offsets drive all of them: a short lit segment chases from the start of the
+   path to the end. The negative animation-delay on each line starts it
+   mid-flight, so they never all fire together. */
+.cl-pulse {
+  stroke-dasharray: 0.055 0.945;
+  stroke-dashoffset: 1;
+  stroke-linecap: round;
+  animation: cl-travel var(--dur, 10s) linear infinite;
+  animation-delay: var(--delay, 0s);
+  will-change: stroke-dashoffset;
+}
+.cl-pulse--glow { stroke: var(--amber); opacity: 0.28; }
+.cl-pulse--core { stroke: var(--amber-hot); opacity: 0.9; }
+@keyframes cl-travel {
+  from { stroke-dashoffset: 1; }
+  to { stroke-dashoffset: -0.055; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cl-pulse { animation: none; opacity: 0; }
+}
+
+/* ── Surface: bloom + grain ──────────────────────────────────────────────── */
+.brand-bloom {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  /* A light source at the warm corner, so the gradient has somewhere it is
+     coming *from* rather than merely a direction. */
+  background: radial-gradient(
+    58% 52% at 16% 96%,
+    rgba(255, 236, 214, calc(0.55 * var(--card-face))) 0%,
+    rgba(255, 236, 214, 0) 100%
+  );
+}
+.brand-grain {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: calc(0.42 * var(--card-face));
+  /* Turbulence inlined as a data URI: no request, no asset to lose, and it
+     tiles at whatever size the card happens to be. */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+  background-size: 140px 140px;
+}
+
+.brand-lines {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  color: var(--gold);
+  opacity: calc(0.5 * var(--card-face));
+}
+
+/* The two arrangements cross-fade: a hero's setting of the type and a card's
+   are different arrangements, not one arrangement at two sizes. */
+.brand-copy { position: absolute; z-index: 2; }
+.brand-copy--hero {
+  left: 8%;
+  top: 50%;
+  translate: 0 -50%;
+  width: min(42%, 46ch);
+  display: grid;
+  gap: 1rem;
+  justify-items: start;
+  text-align: left;
+  opacity: calc(clamp(0, calc(1 - var(--m) * 2.6), 1) * var(--card-face));
+}
+.brand-copy--card {
+  inset: 0;
+  padding: 21px 19px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  opacity: calc(clamp(0, calc((var(--m) - 0.55) / 0.45), 1) * var(--card-face));
+}
+
+/* ── Entrance ────────────────────────────────────────────────────────────────
+   Everything with `data-in` waits for `is-in` and then arrives on its own slot
+   of the sequence, `--d` steps apart. The hero used to appear fully formed the
+   instant the loader lifted, which is why it read as a picture of a hero. */
+[data-in] { opacity: 0; }
+.brand-card.is-in [data-in] {
+  animation: brand-in 0.95s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--d, 0) * 0.09s + 0.1s);
+}
+@keyframes brand-in {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* The headline unmasks word by word from its own baseline, so the line builds
+   rather than fading in as a block.
+
+   The mask has to reach *below* the baseline or it shears the descenders off —
+   the y of "Always" and "Ready." were being cut clean through. The padding
+   opens the clip box downward and the equal negative margin takes the space
+   back out of the layout, so the descenders are visible and the line spacing is
+   unchanged. */
+.brand-line {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.18em;
+  margin-bottom: -0.18em;
+}
+.brand-line > i { display: block; font-style: normal; }
+.brand-card.is-in .brand-line > i {
+  animation-name: brand-unmask;
+  animation-duration: 1.15s;
+}
+@keyframes brand-unmask {
+  from { opacity: 1; transform: translateY(105%); }
+  to { opacity: 1; transform: none; }
+}
+
+/* The rule under the eyebrow draws itself rather than switching on. */
+.brand-card.is-in .brand-eyebrow::after { animation: brand-rule 1.1s var(--ease-out) 0.5s both; }
+@keyframes brand-rule {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-in],
+  .brand-card.is-in [data-in],
+  .brand-card.is-in .brand-line > i {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.brand-eyebrow {
+  font-family: var(--font-label);
+  font-size: var(--step--1);
+  letter-spacing: var(--track-label-wide);
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--gold-deep);
+  padding-bottom: 0.8rem;
+  width: 100%;
+  position: relative;
+}
+.brand-eyebrow::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: var(--line);
+  transform-origin: left center;
+}
+.brand-tagline {
+  font-family: var(--font-display);
+  /* Fraunces is variable: a little extra weight, its softest terminals and a
+     touch of wonk is what gives the line character at this size. */
+  font-weight: 500;
+  font-variation-settings: 'SOFT' 60, 'WONK' 1, 'opsz' 120;
+  font-size: clamp(3.1rem, 8.2vw, 7.4rem);
+  line-height: 0.92;
+  letter-spacing: -0.02em;
+  color: var(--charcoal);
+}
+.brand-promise {
+  color: var(--taupe);
+  font-size: clamp(1.05rem, 1.35vw, 1.35rem);
+  line-height: 1.5;
+  max-width: 34ch;
+}
+
+/* ── The proof strip ─────────────────────────────────────────────────────────
+   Sits across the foot of the hero, which was otherwise empty. It belongs to
+   the hero only, so it retires on exactly the same curve as the hero copy. */
+.brand-proof {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 6%;
+  z-index: 2;
+  pointer-events: none;
+  opacity: calc(clamp(0, calc(1 - var(--m) * 2.6), 1) * var(--card-face));
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 10%, #000 90%, transparent);
+  mask-image: linear-gradient(to right, transparent, #000 10%, #000 90%, transparent);
+}
+.brand-proof-viewport {
+  display: flex;
+  width: max-content;
+  animation: brand-proof-drift 58s linear infinite;
+}
+.brand-proof-run { display: flex; flex: 0 0 auto; }
+.brand-proof-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding-right: 2.2rem;
+  font-family: var(--font-label);
+  font-size: var(--step--1);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--taupe-2);
+  white-space: nowrap;
+}
+.brand-proof-item::after {
+  content: '';
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--amber);
+  opacity: 0.7;
+}
+@keyframes brand-proof-drift {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-50%, 0, 0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .brand-proof-viewport { animation: none; }
+}
+
+/* ── Hero actions ────────────────────────────────────────────────────────── */
+.brand-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  margin-top: 0.5rem;
+  pointer-events: auto;
+}
+.brand-btn {
+  font-family: var(--font-label);
+  font-size: var(--step-0);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  padding: 0.85rem 1.5rem;
+  border-radius: 999px;
+  transition: transform 0.35s var(--ease-out), background 0.35s var(--ease-out),
+    border-color 0.35s var(--ease-out), box-shadow 0.35s var(--ease-out);
+}
+.brand-btn--primary {
+  color: var(--offwhite);
+  background: linear-gradient(140deg, var(--coral-deep), var(--coral));
+  box-shadow: 0 14px 30px -16px rgba(201, 96, 63, 0.9);
+}
+.brand-btn--primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 38px -16px rgba(201, 96, 63, 0.95);
+}
+.brand-btn--ghost {
+  color: var(--charcoal);
+  border: 1px solid rgba(28, 28, 26, 0.22);
+  background: color-mix(in srgb, var(--offwhite) 55%, transparent);
+}
+.brand-btn--ghost:hover {
+  transform: translateY(-2px);
+  border-color: var(--coral-deep);
+  background: color-mix(in srgb, var(--offwhite) 80%, transparent);
+}
+
+.brand-card-eyebrow {
+  font-family: var(--font-label);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--gold-deep);
+  opacity: 0.8;
+}
+.brand-card-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 1.7rem;
+  line-height: 1.06;
+}
+.brand-card-title span { display: block; }
+.brand-card-pillar {
+  font-family: var(--font-label);
+  font-size: 0.64rem;
+  letter-spacing: 0.04em;
+  line-height: 1.35;
+  opacity: 0.78;
+  margin-top: 10px;
+}
+
+/* The mark. One node for the whole sequence: it travels from the hero's right
+   to the middle of the card, and at the end it is what grows to fill the
+   screen. `transform-origin` sits on the solid stem below where the horns
+   cross — growing from the centre would drive the zoom through the gap between
+   them and tear the fill open. */
+.brand-logo {
+  --zoom: 1;
+  --depth: 0px; /* gap between stacked layers; 0 == flat */
+  --yaw: 0deg;
+  --pitch: 0deg;
+  position: absolute;
+  left: calc(72% * (1 - var(--m)) + 50% * var(--m));
+  top: calc(50% * (1 - var(--m)) + 44% * var(--m));
+  height: calc(62% * (1 - var(--m)) + 34% * var(--m));
+  aspect-ratio: 306 / 459;
+  width: auto;
+  transform: translate(-50%, -50%) scale(var(--zoom));
+  transform-origin: 50% 72%;
+  perspective: 900px;
+  will-change: transform;
+  z-index: 3;
+}
+.brand-logo-stack {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transform: rotateY(var(--yaw)) rotateX(var(--pitch, 0deg));
+}
+.brand-logo-stack img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none; /* a global `img { max-width: 100% }` would crush it */
+  object-fit: contain;
+  transform: translateZ(calc(var(--i) * var(--depth)));
+  /* Rear layers sit in their own shadow, so the side of the mark reads as
+     depth rather than as one flat smear of black. */
+  filter: brightness(calc(0.4 + 0.6 * (var(--i) / var(--n))));
+}
+
+/* One column below the width where copy and mark can share a line. */
+@media (max-width: 860px) {
+  .brand-copy--hero {
+    left: 50%;
+    translate: -50% -50%;
+    top: 32%;
+    width: min(84%, 40ch);
+    justify-items: center;
+    text-align: center;
+  }
+  .brand-eyebrow { border-bottom: 0; padding-bottom: 0; }
+  .brand-logo {
+    left: 50%;
+    top: calc(72% * (1 - var(--m)) + 44% * var(--m));
+    height: calc(30% * (1 - var(--m)) + 34% * var(--m));
+  }
+}
+
+/* The field the mark opens into. Act 5 sits on this colour, so it is a token:
+   set it to the logo's own ground once the real asset lands. */
+.cinema-fill {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  background: var(--cinema-fill, var(--charcoal));
+  opacity: 0;
+  will-change: opacity;
+  /* Invisible is not intangible: at opacity 0 this still hit-tests, and it
+     covers the whole stage — which is what was swallowing every press aimed at
+     a card underneath. It never needs to be pressed itself. */
+  pointer-events: none;
+}
+
+/* Reduced motion: no pin, no scrub — one plain screen with the static fan. */
+.cinema.is-static { height: auto; min-height: 100svh; }
+.cinema.is-static .cinema-stage { position: relative; height: auto; min-height: 100svh; }
+.cinema.is-static .cinema-fill { display: none; }
+/* Nothing writes `--t` without a scrub, so the Standard has to stand on its own
+   as an ordinary section underneath the stage. */
+.cinema.is-static .cinema-standard {
+  position: relative;
+  inset: auto;
+  opacity: 1;
+  overflow: visible;
+  background: var(--cinema-fill, var(--charcoal));
+  --t: 1;
+}
+
+/* ── Act 5: The Standard ─────────────────────────────────────────────────────
+   Sits on the fill inside the pinned stage, so it is already on screen the
+   moment the mark finishes swallowing it — there is nothing to scroll to. */
+.cinema-standard {
+  position: absolute;
+  inset: 0;
+  z-index: 7;
+  opacity: 0;
+  /* Same trap as `.cinema-fill`, and it also starts before any scroll has
+     happened — so the default has to be none, and the stage turns it on once
+     the Standard is actually up. */
+  pointer-events: none;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  color: var(--offwhite);
+  --t: 0; /* 0..1 across the build, written by the stage each frame */
+}
+.standard {
+  min-height: 100svh;
+  display: grid;
+  place-items: center;
+  padding: clamp(4.5rem, 10vh, 7rem) var(--gutter);
+}
+.standard-inner { max-width: var(--maxw); width: 100%; text-align: center; }
+
+/* Each element opens in its own slot of the build. `--i` is its place in the
+   order and `--d` the share of the run each slot gets, so the whole sequence
+   lands one piece at a time and reverses cleanly when scrubbed backwards. */
+[data-std] {
+  --d: 0.085;
+  --p: clamp(0, calc((var(--t) - var(--i) * var(--d)) / 0.34), 1);
+  opacity: var(--p);
+  transform: translateY(calc((1 - var(--p)) * 26px)) scale(calc(0.94 + 0.06 * var(--p)));
+  will-change: opacity, transform;
+}
+
+.standard-eyebrow {
+  font-family: var(--font-label);
+  font-size: var(--step--1);
+  letter-spacing: var(--track-label-wide);
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--tan);
+}
+.standard-title {
+  font-family: var(--font-display);
+  font-size: var(--step-5);
+  line-height: 1.02;
+  margin: 0.6rem 0 0;
+  color: var(--offwhite);
+}
+.standard-lead {
+  max-width: 54ch;
+  margin: 1.1rem auto 0;
+  color: var(--taupe-3);
+  font-size: var(--step-1);
+  line-height: 1.55;
+}
+
+.standard-grid {
+  list-style: none;
+  margin: clamp(2.2rem, 5.5vh, 3.6rem) 0 0;
+  padding: 0;
+  display: grid;
+  gap: clamp(0.7rem, 1.4vw, 1.1rem);
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+/* A numbered plate, not a table cell: the index leads, a rule grows out of it,
+   and the name carries the display face. */
+.std-card {
+  position: relative;
+  text-align: left;
+  padding: clamp(1.3rem, 2.6vw, 1.8rem);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.045);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  display: grid;
+  gap: 0.5rem;
+  align-content: start;
+  transition: background 0.4s var(--ease-out), border-color 0.4s var(--ease-out),
+    translate 0.4s var(--ease-out);
+}
+.std-card:hover {
+  background: rgba(255, 255, 255, 0.075);
+  border-color: rgba(201, 166, 107, 0.45);
+  translate: 0 -3px;
+}
+.std-card-n {
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  letter-spacing: 0.12em;
+  color: var(--gold);
+}
+.std-card-rule {
+  height: 1px;
+  width: 100%;
+  background: linear-gradient(to right, var(--gold-deep), transparent);
+  /* Draws itself as the card lands. */
+  transform: scaleX(var(--p, 1));
+  transform-origin: left;
+}
+.std-card-k {
+  font-family: var(--font-display);
+  font-size: var(--step-2);
+  line-height: 1.1;
+  color: var(--offwhite);
+}
+.std-card-d { color: var(--taupe-3); line-height: 1.55; font-size: var(--step-0); }
+
+@media (prefers-reduced-motion: reduce) {
+  [data-std] { opacity: 1; transform: none; }
+  .std-card-rule { transform: none; }
+}

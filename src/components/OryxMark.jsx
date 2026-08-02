@@ -1,50 +1,52 @@
 /**
- * The ORYX brand mark.
+ * The ORYX brand mark — the supplied logo at `public/logo.png`.
  *
- * An abstract line silhouette: two long horns sweeping back over a head
- * profile, reduced to the fewest strokes that still read as alert. It is a
- * mark, not a mascot — it never speaks and never performs.
+ * The asset is a black silhouette on a transparent ground, but the mark has to
+ * sit on cream, on charcoal and on gold cards, so it cannot be drawn as a plain
+ * <img>: it would be a black shape on every one of them. Instead the PNG is
+ * used as a **mask** over `currentColor`, which gives back exactly the
+ * behaviour the old inline SVG had — the mark inherits the colour of whatever
+ * it is placed in, and every existing call site keeps working unchanged.
  *
- * Taken from the brand system rather than re-drawn, so the site and the
- * identity cannot drift apart. `draw` animates the strokes on as if a route
- * line were forming the mark, which is what the opening moment uses.
+ * `draw` previously dashed the SVG strokes on. A raster has no strokes to dash,
+ * so the equivalent reveal is a wipe: the mark is uncovered from its foot over
+ * the same duration.
  */
+const SRC = '/logo.png'
+const ASPECT = 306 / 459 // the asset's own proportions
+
 export default function OryxMark({
   size = 40,
   className = '',
   draw = false,
   duration = 1.1,
-  strokeWidth = 2.2,
+  // Accepted and ignored: call sites pass a stroke weight for the old line
+  // mark, and should not all have to change because the asset did.
+  strokeWidth,
 }) {
-  const style = draw
-    ? {
-        strokeDasharray: 140,
-        strokeDashoffset: 140,
-        animation: `oryx-draw ${duration}s cubic-bezier(0.16,1,0.3,1) forwards`,
-      }
-    : undefined
+  void strokeWidth
 
-  const delayed = (delay) => (style ? { ...style, animationDelay: delay } : undefined)
+  const style = {
+    // aspect-ratio rather than a computed width, so `size` may be a number of
+    // pixels or any CSS length ("0.62em" for the marquee separator).
+    height: typeof size === 'number' ? `${size}px` : size,
+    aspectRatio: String(ASPECT),
+    display: 'inline-block',
+    backgroundColor: 'currentColor',
+    WebkitMaskImage: `url(${SRC})`,
+    maskImage: `url(${SRC})`,
+    WebkitMaskRepeat: 'no-repeat',
+    maskRepeat: 'no-repeat',
+    WebkitMaskPosition: 'center',
+    maskPosition: 'center',
+    WebkitMaskSize: 'contain',
+    maskSize: 'contain',
+    ...(draw
+      ? { animation: `oryx-wipe ${duration}s cubic-bezier(0.16,1,0.3,1) forwards` }
+      : null),
+  }
 
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 64 64"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={strokeWidth}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-      className={`oryx-mark-svg ${className}`}
-    >
-      <path d="M23 41 Q35 24 52 7" style={style} />
-      <path d="M15 38 Q28 20 41 5" style={delayed('0.08s')} />
-      <path d="M23 41 Q16 47 17 55 Q18 61 27 61" style={delayed('0.16s')} />
-      <path d="M15 38 L23 41" style={delayed('0.22s')} />
-    </svg>
-  )
+  return <span aria-hidden="true" className={`oryx-mark-img ${className}`} style={style} />
 }
 
 /** The wordmark, at the identity's own tracking. */

@@ -5,7 +5,7 @@ import { prefersReduced } from '../lib/useLenis'
 /**
  * The sculpture, as a composited object rather than a picture on the page.
  *
- * Drop a transparent PNG at `public/brand/horns.png` and this mounts it. If the
+ * Drop a transparent PNG at `public/logo.png` and this mounts it. If the
  * file is not there it renders nothing — no broken icon, no reserved gap.
  *
  * Everything below exists to stop it reading as a pasted image:
@@ -28,7 +28,7 @@ export default function Horns({ align = 'right', scale = 1, className = '' }) {
     const probe = new Image()
     probe.onload = () => setOk(true)
     probe.onerror = () => setOk(false)
-    probe.src = '/brand/horns.png'
+    probe.src = '/logo.png'
   }, [])
 
   useEffect(() => {
@@ -73,7 +73,7 @@ export default function Horns({ align = 'right', scale = 1, className = '' }) {
   return (
     <div className={`horns horns--${align} ${className}`} ref={wrap} aria-hidden="true">
       <span className="horns-mask">
-        <img ref={img} src="/brand/horns.png" alt="" draggable="false" />
+        <img ref={img} src="/logo.png" alt="" draggable="false" />
       </span>
       <span className="horns-grain" />
     </div>

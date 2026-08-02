@@ -1,0 +1,293 @@
+/* ── A service, opened to the full screen ─────────────────────────────────────
+   The card the visitor pressed grows into this. The expansion is an entrance
+   animation rather than a scrubbed one: it answers a press, so it has to feel
+   immediate and must not depend on where the page is in its scroll. */
+.detail {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  background: var(--cream);
+  color: var(--charcoal);
+  overflow: hidden;
+  /* Fallback for the rare case we were opened without an origin rect. */
+  animation: detail-in 0.75s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* The real thing: the panel starts as the exact box of the card that was
+   pressed and grows out of it. `transform-origin: 0 0` makes the mapping a
+   plain translate + scale, and the scale is deliberately non-uniform because
+   the card and the viewport are not the same shape — over three quarters of a
+   second that reads as the card opening, not as content being stretched. */
+.detail.has-origin {
+  transform-origin: 0 0;
+  animation-name: detail-expand;
+  animation-duration: 0.78s;
+}
+@keyframes detail-expand {
+  from {
+    opacity: 0.35;
+    border-radius: 16px;
+    transform: translate(var(--tx), var(--ty)) scale(var(--sx), var(--sy));
+  }
+  40% { opacity: 1; }
+  to {
+    opacity: 1;
+    border-radius: 0;
+    transform: translate(0, 0) scale(1, 1);
+  }
+}
+
+@keyframes detail-in {
+  from { opacity: 0; transform: scale(0.86); border-radius: 28px; }
+  to { opacity: 1; transform: scale(1); border-radius: 0; }
+}
+
+/* The scrolling layer. Separate from the shell because the shell carries a
+   transform, and a `position: fixed` child of a transformed element is
+   positioned against that element — so a close button inside the scroller
+   would ride away with the copy. */
+.detail-scroll {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.detail-panel {
+  position: relative;
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: clamp(4.5rem, 10vh, 7rem) var(--gutter) clamp(3rem, 8vh, 5rem);
+}
+.detail-lines {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: min(52vh, 460px);
+  width: 100%;
+  color: var(--gold);
+  opacity: 0.4;
+  pointer-events: none;
+}
+.detail-panel > * { position: relative; }
+
+.detail-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding-bottom: clamp(1.2rem, 3vh, 2rem);
+  border-bottom: 1px solid var(--line);
+}
+.detail-eyebrow {
+  font-family: var(--font-label);
+  font-size: var(--step--1);
+  font-weight: 600;
+  letter-spacing: var(--track-label-wide);
+  text-transform: uppercase;
+  color: var(--gold-deep);
+}
+.detail-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: var(--step-5);
+  line-height: 1;
+  margin-top: 0.35rem;
+}
+.detail-pillar {
+  margin-top: 0.5rem;
+  font-family: var(--font-label);
+  font-size: var(--step-0);
+  letter-spacing: 0.04em;
+  color: var(--taupe);
+}
+.detail-mark { color: var(--rust); flex: none; }
+
+.detail-lede {
+  margin: clamp(1.4rem, 3.5vh, 2.2rem) 0 0;
+  max-width: 62ch;
+  font-size: var(--step-1);
+  line-height: 1.6;
+  color: var(--taupe);
+}
+
+/* One wide frame of the service, then two smaller ones further down — enough
+   to give the page a subject without turning it into a gallery. */
+.detail-hero {
+  margin: clamp(1.6rem, 4vh, 2.6rem) 0 0;
+  border-radius: 16px;
+  overflow: hidden;
+  aspect-ratio: 21 / 9;
+  background: var(--sand);
+}
+.detail-hero img,
+.detail-gallery img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.detail-gallery {
+  margin-top: clamp(1.6rem, 4vh, 2.6rem);
+  display: grid;
+  gap: clamp(0.7rem, 1.6vw, 1.1rem);
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+.detail-gallery figure {
+  margin: 0;
+  border-radius: 14px;
+  overflow: hidden;
+  aspect-ratio: 4 / 3;
+  background: var(--sand);
+}
+
+/* The offerings, in their named groups. */
+.detail-groups {
+  margin-top: clamp(2rem, 5vh, 3.2rem);
+  display: grid;
+  gap: clamp(1rem, 2.4vw, 1.6rem);
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+.detail-group {
+  padding: clamp(1.2rem, 2.4vw, 1.7rem);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--offwhite) 70%, transparent);
+  animation: detail-rise 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(0.07s * var(--i, 0) + 0.46s);
+}
+@keyframes detail-rise {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: none; }
+}
+.detail-group-name {
+  font-family: var(--font-label);
+  font-size: var(--step--1);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--gold-deep);
+}
+.detail-list {
+  list-style: none;
+  margin: 0.9rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+.detail-list li {
+  position: relative;
+  padding-left: 1.1rem;
+  line-height: 1.5;
+}
+.detail-list li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.62em;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--tan);
+}
+
+/* Stated once rather than repeated into all ten services. */
+.detail-partner {
+  margin-top: clamp(2.2rem, 5vh, 3.4rem);
+  padding: clamp(1.5rem, 3vw, 2.2rem);
+  border-radius: 16px;
+  background: var(--charcoal);
+  color: var(--offwhite);
+}
+.detail-partner-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: var(--step-3);
+  line-height: 1.08;
+}
+.detail-partner-lede {
+  margin-top: 0.6rem;
+  color: var(--taupe-3);
+  max-width: 56ch;
+  line-height: 1.6;
+}
+.detail-partner-list {
+  list-style: none;
+  margin: 1.3rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.55rem 1.4rem;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+.detail-partner-list li {
+  position: relative;
+  padding-left: 1.4rem;
+  line-height: 1.5;
+  color: var(--offwhite);
+}
+.detail-partner-list li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.55em;
+  width: 8px;
+  height: 1px;
+  background: var(--tan);
+}
+
+.detail-sectors { margin-top: clamp(2rem, 4.5vh, 3rem); }
+.detail-chips {
+  list-style: none;
+  margin: 1rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.detail-chips li {
+  padding: 0.4rem 0.8rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-size: var(--step--1);
+  color: var(--taupe);
+  background: color-mix(in srgb, var(--offwhite) 60%, transparent);
+}
+
+.detail-actions { margin-top: clamp(2rem, 5vh, 3rem); }
+.detail-cta {
+  font-family: var(--font-label);
+  font-size: var(--step-0);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--offwhite);
+  background: var(--charcoal);
+  padding: 0.85rem 1.6rem;
+  border-radius: 999px;
+  transition: background 0.35s var(--ease-out), transform 0.35s var(--ease-out);
+}
+.detail-cta:hover { background: var(--gold-deep); transform: translateY(-1px); }
+
+.detail-close {
+  position: absolute;
+  top: clamp(0.9rem, 2vh, 1.4rem);
+  right: clamp(0.9rem, 2vw, 1.4rem);
+  z-index: 2;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  font-size: 1.6rem;
+  line-height: 1;
+  border-radius: 999px;
+  color: var(--charcoal);
+  background: color-mix(in srgb, var(--offwhite) 85%, transparent);
+  border: 1px solid var(--line);
+  backdrop-filter: blur(10px);
+  transition: background 0.3s var(--ease-out), transform 0.3s var(--ease-out);
+}
+.detail-close:hover { background: var(--sand); transform: rotate(90deg); }
+
+@media (prefers-reduced-motion: reduce) {
+  .detail,
+  .detail-group { animation: none; }
+  .detail-close:hover { transform: none; }
+}

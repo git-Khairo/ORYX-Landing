@@ -1126,7 +1126,8 @@
   font-size: 0.85rem;
   color: var(--offwhite);
 }
-.site-foot-mark .oryx-mark-svg { color: var(--tan); }
+.site-foot-mark .oryx-mark-svg,
+.site-foot-mark .oryx-mark-img { color: var(--tan); }
 .site-foot-brand p {
   margin-top: 0.8rem;
   max-width: 30ch;

@@ -1,5 +1,6 @@
 import { useSectionReveal } from '../lib/useSectionReveal'
 import VideoBackdrop from '../components/VideoBackdrop'
+import AmbientField from '../components/three/AmbientField'
 import { film } from '../content/media'
 
 /**
@@ -14,6 +15,7 @@ export default function OryxMoment() {
   return (
     <section id="beyond" className="oryx-moment" ref={ref} data-stops={1} aria-label="Beyond service">
       <VideoBackdrop src={film.aerial.src} tone="cinematic" className="oryx-moment-bg" />
+      <AmbientField />
       <div className="oryx-moment-inner">
         <p className="eyebrow" data-reveal style={{ color: 'var(--offwhite)' }}>The ORYX</p>
         <h2 className="oryx-moment-title" data-reveal>Beyond service.</h2>

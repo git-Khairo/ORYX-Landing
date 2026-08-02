@@ -1,0 +1,116 @@
+/* ── Act 6: How it works — vertical scroll, horizontal travel ─────────────── */
+.how {
+  position: relative;
+  height: 100svh;
+  overflow: hidden;
+  background: var(--cream);
+}
+.how-track {
+  display: flex;
+  height: 100svh;
+  width: max-content;
+  will-change: transform;
+}
+.how-panel {
+  flex: 0 0 auto;
+  height: 100svh;
+  display: grid;
+  align-content: center;
+  padding: 0 clamp(2rem, 7vw, 7rem);
+}
+
+.how-intro { width: min(90vw, 620px); }
+.how-title {
+  font-family: var(--font-display);
+  font-size: var(--step-4);
+  line-height: 1.04;
+  margin: 0.5rem 0 0;
+}
+.how-lead { margin-top: 1rem; color: var(--muted); font-size: var(--step-1); line-height: 1.55; }
+
+.how-step {
+  width: min(78vw, 440px);
+  gap: 0.6rem;
+  border-left: 1px solid var(--line);
+}
+.how-step-n {
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  letter-spacing: 0.1em;
+  color: var(--gold-deep);
+}
+.how-step-t { font-family: var(--font-display); font-size: var(--step-3); line-height: 1.06; }
+.how-step-d { color: var(--muted); line-height: 1.55; max-width: 34ch; }
+
+/* The fifth frame — the scattered field, and Act 7's zoom target. */
+.how-scatter { width: 100vw; padding: 0; place-items: center; }
+.how-frame {
+  position: relative;
+  width: min(88vw, 1180px);
+  height: min(78svh, 720px);
+  border-radius: 18px;
+  overflow: hidden;
+  background: radial-gradient(120% 100% at 50% 40%, var(--charcoal-soft) 0%, #0d0c0b 100%);
+  will-change: transform;
+  transform-origin: center;
+}
+.how-tile {
+  position: absolute;
+  width: var(--w);
+  min-width: 120px;
+  aspect-ratio: 4 / 5;
+  margin: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 30px 60px -30px rgba(0, 0, 0, 0.85);
+  animation: how-float var(--float, 9s) ease-in-out infinite alternate;
+}
+.how-tile .how-tile-bg { position: absolute; inset: 0; }
+.how-tile figcaption {
+  position: absolute;
+  inset: auto 0 0 0;
+  z-index: 2;
+  padding: 0.6rem 0.7rem;
+  font-family: var(--font-label);
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--offwhite);
+  background: linear-gradient(to top, rgba(10, 9, 8, 0.75), transparent);
+}
+@keyframes how-float {
+  from { translate: 0 -6px; }
+  to   { translate: 0 6px; }
+}
+.how-scatter-center {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: grid;
+  place-content: center;
+  text-align: center;
+  pointer-events: none;
+}
+.how-scatter-center .eyebrow { color: var(--tan); }
+.how-scatter-title {
+  font-family: var(--font-display);
+  font-size: var(--step-5);
+  line-height: 0.98;
+  color: var(--offwhite);
+  text-shadow: 0 8px 40px rgba(0, 0, 0, 0.55);
+}
+
+/* Act 7's scroll budget: empty space whose only job is to give the frame's
+   zoom something to scrub against after the horizontal travel has finished. */
+.how-zoom { height: 120svh; background: var(--cream); }
+
+/* Reduced motion: the track becomes a plain vertical stack. */
+@media (prefers-reduced-motion: reduce) {
+  .how-zoom { display: none; }
+  .how { height: auto; }
+  .how-track { display: block; width: auto; height: auto; }
+  .how-panel { height: auto; width: auto; padding: 4rem var(--gutter); }
+  .how-frame { width: 100%; height: 70svh; }
+  .how-tile { animation: none; }
+}

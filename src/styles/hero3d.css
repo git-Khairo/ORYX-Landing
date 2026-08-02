@@ -1,0 +1,356 @@
+/* ─────────────────────────────────────────────────────────────────────────
+   Hero: 3D service-card coverflow + drifting marquee.
+   Structure borrowed from getlayers' "AI Studio"; skin is pure ORYX —
+   cream / gold / charcoal, Instrument Serif, the horn glyph.
+   ───────────────────────────────────────────────────────────────────────── */
+
+.hero3d {
+  position: relative;
+  min-height: 100svh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  overflow: hidden;
+  isolation: isolate;
+  background:
+    radial-gradient(120% 90% at 50% 30%, var(--offwhite) 0%, var(--cream) 55%, var(--sand) 100%);
+  color: var(--charcoal);
+}
+
+/* ── The scrolling headline band ─────────────────────────────────────────── */
+.marquee {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  transform: translateY(-50%);
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.9;
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 12%, #000 88%, transparent);
+  mask-image: linear-gradient(to right, transparent, #000 12%, #000 88%, transparent);
+}
+.marquee-viewport {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+  animation: marquee-drift 46s linear infinite;
+}
+.marquee-run {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+}
+.marquee-word {
+  display: inline-flex;
+  align-items: center;
+  gap: clamp(1.4rem, 3vw, 3rem);
+  padding-right: clamp(1.4rem, 3vw, 3rem);
+  font-family: var(--font-display);
+  font-size: clamp(3.2rem, 12vw, 10rem);
+  line-height: 0.9;
+  /* It runs over the dark field now, not cream, so the ghost is light. */
+  color: var(--offwhite);
+  opacity: 0.09; /* a ghost behind the cards, never competing with them */
+  white-space: nowrap;
+}
+.marquee-sep {
+  color: var(--gold);
+  opacity: 0.9;
+  flex: 0 0 auto;
+}
+@keyframes marquee-drift {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(-50%, 0, 0); }
+}
+
+/* ── The carousel stage ──────────────────────────────────────────────────── */
+.hero3d-stage {
+  position: relative;
+  z-index: 2;
+  grid-row: 2;
+  display: grid;
+  place-items: center;
+}
+/* Fixed height on purpose: the 3D cards scale with the canvas's pixel height,
+   so a stable stage height is what keeps the card size stable — and it leaves
+   guaranteed room for the head above and the foot below within one screen. */
+.svc-stage {
+  position: relative;
+  width: 100%;
+  height: min(52svh, 520px);
+}
+/* Per-frame opacity/scale from the ring live on this wrapper. */
+.svc-card-fade {
+  will-change: opacity, transform;
+  transform-origin: center;
+}
+.svc-canvas {
+  opacity: 0;
+  transition: opacity 0.9s var(--ease-out);
+}
+.svc-canvas.is-ready { opacity: 1; }
+
+/* drei <Html transform> wraps each card in a positioned div; keep it from
+   catching pointer events except the drag handled on the mesh group. */
+.svc-card-html { pointer-events: none; }
+
+/* ── A single card face ──────────────────────────────────────────────────── */
+/* These three values are mirrored by `CARD_PX` in CarouselCanvas.jsx, which
+   derives the WebGL logo card's size from them so the four cards match. Change
+   them together. */
+.svc-card {
+  width: 210px;
+  height: 286px;
+  border-radius: 18px;
+  padding: 21px 19px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  /* The face is a <button>, which centres its text by default. */
+  text-align: left;
+  overflow: hidden;
+  position: relative;
+  isolation: isolate;
+  /* Same reason as `.brand-card`: these sit inside drei's preserve-3d wrapper,
+     where children paint by depth rather than by z-index. Flattening keeps the
+     gloss sweep and the type stacking the way the stylesheet says they should. */
+  transform-style: flat;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.5) inset,
+    0 26px 60px -24px rgba(28, 28, 26, 0.55);
+  user-select: none;
+}
+/* The service's own photography, filling the upper half and dissolving into
+   the card rather than sitting in a framed box — so the card stays one object
+   and the type below it keeps a clean, unbusy ground to sit on. */
+.svc-card-photo {
+  position: absolute;
+  inset: 0 0 auto 0;
+  z-index: 0;
+  width: 100%;
+  height: 62%;
+  object-fit: cover;
+  /* Graded back so it reads as part of the card's surface, not a photo pasted
+     onto it, and so the eyebrow stays legible over it. */
+  opacity: 0.9;
+  -webkit-mask-image: linear-gradient(to bottom, #000 42%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 42%, transparent 100%);
+}
+.svc-card > *:not(.svc-card-photo) { position: relative; z-index: 1; }
+.svc-card-top { text-shadow: 0 1px 10px rgba(255, 255, 255, 0.55); }
+
+/* The gloss sweep that reads the cards as glass, echoing AI Studio's sheen. */
+.svc-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background: linear-gradient(150deg, rgba(255, 255, 255, 0.34) 0%, rgba(255, 255, 255, 0) 42%);
+  mix-blend-mode: screen;
+}
+
+/* Three tones so the ring has rhythm, all inside the ORYX palette. */
+.svc-card--paper {
+  background: linear-gradient(158deg, var(--offwhite) 0%, var(--sand) 100%);
+  color: var(--charcoal);
+  border: 1px solid rgba(180, 138, 80, 0.28);
+}
+.svc-card--gold {
+  background: linear-gradient(158deg, var(--tan) 0%, var(--gold-deep) 100%);
+  color: var(--offwhite);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+}
+.svc-card--ink {
+  background: linear-gradient(158deg, var(--charcoal-soft) 0%, #100f0d 100%);
+  color: var(--offwhite);
+  border: 1px solid rgba(201, 166, 107, 0.35);
+}
+.svc-card--ink .svc-card-title,
+.svc-card--gold .svc-card-title { color: var(--offwhite); }
+
+.svc-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+.svc-card-eyebrow {
+  font-family: var(--font-label);
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  opacity: 0.72;
+}
+.svc-card--paper .svc-card-glyph { color: var(--gold-deep); }
+.svc-card--gold .svc-card-glyph,
+.svc-card--ink .svc-card-glyph { color: var(--tan); }
+
+/* Sized against the card's ~138px of content width, not by eye: at the old
+   2.5rem a word like "Management" was half again wider than the card and ran
+   off its edge. `break-word` is the backstop for any future long title. */
+.svc-card-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 2.05rem;
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+  margin-top: auto;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+.svc-card-title span { display: block; }
+.svc-card-pillar {
+  font-family: var(--font-label);
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  line-height: 1.35;
+  opacity: 0.78;
+  margin-top: 12px;
+}
+
+/* ── Static fallback (reduced motion / no WebGL) ─────────────────────────── */
+.svc-fallback {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  perspective: 1400px;
+}
+.svc-fallback-slot {
+  position: absolute;
+  transform:
+    translateX(calc((var(--i) - 1.5) * 150px))
+    rotateY(calc((var(--i) - 1.5) * -12deg))
+    scale(calc(1 - (var(--absdev, 0) * 0.06)));
+  transition: transform 0.6s var(--ease-out);
+}
+.svc-fallback-slot:nth-child(1) { --absdev: 1.5; z-index: 1; }
+.svc-fallback-slot:nth-child(2) { --absdev: 0.5; z-index: 3; }
+.svc-fallback-slot:nth-child(3) { --absdev: 0.5; z-index: 2; }
+.svc-fallback-slot:nth-child(4) { --absdev: 1.5; z-index: 1; }
+
+/* ── Hero chrome: category, wordmark echo, foot ──────────────────────────── */
+.hero3d-head {
+  grid-row: 1;
+  z-index: 4;
+  text-align: center;
+  padding: clamp(4.5rem, 9vh, 6.5rem) var(--gutter) 0;
+}
+.hero3d-eyebrow {
+  font-family: var(--font-label);
+  font-size: var(--step--1);
+  font-weight: 600;
+  letter-spacing: var(--track-label-wide);
+  text-transform: uppercase;
+  color: var(--gold-deep);
+}
+.hero3d-foot {
+  grid-row: 3;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0 var(--gutter) clamp(2.4rem, 6vh, 4rem);
+  text-align: center;
+}
+.hero3d-tagline {
+  font-family: var(--font-display);
+  font-size: var(--step-3);
+  line-height: 1;
+  color: var(--charcoal);
+}
+.hero3d-promise {
+  color: var(--taupe);
+  max-width: 44ch;
+  /* The measure is capped, so the block needs centring in its own right —
+     text-align on the parent only centres the lines inside it. */
+  margin-inline: auto;
+}
+
+/* ── Floating parallax gallery ───────────────────────────────────────────── */
+.gallery {
+  position: relative;
+  min-height: 100svh;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(120% 100% at 50% 40%, var(--charcoal-soft) 0%, #0d0c0b 100%);
+  color: var(--offwhite);
+}
+.gallery-field {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+.gallery-tile {
+  position: absolute;
+  width: var(--w);
+  min-width: 150px;
+  aspect-ratio: 4 / 5;
+  border-radius: 14px;
+  overflow: hidden;
+  will-change: transform;
+  box-shadow: 0 30px 60px -30px rgba(0, 0, 0, 0.8);
+  animation: gallery-float var(--float, 9s) ease-in-out infinite alternate;
+}
+.gallery-tile .gallery-tile-bg { position: absolute; inset: 0; }
+.gallery-tile-cap {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  padding: 0.7rem 0.85rem;
+  font-family: var(--font-label);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--offwhite);
+  background: linear-gradient(to top, rgba(10, 9, 8, 0.75), transparent);
+}
+@keyframes gallery-float {
+  from { translate: 0 -6px; }
+  to   { translate: 0 6px; }
+}
+.gallery-center {
+  position: relative;
+  z-index: 3;
+  text-align: center;
+  pointer-events: none;
+  padding: 0 var(--gutter);
+  mix-blend-mode: normal;
+}
+.gallery-center .eyebrow { color: var(--tan); }
+.gallery-title {
+  font-family: var(--font-display);
+  font-size: var(--step-5);
+  line-height: 0.98;
+  color: var(--offwhite);
+  text-shadow: 0 8px 40px rgba(0, 0, 0, 0.55);
+}
+
+/* ── Ambient gold-mote field (layered decoration in the interlude) ───────── */
+.ambient-field {
+  position: absolute;
+  inset: 0;
+  z-index: 1; /* above the video backdrop, below the content */
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+.ambient-canvas { width: 100% !important; height: 100% !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-viewport { animation: none; }
+  .svc-canvas { transition: none; }
+}
+
+@media (max-width: 640px) {
+  .svc-card { width: 232px; height: 322px; }
+  .svc-card-title { font-size: 2.1rem; }
+}

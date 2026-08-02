@@ -1,55 +1,77 @@
 import { useState } from 'react'
-import { useLenis } from './lib/useLenis'
-import { usePager } from './lib/usePager'
+import { useSmoothScroll } from './lib/useSmoothScroll'
 import ContactGateway from './components/ContactGateway'
 import './styles/components.css'
 import './styles/sections.css'
 
-import Backdrop from './components/Backdrop'
 import Preloader from './components/Preloader'
 import Nav from './components/Nav'
-import ProgressRail from './components/ProgressRail'
 
-import Hero from './sections/Hero'
-import Discover from './sections/Discover'
-import Technology from './sections/Technology'
-import Services from './sections/Services'
-import OryxMoment from './sections/OryxMoment'
-import WhyOryx from './sections/WhyOryx'
-import Sustainability from './sections/Sustainability'
-import Process from './sections/Process'
-import Contact from './sections/Contact'
+import ServiceDetail from './components/ServiceDetail'
+import Cinema from './sections/Cinema'
+import HowItWorks from './sections/HowItWorks'
 import Statement from './sections/Statement'
 
+/**
+ * The site is one continuous scroll-scrubbed sequence rather than a stack of
+ * self-contained screens:
+ *
+ *   loader → [Acts 1–4] the mark, the ring assembling around it, the turn
+ *   through the services, the rush into the fill → [Act 5] the standard →
+ *   [Act 6] how it works, travelling horizontally → [Act 7] the last frame
+ *   opens into the closing statement.
+ *
+ * `useSmoothScroll` owns the scroll spine (Lenis + ScrollTrigger). The old
+ * snap-pager, progress rail and per-section backdrop are gone: paging fought
+ * scrubbing for the same gesture, and only one of them can win.
+ */
 export default function App() {
-  useLenis()
-  usePager()
+  useSmoothScroll()
 
-  // The contact experience is an overlay, not a place on the page — a service
-  // world can hand straight into it without the visitor losing their position.
+  // The contact experience is an overlay, not a place on the page — the nav and
+  // the closing statement can hand straight into it without losing position.
   // `null` = closed; a service id or '' (undecided) = open.
   const [request, setRequest] = useState(null)
+  // Which service has been opened out to the full screen; null = none.
+  const [openService, setOpenService] = useState(null) // { id, rect }
   const openRequest = (serviceId = '') => setRequest(serviceId)
 
   return (
     <>
       <Preloader />
-      <Backdrop />
-      <Nav onContact={() => openRequest()} />
-      <ProgressRail />
+      <Nav
+        onContact={() => openRequest()}
+        /* No card was pressed, so there is no rect to grow from — the panel
+           falls back to its own entrance. */
+        onOpenService={(id) => setOpenService({ id, rect: null })}
+      />
 
       <main className="content-layer">
-        <Hero />
-        <Discover />
-        <Technology />
-        <Services onRequest={openRequest} />
-        <OryxMoment />
-        <WhyOryx />
-        <Sustainability />
-        <Process />
-        <Contact onRequest={openRequest} />
+        {/* Acts 1–5: the mark, the ring, the zoom, and The Standard — which is
+            revealed by the transition itself rather than scrolled to. */}
+        <Cinema
+          onOpenService={(id, rect) => setOpenService({ id, rect })}
+          onContact={() => openRequest()}
+        />
+        <HowItWorks />
+        {/* Scroll budget for Act 7: the frame's zoom is scrubbed against this. */}
+        <div id="how-zoom" className="how-zoom" aria-hidden="true" />
         <Statement onRequest={openRequest} />
       </main>
+
+      {openService && (
+        <ServiceDetail
+          serviceId={openService.id}
+          originRect={openService.rect}
+          onClose={() => setOpenService(null)}
+          onRequest={(id) => {
+            setOpenService(null)
+            // Ids match the journeys in `copy.js`, so the request opens on this
+            // service's own question flow rather than the undecided one.
+            openRequest(id)
+          }}
+        />
+      )}
 
       {request !== null && (
         <ContactGateway initialService={request} onClose={() => setRequest(null)} />
