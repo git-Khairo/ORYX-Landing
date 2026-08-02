@@ -9,8 +9,7 @@ import Nav from './components/Nav'
 
 import ServiceDetail from './components/ServiceDetail'
 import Cinema from './sections/Cinema'
-import HowItWorks from './sections/HowItWorks'
-import Statement from './sections/Statement'
+import FlowScene from './sections/FlowScene'
 
 /**
  * The site is one continuous scroll-scrubbed sequence rather than a stack of
@@ -53,10 +52,10 @@ export default function App() {
           onOpenService={(id, rect) => setOpenService({ id, rect })}
           onContact={() => openRequest()}
         />
-        <HowItWorks />
-        {/* Scroll budget for Act 7: the frame's zoom is scrubbed against this. */}
-        <div id="how-zoom" className="how-zoom" aria-hidden="true" />
-        <Statement onRequest={openRequest} />
+        {/* One horizontal journey: the process, then the S-weave through the
+            scattered frames, ending on the statement frame — the real closing
+            page — which the scroll zooms open in place, footer and all. */}
+        <FlowScene onRequest={openRequest} />
       </main>
 
       {openService && (

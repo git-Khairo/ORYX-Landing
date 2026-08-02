@@ -128,8 +128,15 @@ function Stage({ onOpen, onContact, onExplore }) {
         aim.current.x += (pointer.x - aim.current.x) * 0.06
         aim.current.y += (pointer.y - aim.current.y) * 0.06
 
-        const yaw = solid * (11 * Math.sin(performance.now() / 2600) + aim.current.x * 16)
-        const pitch = solid * (-aim.current.y * 11)
+        // A wider, livelier idle sway on both axes — the two periods are
+        // coprime so the mark never falls into a flat back-and-forth and keeps
+        // finding new angles. The pointer lean rides on top. Everything is
+        // scaled by `solid`, so it all settles square exactly as it flattens.
+        const now = performance.now()
+        const yaw =
+          solid * (26 * Math.sin(now / 2400) + 8 * Math.sin(now / 5300) + aim.current.x * 20)
+        const pitch =
+          solid * (12 * Math.sin(now / 3100) - aim.current.y * 13)
         logoEl.current.style.setProperty('--yaw', `${yaw.toFixed(2)}deg`)
         logoEl.current.style.setProperty('--pitch', `${pitch.toFixed(2)}deg`)
       }

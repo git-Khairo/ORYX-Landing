@@ -29,9 +29,22 @@
 .how-lead { margin-top: 1rem; color: var(--muted); font-size: var(--step-1); line-height: 1.55; }
 
 .how-step {
-  width: min(78vw, 440px);
+  width: min(84vw, 560px);
   gap: 0.6rem;
   border-left: 1px solid var(--line);
+}
+/* The step's photo, faded into the panel like the service cards: a band at the
+   top masked to transparent, so it dissolves into the ground the text sits on
+   rather than sitting in a framed box. */
+.how-step-photo {
+  width: 100%;
+  max-width: 480px;
+  height: clamp(230px, 42vh, 380px);
+  object-fit: cover;
+  border-radius: 12px;
+  margin-bottom: clamp(1.1rem, 2.4vh, 1.7rem);
+  -webkit-mask-image: linear-gradient(to bottom, #000 58%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 58%, transparent 100%);
 }
 .how-step-n {
   font-family: var(--font-mono);
