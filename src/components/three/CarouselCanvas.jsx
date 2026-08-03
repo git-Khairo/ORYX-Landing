@@ -25,7 +25,7 @@ const DISTANCE_FACTOR = 2.5
  *  units. Everything that has to agree between DOM pixels and the 3D scene goes
  *  through this, so the two can never drift apart. */
 const PX_TO_WORLD = DISTANCE_FACTOR / 400
-const CARD_PX = { w: 210, h: 286 } // must match `.svc-card` in CSS
+const CARD_PX = { w: 300, h: 200 } // must match `.svc-card` in CSS — landscape
 
 /**
  * Sized from the ring's own contents rather than picked by eye: with eleven
@@ -37,7 +37,7 @@ const CARD_W_WORLD = CARD_PX.w * PX_TO_WORLD
 const CARD_COUNT_TOTAL = CARDS.length + 1 // services + the brand station
 const RADIUS = Math.max(
   1.15,
-  (CARD_W_WORLD * 1.5) / (2 * Math.sin(Math.PI / CARD_COUNT_TOTAL)),
+  (CARD_W_WORLD * 1.1) / (2 * Math.sin(Math.PI / CARD_COUNT_TOTAL)),
 )
 /**
  * Shared by every station, and deliberately drei's own default.

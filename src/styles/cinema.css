@@ -54,24 +54,15 @@
   background: #100f0d;
   pointer-events: none;
 }
-/* A slow warm mass behind everything, so the field is lit rather than merely
-   dark. It breathes, which is most of what keeps a static backdrop alive. */
-.cinema-atmos-ember {
-  --ex: 50%;
-  --ey: 58%;
+/* Canvas particle system: ambient cursor glow + floating amber sparks.
+   Replaces the old CSS-variable ember; all animation is driven per-frame by
+   the useEffect in Cinema.jsx, so no custom-property writes in the hot path. */
+.cinema-atmos-particles {
   position: absolute;
-  inset: -12%;
-  /* The warm mass follows the cursor (--ex/--ey, written each frame); a cooler
-     violet counter-light sits opposite it, so the field has a light and a
-     shadow side that swing with the pointer rather than a static glow. */
-  background:
-    radial-gradient(42% 42% at var(--ex) var(--ey), rgba(226, 120, 70, 0.55) 0%, rgba(226, 120, 70, 0) 66%),
-    radial-gradient(38% 38% at calc(100% - var(--ex)) calc(100% - var(--ey)), rgba(109, 99, 130, 0.4) 0%, rgba(109, 99, 130, 0) 70%);
-  animation: atmos-breathe 22s ease-in-out infinite alternate;
-}
-@keyframes atmos-breathe {
-  from { transform: scale(1) translate3d(0, 0, 0); opacity: 0.85; }
-  to { transform: scale(1.12) translate3d(2%, -2%, 0); opacity: 1; }
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
 }
 /* The measured grid — the counterpart to the hero's curves: where that is
    organic and flowing, this is regular and surveyed. */
@@ -95,17 +86,21 @@
   inset: 0;
   background: radial-gradient(78% 70% at 50% 50%, transparent 40%, rgba(0, 0, 0, 0.6) 100%);
 }
-@media (prefers-reduced-motion: reduce) {
-  .cinema-atmos-ember { animation: none; }
-}
 
-/* Behind everything, and only present once the ring is. */
+/* Giant type drifting behind the ring as texture — readable only as a ghost.
+   The word colour overrides hero3d.css's offwhite so it reads warm against
+   the dark field; opacity is set here rather than on the words so the whole
+   layer can be killed with a single property if needed. */
 .cinema-marquee {
   position: absolute;
   inset: 0;
   z-index: 1;
-  opacity: 0;
   pointer-events: none;
+}
+.cinema-marquee .marquee-word {
+  color: var(--tan);
+  opacity: 0.28;
+  letter-spacing: 0.04em;
 }
 
 /* ── The brand station: hero → card → zoom, one element ──────────────────────
@@ -183,6 +178,23 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .cl-pulse { animation: none; opacity: 0; }
+}
+
+/* City footage playing inside the hero card. It sits below the warm gradient
+   layers (bloom, grain) and uses overlay blend so the paper warmth wins and
+   the footage adds texture and motion rather than a competing image. */
+.brand-card-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.62) saturate(0.75);
+  mix-blend-mode: overlay;
+  opacity: calc(var(--card-face) * 0.72);
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 0;
 }
 
 /* ── Surface: bloom + grain ──────────────────────────────────────────────── */

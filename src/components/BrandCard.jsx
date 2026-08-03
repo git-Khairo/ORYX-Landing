@@ -1,6 +1,6 @@
 import { brand } from '../content/copy'
-import { sectors } from '../content/catalog'
 import { useAppReady } from '../lib/useAppReady'
+import { film } from '../content/media'
 import CurvedLines from './CurvedLines'
 
 /** Layers in the mark's depth stack. Enough to read as solid at hero scale
@@ -43,6 +43,19 @@ export default function BrandCard({ cardRef, logoRef, onContact, onExplore }) {
       ref={cardRef}
       data-card="always-ready"
     >
+      {/* City drone footage blended into the warm surface — overlay mode so the
+          paper gradient wins and the video adds motion texture, not a picture. */}
+      <video
+        className="brand-card-video"
+        src={film.hero.src}
+        muted
+        loop
+        playsInline
+        autoPlay
+        preload="auto"
+        aria-hidden="true"
+      />
+
       <CurvedLines className="brand-lines" />
 
       {/* Surface treatment. The bloom lifts the warm corner so the gradient has
@@ -82,24 +95,6 @@ export default function BrandCard({ cardRef, logoRef, onContact, onExplore }) {
           <button className="brand-btn brand-btn--ghost" onClick={() => onExplore?.()}>
             Explore services
           </button>
-        </div>
-      </div>
-
-      {/* The proof strip. The hero's lower third was empty, which read as
-          unfinished rather than roomy — and the sectors are the fastest way to
-          say what kind of company this is. Duplicated once and translated by
-          exactly -50% so the loop is seamless. */}
-      <div className="brand-proof" data-in style={{ '--d': 5 }}>
-        <div className="brand-proof-viewport" aria-hidden="true">
-          {[0, 1].map((run) => (
-            <span className="brand-proof-run" key={run}>
-              {sectors.map((s) => (
-                <span className="brand-proof-item" key={s}>
-                  {s}
-                </span>
-              ))}
-            </span>
-          ))}
         </div>
       </div>
 

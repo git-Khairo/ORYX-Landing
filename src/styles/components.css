@@ -426,7 +426,7 @@ html.tone-dark .nav-dropdown-sub { color: var(--taupe-3); }
   box-shadow: 0 10px 30px -12px rgba(28, 28, 26, 0.5);
 }
 .cta-solid:hover { background: var(--gold-deep); }
-.cta-gold { background: var(--gold); color: var(--offwhite); box-shadow: 0 10px 30px -12px rgba(180, 138, 80, 0.6); }
+.cta-gold { background: var(--gold); color: var(--offwhite); box-shadow: 0 10px 30px -12px rgba(125, 45, 68, 0.6); }
 .cta-gold:hover { background: var(--gold-deep); }
 .cta-ghost { border: 1px solid var(--charcoal); color: var(--charcoal); }
 .cta-ghost:hover { background: var(--charcoal); color: var(--cream); }

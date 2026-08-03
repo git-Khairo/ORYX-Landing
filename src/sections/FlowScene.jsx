@@ -9,60 +9,58 @@ import { prefersReduced } from '../lib/useLenis'
 import '../styles/flowscene.css'
 
 /**
- * One continuous horizontal journey — the process, the scattered board, and the
+ * One continuous horizontal journey — intro, four process steps, and the
  * closing statement, all in a single pinned scroll.
  *
- * A camera travels a world far wider than the screen; the world is translated
- * by the inverse of the camera, so moving the camera moves the world. The
- * camera's route has three characters, blended into one scrub:
- *
- *   · through the process it runs dead straight, left to right — a track
- *   · into the scattered frames it starts to weave up and down — the S — and
- *     the frames are strewn off that line, so it threads between them
- *   · at the far end it parks on the Statement frame and scales the world into
- *     it, so the last frame *is* the closing section, opening where it sits
- *
- * The lit curved lines from the hero run behind the whole thing, fixed to the
- * stage, so the frames drift over the same rails the opening used.
+ * The camera travels a waypoint path: it moves directly to each step and
+ * centres on it, so every step is always fully visible when the camera arrives.
+ * The alternating Y positions of the waypoints produce the S-shape: the path
+ * arcs above and below the midline between steps, weaving through them rather
+ * than flying past them.
  */
 const lerp = (a, b, t) => a + (b - a) * t
-const clamp = (v, lo, hi) => (v < lo ? lo : v > hi ? hi : v)
 const smooth = (t) => t * t * (3 - 2 * t)
 
-/** Placeholder photo per step, in order. */
 const STEP_PHOTOS = [5025639, 3184292, 2760241, 3862632]
 
-/** World layout. x is in viewport-widths, y a fraction of viewport height
- *  (0.5 = centre). The camera visits these left to right. */
-const X_INTRO = 0.5
-const STEPS_X = [1.08, 1.68, 2.28, 2.88] // a tight row
-const X_STEPS_END = STEPS_X[STEPS_X.length - 1]
-
-/** The scattered frames — deliberately different sizes, strewn above and below
- *  the weave rather than sat on it, and packed close together. */
-const FRAMES = [
-  { id: 1267338, label: 'Delivery', x: 3.55, y: 0.34, w: 0.2 },
-  { id: 4239146, label: 'Cleaning', x: 3.92, y: 0.68, w: 0.13 },
-  { id: 906494, label: 'Logistics', x: 4.32, y: 0.42, w: 0.25 },
-  { id: 5025639, label: 'The people', x: 4.74, y: 0.7, w: 0.15 },
-  { id: 2760241, label: 'Facility', x: 5.08, y: 0.3, w: 0.22 },
-  { id: 3862632, label: 'Technology', x: 5.44, y: 0.62, w: 0.11 },
-  { id: 4481259, label: 'Distribution', x: 5.72, y: 0.44, w: 0.17 },
+/**
+ * Step world positions. The camera centres on each one when it arrives, so the
+ * step is always exactly in the middle of the screen at that moment. Alternating
+ * Y values give the S-shape; the values stay moderate so nothing clips.
+ */
+const STEPS = [
+  { x: 1.1,  y: 0.38 },
+  { x: 1.78, y: 0.62 },
+  { x: 2.46, y: 0.36 },
+  { x: 3.14, y: 0.64 },
 ]
 
-const X_STMT = 6.5
-const STMT_W = 0.42 // statement frame width as a fraction of the viewport
-const SF = 1 / STMT_W // world scale that brings the statement frame to full bleed
+const X_INTRO = 0.5
+const X_STMT  = 3.9
+const STMT_W  = 0.42
+const SF      = 1 / STMT_W
 
-const AMP = 0.16 // vertical weave amplitude (fraction of viewport height)
-const P_STEPS = 0.3 // progress the straight run ends
-const P_SCATTER = 0.76 // progress the weave ends and the zoom begins
+/**
+ * Camera waypoints. Each waypoint records the world position the camera centres
+ * on and the scroll-progress fraction at which it arrives. The camera eases
+ * between consecutive waypoints using smooth-step so each transition accelerates
+ * out and decelerates in rather than moving at a constant rate.
+ */
+const P_ZOOM = 0.74  // progress at which the zoom phase starts
+
+const WAYPOINTS = [
+  { x: X_INTRO,    y: 0.5,         p: 0    },
+  { x: STEPS[0].x, y: STEPS[0].y,  p: 0.13 },
+  { x: STEPS[1].x, y: STEPS[1].y,  p: 0.28 },
+  { x: STEPS[2].x, y: STEPS[2].y,  p: 0.43 },
+  { x: STEPS[3].x, y: STEPS[3].y,  p: 0.58 },
+  { x: X_STMT,     y: 0.5,         p: P_ZOOM },
+]
 
 export default function FlowScene({ onRequest }) {
-  const root = useRef(null)
+  const root  = useRef(null)
   const stage = useRef(null)
   const world = useRef(null)
-  const frameEls = useRef([])
 
   useEffect(() => {
     if (prefersReduced) return
@@ -78,41 +76,35 @@ export default function FlowScene({ onRequest }) {
         onUpdate: (self) => {
           const w = world.current
           if (!w) return
-          const p = self.progress
-          const vw = window.innerWidth
-          const vh = window.innerHeight
+          const p   = self.progress
+          const vw  = window.innerWidth
+          const vh  = window.innerHeight
 
-          let camX
+          let camX = X_INTRO
           let camY = 0.5
-          let s = 1
+          let s    = 1
 
-          if (p < P_STEPS) {
-            // Straight run through the process.
-            camX = lerp(X_INTRO, X_STEPS_END, p / P_STEPS)
-          } else if (p < P_SCATTER) {
-            // The weave: horizontal march + a sine S through the scattered frames.
-            const l = (p - P_STEPS) / (P_SCATTER - P_STEPS)
-            camX = lerp(X_STEPS_END, X_STMT, smooth(l))
-            camY = 0.5 + AMP * Math.sin(l * Math.PI * 2.4)
+          if (p < P_ZOOM) {
+            // Find the active waypoint segment and ease through it.
+            let i = 0
+            while (i < WAYPOINTS.length - 2 && p >= WAYPOINTS[i + 1].p) i++
+            const w0 = WAYPOINTS[i]
+            const w1 = WAYPOINTS[i + 1]
+            const t  = (p - w0.p) / (w1.p - w0.p)
+            const st = smooth(t)
+            camX = lerp(w0.x, w1.x, st)
+            camY = lerp(w0.y, w1.y, st)
           } else {
-            // Park on the Statement and scale the world into it.
-            const l = (p - P_SCATTER) / (1 - P_SCATTER)
+            // Parked at the statement; scale the world into it.
+            const l = (p - P_ZOOM) / (1 - P_ZOOM)
             camX = X_STMT
-            s = 1 + (SF - 1) * smooth(l)
+            camY = 0.5
+            s    = 1 + (SF - 1) * smooth(l)
           }
 
           const bx = vw / 2 - s * camX * vw
           const by = vh / 2 - s * camY * vh
           w.style.transform = `translate(${bx.toFixed(1)}px, ${by.toFixed(1)}px) scale(${s.toFixed(4)})`
-
-          // Emphasis on the scattered frames: the one the camera is passing
-          // reads as the subject, the rest recede.
-          for (const item of frameEls.current) {
-            if (!item?.el) continue
-            const d = Math.hypot(bx + item.x * vw - vw / 2, by + item.y * vh - vh / 2) / vw
-            item.el.style.setProperty('--e', clamp(1.14 - d * 0.5, 0.76, 1.14).toFixed(3))
-            item.el.style.opacity = clamp(1.2 - d * 0.8, 0.42, 1).toFixed(3)
-          }
         },
       })
       return () => st.kill()
@@ -124,7 +116,6 @@ export default function FlowScene({ onRequest }) {
   return (
     <section id="how" className="flow" ref={root} aria-label="How it works">
       <div className="flow-stage" ref={stage}>
-        {/* The hero's lit rails, fixed behind the moving world. */}
         <CurvedLines className="flow-lines" />
 
         <div className="flow-world" ref={world}>
@@ -135,35 +126,23 @@ export default function FlowScene({ onRequest }) {
             <p className="flow-lead">{process.body}</p>
           </div>
 
-          {/* The four process steps, in a straight row. */}
+          {/* The four process steps. Each one is placed at the world coordinate
+              the camera will centre on, so it is always perfectly visible. */}
           {process.steps.map((s, i) => (
-            <article className="flow-item flow-step" key={s.n} style={pos(STEPS_X[i], 0.5)}>
-              <img className="flow-step-photo" src={photo(STEP_PHOTOS[i], 600)} alt="" draggable="false" />
+            <article
+              className="flow-item flow-step"
+              key={s.n}
+              style={pos(STEPS[i].x, STEPS[i].y)}
+            >
+              <img className="flow-step-photo" src={photo(STEP_PHOTOS[i], 900)} alt="" draggable="false" />
               <span className="flow-step-n">{s.n}</span>
               <h3 className="flow-step-t">{s.t}</h3>
               <p className="flow-step-d">{s.d}</p>
             </article>
           ))}
 
-          {/* The scattered frames. */}
-          {FRAMES.map((f, i) => (
-            <figure
-              className="flow-item flow-frame"
-              key={f.id}
-              ref={(el) => {
-                frameEls.current[i] = { el, x: f.x, y: f.y }
-              }}
-              style={{ ...pos(f.x, f.y), '--w': `${f.w * 100}vw` }}
-            >
-              <img src={photo(f.id, 900)} alt="" draggable="false" />
-              <figcaption>{f.label}</figcaption>
-            </figure>
-          ))}
-
-          {/* The last frame IS the closing page: the real Statement, authored
-              full-viewport and shown small until the zoom scales the world so it
-              fills the screen. It carries its own footer, so the zoom lands on
-              the finished page — there is nothing to scroll down to. */}
+          {/* The statement — the one and only closing frame. World zoom brings
+              it to exactly 1:1, so it becomes the finished page. */}
           <div className="flow-item flow-stmt" style={pos(X_STMT, 0.5)}>
             <div className="flow-stmt-canvas">
               <Statement onRequest={onRequest} />
@@ -175,7 +154,6 @@ export default function FlowScene({ onRequest }) {
   )
 }
 
-/** Position helper: centre an item at world (x in vw-units, y in vh fraction). */
 function pos(x, y) {
   return { left: `${x * 100}vw`, top: `${y * 100}vh` }
 }

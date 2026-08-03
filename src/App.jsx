@@ -49,7 +49,7 @@ export default function App() {
         {/* Acts 1–5: the mark, the ring, the zoom, and The Standard — which is
             revealed by the transition itself rather than scrolled to. */}
         <Cinema
-          onOpenService={(id, rect) => setOpenService({ id, rect })}
+          onOpenService={(id) => setOpenService({ id, rect: null })}
           onContact={() => openRequest()}
         />
         {/* One horizontal journey: the process, then the S-weave through the

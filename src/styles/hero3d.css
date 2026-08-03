@@ -99,8 +99,8 @@
    derives the WebGL logo card's size from them so the four cards match. Change
    them together. */
 .svc-card {
-  width: 210px;
-  height: 286px;
+  width: 300px;
+  height: 200px;
   border-radius: 18px;
   padding: 21px 19px;
   display: flex;
