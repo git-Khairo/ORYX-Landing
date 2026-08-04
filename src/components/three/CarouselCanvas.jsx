@@ -102,6 +102,11 @@ function Stage({ onOpen, onContact, onExplore }) {
       // Growing from the centre would drive the zoom through the gap between
       // them and tear the fill open.
       if (logoEl.current) {
+        // Logo is hidden in the hero state and fades in as the ring passes 180°,
+        // reaching full opacity at 360° (when zoom begins).
+        const logoT = Math.min(Math.max((tRotate - 0.5) / 0.5, 0), 1)
+        logoEl.current.style.opacity = (logoT * logoT * (3 - 2 * logoT)).toFixed(3)
+
         const s = 1 + tZoom * tZoom * 120
         logoEl.current.style.setProperty('--zoom', s.toFixed(3))
 
@@ -113,32 +118,20 @@ function Stage({ onOpen, onContact, onExplore }) {
         // being swapped for it. There is no cross-fade and no seam.
         const flat = Math.min(tMorph / 0.34, 1)
         const solid = 1 - flat * flat * (3 - 2 * flat) // smoothstep
-        // Depth is a share of the mark's current pixel height, so it holds its
-        // proportions as the hero shrinks instead of thinning out.
         const logoPx = h * (0.62 + (0.34 - 0.62) * tMorph)
         logoEl.current.style.setProperty('--depth', `${(solid * logoPx * 0.0055).toFixed(3)}px`)
-        // A slow turn while it is still an object, plus a lean toward the
-        // pointer — a dimensional thing that ignores you reads as a picture of
-        // a dimensional thing. Both settle square to the camera exactly as it
-        // flattens, so the handoff to 2D is still face-on.
-        //
-        // `pointer` is R3F's own normalised -1..1 over the canvas, so this needs
-        // no listener of its own and costs nothing when the cursor is still.
-        // It is eased rather than applied raw, or the mark snaps about.
-        aim.current.x += (pointer.x - aim.current.x) * 0.06
-        aim.current.y += (pointer.y - aim.current.y) * 0.06
 
-        // A wider, livelier idle sway on both axes — the two periods are
-        // coprime so the mark never falls into a flat back-and-forth and keeps
-        // finding new angles. The pointer lean rides on top. Everything is
-        // scaled by `solid`, so it all settles square exactly as it flattens.
-        const now = performance.now()
-        const yaw =
-          solid * (26 * Math.sin(now / 2400) + 8 * Math.sin(now / 5300) + aim.current.x * 20)
-        const pitch =
-          solid * (12 * Math.sin(now / 3100) - aim.current.y * 13)
-        logoEl.current.style.setProperty('--yaw', `${yaw.toFixed(2)}deg`)
-        logoEl.current.style.setProperty('--pitch', `${pitch.toFixed(2)}deg`)
+        if (solid > 0.01) {
+          aim.current.x += (pointer.x - aim.current.x) * 0.06
+          aim.current.y += (pointer.y - aim.current.y) * 0.06
+          const now = performance.now()
+          const yaw =
+            solid * (26 * Math.sin(now / 2400) + 8 * Math.sin(now / 5300) + aim.current.x * 20)
+          const pitch =
+            solid * (12 * Math.sin(now / 3100) - aim.current.y * 13)
+          logoEl.current.style.setProperty('--yaw', `${yaw.toFixed(2)}deg`)
+          logoEl.current.style.setProperty('--pitch', `${pitch.toFixed(2)}deg`)
+        }
       }
       // Let the mark escape its own card once it starts to rush the lens.
       el.style.setProperty('--card-overflow', tZoom > 0.001 ? 'visible' : 'hidden')
@@ -162,7 +155,6 @@ function Stage({ onOpen, onContact, onExplore }) {
     }
 
     camera.position.z = THREE.MathUtils.lerp(6.4, 5.4, tMorph) - tZoom * 1.6
-    camera.updateProjectionMatrix()
   })
 
   return (

@@ -96,36 +96,37 @@ export default function Cinema({ onOpenService, onContact }) {
     window.addEventListener('pointermove', onMove, { passive: true })
 
     let raf = 0
-    const tick = () => {
+    let lastT = 0
+    const tick = (t) => {
+      raf = requestAnimationFrame(tick)
+      // Cap at ~30fps to halve the CPU cost — the soft glow doesn't need 60fps.
+      if (t - lastT < 32) return
+      lastT = t
+
       const w = canvas.width
       const h = canvas.height
 
-      cur.x += (target.x - cur.x) * 0.06
-      cur.y += (target.y - cur.y) * 0.06
+      cur.x += (target.x - cur.x) * 0.1
+      cur.y += (target.y - cur.y) * 0.1
 
-      // Spawn two sparks per frame around the cursor
-      for (let i = 0; i < 2; i++) {
-        particles.push({
-          x: cur.x + (Math.random() - 0.5) * 90,
-          y: cur.y + (Math.random() - 0.5) * 50,
-          vx: (Math.random() - 0.5) * 0.45,
-          vy: -(0.25 + Math.random() * 0.75),
-          life: 1,
-          decay: 0.0045 + Math.random() * 0.007,
-          r: 0.7 + Math.random() * 2,
-        })
-      }
+      particles.push({
+        x: cur.x + (Math.random() - 0.5) * 90,
+        y: cur.y + (Math.random() - 0.5) * 50,
+        vx: (Math.random() - 0.5) * 0.45,
+        vy: -(0.25 + Math.random() * 0.75),
+        life: 1,
+        decay: 0.009 + Math.random() * 0.014,
+        r: 0.7 + Math.random() * 2,
+      })
 
       ctx.clearRect(0, 0, w, h)
 
-      // Soft ambient glow that follows the cursor
       const grd = ctx.createRadialGradient(cur.x, cur.y, 0, cur.x, cur.y, Math.min(w, h) * 0.38)
-      grd.addColorStop(0, 'rgba(140, 40, 80, 0.22)')
-      grd.addColorStop(1, 'rgba(140, 40, 80, 0)')
+      grd.addColorStop(0, 'rgba(180, 180, 180, 0.10)')
+      grd.addColorStop(1, 'rgba(180, 180, 180, 0)')
       ctx.fillStyle = grd
       ctx.fillRect(0, 0, w, h)
 
-      // Sparks — amber, floating upward, fading out
       for (let i = particles.length - 1; i >= 0; i--) {
         const p = particles[i]
         p.life -= p.decay
@@ -134,11 +135,9 @@ export default function Cinema({ onOpenService, onContact }) {
         p.y += p.vy
         ctx.beginPath()
         ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2)
-        ctx.fillStyle = `rgba(200, 90, 120, ${(p.life * 0.8).toFixed(3)})`
+        ctx.fillStyle = `rgba(200, 200, 200, ${(p.life * 0.5).toFixed(3)})`
         ctx.fill()
       }
-
-      raf = requestAnimationFrame(tick)
     }
     raf = requestAnimationFrame(tick)
 

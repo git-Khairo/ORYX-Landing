@@ -7,9 +7,9 @@
      when the fill takes over from the grown logo there is no step in tone. */
   --cinema-fill: #131211;
   position: relative;
-  /* The scrub budget for logo → morph → rotate → zoom → the Standard's build.
-     The last act was added to this run rather than to the page below it, so the
-     budget grew with it. */
+  /* With no 3D ring animation the budget shrinks to: static hero pause + fill +
+     Standard build. 200svh gives ~70svh of comfortable resting before the
+     transition begins, then the standard animates in over the last 30svh. */
   height: 520svh;
   background: var(--cream);
 }
@@ -35,8 +35,64 @@
   position: absolute;
   inset: 0;
   z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  pointer-events: none; /* children opt back in */
 }
 .cinema-canvas .svc-stage { height: 100%; min-height: 0; }
+
+/* ── Static hero content (replaces 3D carousel) ─────────────────────────── */
+.cinema-hero {
+  padding: calc(var(--nav-h) + clamp(2rem, 6vh, 4rem)) var(--gutter) 0;
+  max-width: var(--maxw);
+  width: 100%;
+  margin: 0 auto;
+  pointer-events: auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.cinema-hero-eyebrow {
+  font-family: var(--font-label);
+  font-size: var(--step--1);
+  font-weight: 600;
+  letter-spacing: var(--track-label-wide);
+  text-transform: uppercase;
+  color: var(--taupe-3);
+  margin-bottom: 1.4rem;
+}
+.cinema-hero-title {
+  font-family: var(--font-display);
+  font-size: clamp(3.2rem, 9vw, 7.5rem);
+  line-height: 0.92;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+  margin-bottom: 1.6rem;
+}
+.cinema-hero-promise {
+  max-width: 48ch;
+  font-size: var(--step-1);
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.52);
+  margin-bottom: 2.2rem;
+}
+
+/* ── Service cards strip ─────────────────────────────────────────────────── */
+.cinema-svc-row {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  padding: 0 var(--gutter) clamp(2rem, 5vh, 4rem);
+  scrollbar-width: none;
+  pointer-events: auto;
+  flex-shrink: 0;
+}
+.cinema-svc-row::-webkit-scrollbar { display: none; }
+.cinema-svc-row .svc-card {
+  flex: 0 0 clamp(200px, 26vw, 300px);
+}
 
 /* ── The ring's world ────────────────────────────────────────────────────────
    The dark field the whole run happens on: the hero is inset now, so this is
@@ -69,7 +125,7 @@
 .cinema-atmos-grid {
   position: absolute;
   inset: 0;
-  background-image: radial-gradient(circle, rgba(226, 163, 77, 0.22) 1px, transparent 1.2px);
+  background-image: radial-gradient(circle, rgba(200, 200, 200, 0.12) 1px, transparent 1.2px);
   background-size: 38px 38px;
   -webkit-mask-image: radial-gradient(72% 66% at 50% 50%, #000 20%, transparent 100%);
   mask-image: radial-gradient(72% 66% at 50% 50%, #000 20%, transparent 100%);
@@ -126,36 +182,21 @@
      away; the alpha rides `--card-face` so the zoom can take the card away
      while leaving the mark untouched. Fading the element itself would fade the
      mark with it — hence alpha in the paint rather than opacity on the box. */
-  /* Square as a hero, rounded only once it is a card: the radius grows in with
-     `--m`, so the inset hero panel has sharp corners and the ring card is the
-     usual 16px. */
   border-radius: calc(16px * var(--m));
-  /* Desert Dawn. Two washes over the paper: a warm rise from the lower left
-     and a cool ash-violet from the upper right, so the field has range instead
-     of sitting in one temperature. Both alphas ride `--card-face` so the whole
-     surface still retires under the zoom while the mark stays solid. */
   background:
     radial-gradient(
-      120% 95% at 12% 108%,
-      rgba(224, 135, 103, calc(0.5 * var(--card-face))) 0%,
-      rgba(240, 180, 138, calc(0.32 * var(--card-face))) 34%,
-      rgba(240, 180, 138, 0) 68%
-    ),
-    radial-gradient(
-      90% 80% at 96% -8%,
-      rgba(109, 99, 130, calc(0.22 * var(--card-face))) 0%,
-      rgba(109, 99, 130, 0) 62%
+      ellipse 70% 55% at 50% 110%,
+      rgba(0, 0, 0, calc(0.03 * var(--card-face))) 0%,
+      rgba(0, 0, 0, 0) 70%
     ),
     linear-gradient(
       158deg,
-      rgba(251, 249, 245, var(--card-face)) 0%,
-      rgba(233, 226, 212, var(--card-face)) 100%
+      rgba(255, 255, 255, var(--card-face)) 0%,
+      rgba(246, 246, 248, var(--card-face)) 100%
     );
-  /* It is lifted off the dark field throughout, so the shadow no longer waits
-     for `--m`; it only tightens as the panel shrinks. */
   box-shadow: 0 calc(30px - 8px * var(--m)) calc(80px - 24px * var(--m)) -28px
     rgba(0, 0, 0, calc(0.75 * var(--card-face)));
-  border: 1px solid rgba(180, 138, 80, calc(0.28 * var(--card-face)));
+  border: 1px solid rgba(0, 0, 0, calc(0.07 * var(--card-face)));
 }
 /* ── The light travelling the rails ──────────────────────────────────────────
    `pathLength="1"` normalises every curve, so one dash pattern and one set of
@@ -170,8 +211,8 @@
   animation-delay: var(--delay, 0s);
   will-change: stroke-dashoffset;
 }
-.cl-pulse--glow { stroke: var(--amber); opacity: 0.28; }
-.cl-pulse--core { stroke: var(--amber-hot); opacity: 0.9; }
+.cl-pulse--glow { stroke: var(--gold); opacity: 0.18; }
+.cl-pulse--core { stroke: var(--gold); opacity: 0.5; }
 @keyframes cl-travel {
   from { stroke-dashoffset: 1; }
   to { stroke-dashoffset: -0.055; }
@@ -184,17 +225,7 @@
    layers (bloom, grain) and uses overlay blend so the paper warmth wins and
    the footage adds texture and motion rather than a competing image. */
 .brand-card-video {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  filter: brightness(0.62) saturate(0.75);
-  mix-blend-mode: overlay;
-  opacity: calc(var(--card-face) * 0.72);
-  border-radius: inherit;
-  pointer-events: none;
-  z-index: 0;
+  display: none;
 }
 
 /* ── Surface: bloom + grain ──────────────────────────────────────────────── */
@@ -207,8 +238,8 @@
      coming *from* rather than merely a direction. */
   background: radial-gradient(
     58% 52% at 16% 96%,
-    rgba(255, 236, 214, calc(0.55 * var(--card-face))) 0%,
-    rgba(255, 236, 214, 0) 100%
+    rgba(0, 0, 0, calc(0.03 * var(--card-face))) 0%,
+    rgba(0, 0, 0, 0) 100%
   );
 }
 .brand-grain {
@@ -229,22 +260,22 @@
   z-index: 1;
   width: 100%;
   height: 100%;
-  color: var(--gold);
-  opacity: calc(0.5 * var(--card-face));
+  color: var(--charcoal);
+  opacity: calc(0.12 * var(--card-face));
 }
 
 /* The two arrangements cross-fade: a hero's setting of the type and a card's
    are different arrangements, not one arrangement at two sizes. */
 .brand-copy { position: absolute; z-index: 2; }
 .brand-copy--hero {
-  left: 8%;
+  left: 50%;
   top: 50%;
-  translate: 0 -50%;
-  width: min(42%, 46ch);
+  translate: -50% -50%;
+  width: min(80%, 58ch);
   display: grid;
   gap: 1rem;
-  justify-items: start;
-  text-align: left;
+  justify-items: center;
+  text-align: center;
   opacity: calc(clamp(0, calc(1 - var(--m) * 2.6), 1) * var(--card-face));
 }
 .brand-copy--card {
@@ -317,7 +348,7 @@
   letter-spacing: var(--track-label-wide);
   text-transform: uppercase;
   font-weight: 600;
-  color: var(--gold-deep);
+  color: var(--taupe-2);
   padding-bottom: 0.8rem;
   width: 100%;
   position: relative;
@@ -330,7 +361,7 @@
   bottom: 0;
   height: 1px;
   background: var(--line);
-  transform-origin: left center;
+  transform-origin: center center;
 }
 .brand-tagline {
   font-family: var(--font-display);
@@ -417,23 +448,26 @@
     border-color 0.35s var(--ease-out), box-shadow 0.35s var(--ease-out);
 }
 .brand-btn--primary {
-  color: var(--offwhite);
-  background: linear-gradient(140deg, var(--coral-deep), var(--coral));
-  box-shadow: 0 14px 30px -16px rgba(201, 96, 63, 0.9);
+  color: #ffffff;
+  background: var(--gold);
+  border: 1px solid transparent;
+  box-shadow: 0 4px 24px rgba(125, 45, 68, 0.3);
 }
 .brand-btn--primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 20px 38px -16px rgba(201, 96, 63, 0.95);
+  background: var(--tan);
+  box-shadow: 0 6px 32px rgba(125, 45, 68, 0.45);
 }
 .brand-btn--ghost {
   color: var(--charcoal);
-  border: 1px solid rgba(28, 28, 26, 0.22);
-  background: color-mix(in srgb, var(--offwhite) 55%, transparent);
+  border: 1px solid rgba(0, 0, 0, 0.18);
+  background: transparent;
 }
 .brand-btn--ghost:hover {
   transform: translateY(-2px);
-  border-color: var(--coral-deep);
-  background: color-mix(in srgb, var(--offwhite) 80%, transparent);
+  color: var(--charcoal);
+  border-color: rgba(0, 0, 0, 0.35);
+  background: rgba(0, 0, 0, 0.04);
 }
 
 .brand-card-eyebrow {
@@ -505,12 +539,7 @@
 /* One column below the width where copy and mark can share a line. */
 @media (max-width: 860px) {
   .brand-copy--hero {
-    left: 50%;
-    translate: -50% -50%;
-    top: 32%;
-    width: min(84%, 40ch);
-    justify-items: center;
-    text-align: center;
+    width: min(90%, 44ch);
   }
   .brand-eyebrow { border-bottom: 0; padding-bottom: 0; }
   .brand-logo {

@@ -122,7 +122,7 @@ export default function BrandCard({ cardRef, logoRef, onContact, onExplore }) {
           layers; drive it to zero and every layer lands on the same plane, at
           which point the stack *is* the flat image — so the return to 2D needs
           no cross-fade and has no seam to notice. */}
-      <div className="brand-logo" ref={logoRef}>
+      <div className="brand-logo" ref={logoRef} style={{ opacity: 0 }}>
         <div className="brand-logo-stack">
           {Array.from({ length: LOGO_LAYERS }, (_, i) => (
             <img
