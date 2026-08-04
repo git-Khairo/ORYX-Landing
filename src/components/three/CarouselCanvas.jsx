@@ -28,6 +28,30 @@ const PX_TO_WORLD = DISTANCE_FACTOR / 400
 const CARD_PX = { w: 300, h: 200 } // must match `.svc-card` in CSS — landscape
 
 /**
+ * How many DOM pixels the brand station is laid out with, per pixel it occupies
+ * on screen.
+ *
+ * `<Html transform>` is a DOM element scaled into the scene — the browser
+ * rasterises it once at its layout size and the 3D transform then magnifies
+ * that bitmap. At a 300px layout the card is blown up roughly twice over before
+ * it reaches the glass, so its contents arrive softened no matter how sharp the
+ * source art is: a 1023px logo is resampled down to the ~68px it occupies in
+ * the layout, and *that* is what gets stretched back out.
+ *
+ * Laying it out at twice the pixels and halving `distanceFactor` cancels
+ * exactly — the world size is unchanged (600 × 0.003125 == 300 × 0.00625, the
+ * same 1.875 units the service cards use) — but there are now four times as
+ * many pixels in the raster the magnification works from.
+ *
+ * The card's own CSS reads this back as `--ss` and scales its type and spacing
+ * by it, so doubling the resolution does not double the apparent size.
+ */
+const BRAND_SS = 4
+const BRAND_DISTANCE_FACTOR = DISTANCE_FACTOR / BRAND_SS
+const BRAND_PX_TO_WORLD = BRAND_DISTANCE_FACTOR / 400
+const BRAND_CARD_PX = { w: CARD_PX.w * BRAND_SS, h: CARD_PX.h * BRAND_SS }
+
+/**
  * Sized from the ring's own contents rather than picked by eye: with eleven
  * stations a fixed radius would overlap every card with its neighbour. The
  * chord between adjacent stations is 2R·sin(π/N), so solving that for a
@@ -81,8 +105,12 @@ function Stage({ onOpen, onContact, onExplore }) {
       const dist = Math.abs(camera.position.z)
       const heroH = 2 * dist * Math.tan(((camera.fov * Math.PI) / 180) / 2)
       const heroW = heroH * camera.aspect
-      const w = Math.round(THREE.MathUtils.lerp(heroW / PX_TO_WORLD, CARD_PX.w, tMorph))
-      const h = Math.round(THREE.MathUtils.lerp(heroH / PX_TO_WORLD, CARD_PX.h, tMorph))
+      const w = Math.round(
+        THREE.MathUtils.lerp(heroW / BRAND_PX_TO_WORLD, BRAND_CARD_PX.w, tMorph),
+      )
+      const h = Math.round(
+        THREE.MathUtils.lerp(heroH / BRAND_PX_TO_WORLD, BRAND_CARD_PX.h, tMorph),
+      )
 
       const el = brandEl.current
       el.style.width = `${w}px`
@@ -164,13 +192,14 @@ function Stage({ onOpen, onContact, onExplore }) {
       <group ref={brand}>
         <Html
           transform
-          distanceFactor={DISTANCE_FACTOR}
+          distanceFactor={BRAND_DISTANCE_FACTOR}
           zIndexRange={CARD_Z_RANGE}
           className="svc-card-html brand-card-html"
         >
           <BrandCard
             cardRef={brandEl}
             logoRef={logoEl}
+            ss={BRAND_SS}
             onContact={onContact}
             onExplore={onExplore}
           />

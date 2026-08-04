@@ -34,7 +34,7 @@ const LOGO_LAYERS = 16
  * arrives in sequence rather than appearing fully formed, which is most of the
  * difference between a still frame and a moment.
  */
-export default function BrandCard({ cardRef, logoRef, onContact, onExplore }) {
+export default function BrandCard({ cardRef, logoRef, ss = 1, onContact, onExplore }) {
   const ready = useAppReady()
 
   return (
@@ -42,6 +42,10 @@ export default function BrandCard({ cardRef, logoRef, onContact, onExplore }) {
       className={`brand-card ${ready ? 'is-in' : ''}`}
       ref={cardRef}
       data-card="always-ready"
+      /* The stage lays this card out at `ss` DOM pixels per on-screen pixel so
+         the 3D magnification has a denser raster to work from; every size below
+         is multiplied by it to keep the apparent scale unchanged. */
+      style={{ '--ss': ss }}
     >
       {/* City drone footage blended into the warm surface — overlay mode so the
           paper gradient wins and the video adds motion texture, not a picture. */}
