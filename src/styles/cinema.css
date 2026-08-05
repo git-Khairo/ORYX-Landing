@@ -5,7 +5,7 @@
 .cinema {
   /* The field the zoom opens into. Kept close to the mark's own black so that
      when the fill takes over from the grown logo there is no step in tone. */
-  --cinema-fill: #131211;
+  --cinema-fill: #121211;
   position: relative;
   /* With no 3D ring animation the budget shrinks to: static hero pause + fill +
      Standard build. 200svh gives ~70svh of comfortable resting before the
@@ -107,7 +107,7 @@
   position: absolute;
   inset: 0;
   z-index: 0;
-  background: #100f0d;
+  background: #0f0f0e;
   pointer-events: none;
 }
 /* Canvas particle system: ambient cursor glow + floating amber sparks.
@@ -197,7 +197,7 @@
     linear-gradient(
       158deg,
       rgba(255, 255, 255, var(--card-face)) 0%,
-      rgba(246, 246, 248, var(--card-face)) 100%
+      rgba(244, 244, 242, var(--card-face)) 100%
     );
   box-shadow: 0 calc((30px - 8px * var(--m)) * var(--ss))
     calc((80px - 24px * var(--m)) * var(--ss)) calc(-28px * var(--ss))
@@ -384,10 +384,10 @@
 }
 .brand-tagline {
   font-family: var(--font-display);
-  /* Fraunces is variable: a little extra weight, its softest terminals and a
-     touch of wonk is what gives the line character at this size. */
-  font-weight: 500;
-  font-variation-settings: 'SOFT' 60, 'WONK' 1, 'opsz' 120;
+  /* Instrument Serif ships one weight only; its character at display size comes
+     from the high contrast and tight fit, so the line is set large and close
+     rather than emboldened. */
+  font-weight: 400;
   font-size: calc(clamp(3.1rem, 8.2vw, 7.4rem) * var(--ss));
   line-height: 0.92;
   letter-spacing: -0.02em;
@@ -470,12 +470,15 @@
   color: #ffffff;
   background: var(--gold);
   border: calc(1px * var(--ss)) solid transparent;
-  box-shadow: 0 calc(4px * var(--ss)) calc(24px * var(--ss)) rgba(125, 45, 68, 0.3);
+  box-shadow: 0 calc(4px * var(--ss)) calc(24px * var(--ss)) rgba(10, 10, 9, 0.3);
 }
 .brand-btn--primary:hover {
   transform: translateY(calc(-2px * var(--ss)));
-  background: var(--tan);
-  box-shadow: 0 calc(6px * var(--ss)) calc(32px * var(--ss)) rgba(125, 45, 68, 0.45);
+  /* A short lift up the ramp rather than a jump to mid grey — with no hue to
+     shift, hover has only lightness to work with and a large step reads as a
+     different button. */
+  background: var(--taupe);
+  box-shadow: 0 calc(6px * var(--ss)) calc(32px * var(--ss)) rgba(10, 10, 9, 0.45);
 }
 .brand-btn--ghost {
   color: var(--charcoal);
@@ -697,7 +700,9 @@
   color: var(--taupe-2);
   transition: color 0.35s var(--ease-out);
 }
-.std-item.is-active .std-item-n { color: var(--gold); }
+/* This section sits on ink, where the accent has to invert or it is simply not
+   there — a near-black mark on a near-black field. */
+.std-item.is-active .std-item-n { color: var(--accent-on-ink); }
 .std-item-k {
   font-family: var(--font-display);
   font-size: clamp(1.5rem, 2.6vw, 2.3rem);
@@ -715,7 +720,7 @@
   display: block;
   height: 100%;
   width: 100%;
-  background: linear-gradient(to right, var(--gold-deep), var(--amber));
+  background: linear-gradient(to right, var(--tan), var(--accent-on-ink));
   transform: scaleX(0);
   transform-origin: left;
   transition: transform 0.4s var(--ease-out);
@@ -743,12 +748,11 @@
   font-family: var(--font-mono);
   font-size: var(--step--1);
   letter-spacing: 0.14em;
-  color: var(--gold);
+  color: var(--accent-on-ink);
 }
 .std-detail-k {
   font-family: var(--font-display);
-  font-weight: 500;
-  font-variation-settings: 'SOFT' 40, 'WONK' 1;
+  font-weight: 400;
   font-size: clamp(2.6rem, 6vw, 5rem);
   line-height: 1;
   letter-spacing: -0.02em;

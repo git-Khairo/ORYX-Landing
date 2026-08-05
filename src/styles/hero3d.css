@@ -54,7 +54,8 @@
   white-space: nowrap;
 }
 .marquee-sep {
-  color: var(--gold);
+  /* Same dark field as the words beside it — ink would simply not be there. */
+  color: var(--offwhite);
   opacity: 0.9;
   flex: 0 0 auto;
 }
@@ -117,7 +118,7 @@
   transform-style: flat;
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.5) inset,
-    0 26px 60px -24px rgba(28, 28, 26, 0.55);
+    0 26px 60px -24px rgba(10, 10, 9, 0.55);
   user-select: none;
 }
 /* The service's own photography, filling the upper half and dissolving into
@@ -154,7 +155,7 @@
 .svc-card--paper {
   background: linear-gradient(158deg, var(--offwhite) 0%, var(--sand) 100%);
   color: var(--charcoal);
-  border: 1px solid rgba(180, 138, 80, 0.28);
+  border: 1px solid rgba(138, 138, 133, 0.28);
 }
 .svc-card--gold {
   background: linear-gradient(158deg, var(--tan) 0%, var(--gold-deep) 100%);
@@ -162,9 +163,9 @@
   border: 1px solid rgba(255, 255, 255, 0.22);
 }
 .svc-card--ink {
-  background: linear-gradient(158deg, var(--charcoal-soft) 0%, #100f0d 100%);
+  background: linear-gradient(158deg, var(--charcoal-soft) 0%, #0f0f0e 100%);
   color: var(--offwhite);
-  border: 1px solid rgba(201, 166, 107, 0.35);
+  border: 1px solid rgba(173, 173, 168, 0.35);
 }
 .svc-card--ink .svc-card-title,
 .svc-card--gold .svc-card-title { color: var(--offwhite); }
@@ -279,7 +280,7 @@
   overflow: hidden;
   display: grid;
   place-items: center;
-  background: radial-gradient(120% 100% at 50% 40%, var(--charcoal-soft) 0%, #0d0c0b 100%);
+  background: radial-gradient(120% 100% at 50% 40%, var(--charcoal-soft) 0%, #0c0c0b 100%);
   color: var(--offwhite);
 }
 .gallery-field {
@@ -312,7 +313,7 @@
   letter-spacing: var(--track-label);
   text-transform: uppercase;
   color: var(--offwhite);
-  background: linear-gradient(to top, rgba(10, 9, 8, 0.75), transparent);
+  background: linear-gradient(to top, rgba(10, 10, 9, 0.75), transparent);
 }
 @keyframes gallery-float {
   from { translate: 0 -6px; }

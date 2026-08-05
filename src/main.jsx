@@ -1,8 +1,9 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-// Fraunces carries the display voice: a variable soft-serif with a genuine
-// wonk axis, so it has personality without being a novelty face.
-import '@fontsource-variable/fraunces'
+// Instrument Serif carries the display voice: high-contrast, tightly fitted,
+// one weight only — editorial rather than decorative, which is what lets the
+// monochrome palette stay quiet without going bland.
+import '@fontsource/instrument-serif'
 import '@fontsource-variable/geist'
 import '@fontsource-variable/geist-mono'
 import './styles/tokens.css'

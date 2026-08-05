@@ -42,7 +42,8 @@ html.is-loading body {
   font-family: var(--font-display);
   font-style: italic;
   font-size: var(--step-1);
-  color: var(--gold);
+  /* The loader is an ink field, so the accent inverts. */
+  color: var(--tan);
 }
 .pl-foot {
   position: absolute;
@@ -69,7 +70,7 @@ html.is-loading body {
 .pl-count em {
   font-style: normal;
   font-size: 0.4em;
-  color: var(--gold);
+  color: var(--tan);
   margin-left: 0.15em;
   vertical-align: super;
 }
@@ -79,7 +80,7 @@ html.is-loading body {
   right: 0;
   bottom: 0;
   height: 2px;
-  background: rgba(251, 249, 245, 0.12);
+  background: rgba(255, 255, 255, 0.12);
 }
 .pl-bar-fill {
   display: block;
@@ -157,17 +158,17 @@ html.is-loading body {
   gap: clamp(0.75rem, 2vw, 1.6rem);
   padding: 0.42rem 0.42rem 0.42rem 1.1rem;
   border-radius: 999px;
-  background: rgba(251, 249, 245, 0.74); /* rgba, not color-mix: the dark act
+  background: rgba(255, 255, 255, 0.74); /* rgba, not color-mix: the dark act
      transitions this, and color-mix pairs do not interpolate. */
-  border: 1px solid rgba(28, 28, 26, 0.08);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.6) inset, 0 12px 34px -22px rgba(28, 28, 26, 0.5);
+  border: 1px solid rgba(10, 10, 9, 0.08);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.6) inset, 0 12px 34px -22px rgba(10, 10, 9, 0.5);
   backdrop-filter: blur(16px) saturate(1.1);
   -webkit-backdrop-filter: blur(16px) saturate(1.1);
   transition: background 0.5s var(--ease-out), border-color 0.5s var(--ease-out);
 }
 .nav.is-scrolled .nav-pill {
-  background: rgba(251, 249, 245, 0.88);
-  border-color: rgba(28, 28, 26, 0.12);
+  background: rgba(255, 255, 255, 0.88);
+  border-color: rgba(10, 10, 9, 0.12);
 }
 /* Retreats past the top edge, pill and all. */
 .nav.is-hidden {
@@ -192,7 +193,7 @@ html.is-loading body {
   align-items: center;
   gap: clamp(0.4rem, 1.4vw, 1.1rem);
   padding: 0 clamp(0.2rem, 1vw, 0.8rem);
-  border-left: 1px solid rgba(28, 28, 26, 0.1);
+  border-left: 1px solid rgba(10, 10, 9, 0.1);
 }
 .nav-link {
   position: relative;
@@ -204,12 +205,12 @@ html.is-loading body {
   border-radius: 999px;
   transition: color 0.3s var(--ease-out), background 0.3s var(--ease-out);
 }
-.nav-link:hover { color: var(--charcoal); background: rgba(28, 28, 26, 0.05); }
+.nav-link:hover { color: var(--charcoal); background: rgba(10, 10, 9, 0.05); }
 
 /* ── Services menu ──────────────────────────────────────────────────────── */
 .nav-menu { position: relative; }
 .nav-link--menu { display: inline-flex; align-items: center; gap: 0.35rem; }
-.nav-link--menu.is-open { color: var(--charcoal); background: rgba(28, 28, 26, 0.05); }
+.nav-link--menu.is-open { color: var(--charcoal); background: rgba(10, 10, 9, 0.05); }
 .nav-caret {
   width: 0;
   height: 0;
@@ -230,9 +231,9 @@ html.is-loading body {
   display: grid;
   gap: 0.15rem;
   border-radius: 14px;
-  background: rgba(251, 249, 245, 0.94);
-  border: 1px solid rgba(28, 28, 26, 0.1);
-  box-shadow: 0 20px 44px -22px rgba(28, 28, 26, 0.55);
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(10, 10, 9, 0.1);
+  box-shadow: 0 20px 44px -22px rgba(10, 10, 9, 0.55);
   backdrop-filter: blur(16px) saturate(1.1);
   -webkit-backdrop-filter: blur(16px) saturate(1.1);
   animation: nav-drop 0.28s var(--ease-out) both;
@@ -249,7 +250,7 @@ html.is-loading body {
   text-align: left;
   transition: background 0.25s var(--ease-out);
 }
-.nav-dropdown-item:hover { background: rgba(28, 28, 26, 0.055); }
+.nav-dropdown-item:hover { background: rgba(10, 10, 9, 0.055); }
 .nav-dropdown-title {
   font-family: var(--font-display);
   font-size: var(--step-1);
@@ -284,7 +285,7 @@ html.is-loading body {
    three classes and would otherwise win — and the bar is always scrolled by the
    time this act is on screen, so without it the dark treatment never applied. */
 html.tone-dark .nav .nav-pill {
-  background: rgba(20, 19, 15, 0.74);
+  background: rgba(10, 10, 9, 0.74);
   border-color: rgba(255, 255, 255, 0.14);
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.08) inset, 0 14px 40px -22px rgba(0, 0, 0, 0.9);
 }
@@ -301,7 +302,7 @@ html.tone-dark .nav .nav-cta { background: var(--offwhite); color: var(--charcoa
 html.tone-dark .nav .nav-cta:hover { background: var(--tan); color: var(--charcoal); }
 
 html.tone-dark .nav-dropdown {
-  background: rgba(20, 19, 15, 0.92);
+  background: rgba(10, 10, 9, 0.92);
   border-color: rgba(255, 255, 255, 0.14);
 }
 html.tone-dark .nav-dropdown-item:hover { background: rgba(255, 255, 255, 0.07); }
@@ -389,7 +390,7 @@ html.tone-dark .nav-dropdown-sub { color: var(--taupe-3); }
   border-radius: 999px;
   color: var(--charcoal);
   background: color-mix(in srgb, var(--offwhite) 92%, transparent);
-  box-shadow: 0 6px 18px -10px rgba(28, 28, 26, 0.55);
+  box-shadow: 0 6px 18px -10px rgba(10, 10, 9, 0.55);
   backdrop-filter: blur(8px);
   opacity: 0;
   pointer-events: none;
@@ -423,10 +424,10 @@ html.tone-dark .nav-dropdown-sub { color: var(--taupe-3); }
 .cta-solid {
   background: var(--charcoal);
   color: var(--cream);
-  box-shadow: 0 10px 30px -12px rgba(28, 28, 26, 0.5);
+  box-shadow: 0 10px 30px -12px rgba(10, 10, 9, 0.5);
 }
 .cta-solid:hover { background: var(--gold-deep); }
-.cta-gold { background: var(--gold); color: var(--offwhite); box-shadow: 0 10px 30px -12px rgba(125, 45, 68, 0.6); }
+.cta-gold { background: var(--gold); color: var(--offwhite); box-shadow: 0 10px 30px -12px rgba(10, 10, 9, 0.6); }
 .cta-gold:hover { background: var(--gold-deep); }
 .cta-ghost { border: 1px solid var(--charcoal); color: var(--charcoal); }
 .cta-ghost:hover { background: var(--charcoal); color: var(--cream); }

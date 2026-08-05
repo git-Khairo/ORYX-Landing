@@ -1,46 +1,56 @@
 :root {
-  /* ── Palette ─────────────────────────────────────────────────────────── */
-  --cream: #ffffff;       /* primary background — pure white */
-  --offwhite: #f5f5f7;   /* raised panels */
-  --sand: #ebebed;        /* dividers, soft panels */
-  --charcoal: #0f0e14;   /* primary dark / dark sections */
-  --charcoal-soft: #1c1b26;
+  /* ── Palette — one ramp, paper to ink ─────────────────────────────────
+     There is no accent hue. Emphasis is carried by contrast, weight and
+     space alone, which is what leaves the black horns mark as the only
+     strong shape on the page — a coloured button would compete with it.
+     The ramp is very slightly warm (blue a touch below red/green) so large
+     areas of white read as paper rather than as screen. */
+  --paper: #ffffff;
+  --ink: #0a0a09;
 
-  /* Accent: vinous / wine ─────────────────────────────────────────────── */
-  --gold: #7d2d44;        /* primary wine accent */
-  --tan: #a85068;         /* rose-wine lighter accent */
-  --gold-deep: #5c1a2b;   /* deep burgundy */
+  --cream: #ffffff;       /* page background */
+  --offwhite: #f4f4f2;    /* raised panels */
+  --sand: #e8e8e5;        /* dividers, soft panels */
+  --charcoal: #0a0a09;    /* dark sections */
+  --charcoal-soft: #1a1a18;
 
-  /* Secondary text — same ratios hold on white (contrast only increases). */
-  --taupe: #514e47;       /* 7.4:1 on cream → even higher on white */
-  --taupe-2: #6b675e;
-  --taupe-3: #b9b3a6;     /* hairlines / text on charcoal only */
+  /* The accent slots are kept as tokens so no call site has to change, but
+     they now resolve into the same ramp: "accent" here means ink, not hue. */
+  --gold: #0a0a09;        /* accent on paper */
+  --tan: #8a8a85;         /* mid grey — legible on both paper and ink */
+  --gold-deep: #1a1a18;
 
-  --leaf: #7d8a5f;        /* sustainability accent */
+  --taupe: #4a4a47;       /* body text on paper — ~9:1 */
+  --taupe-2: #6b6b67;     /* secondary text */
+  --taupe-3: #8a8a85;     /* hairlines; text on ink */
 
-  /* Wine glow range (replaces Desert Dawn warm apricot/coral) */
-  --apricot: #c4607a;
-  --coral: #a03050;
-  --coral-deep: #7d1e3c;
-  --violet-ash: #6d6382;
-  --violet-mist: #cfc6d8;
+  --leaf: #4a4a47;
 
-  --amber: #9c3854;       /* wine glow (replaces amber) */
-  --amber-hot: #c85a78;   /* lighter rose-wine */
-
-  /* Sculpture colour — kept exactly; it is the horns, not the accent. */
-  --rust: #9e4b2f;
-  --rust-light: #c2643a;
+  /* Former hue slots, folded into the ramp. Retained so existing rules keep
+     resolving; none of them carry colour any more. */
+  --apricot: #8a8a85;
+  --coral: #4a4a47;
+  --coral-deep: #1a1a18;
+  --violet-ash: #6b6b67;
+  --violet-mist: #d6d6d2;
+  --amber: #8a8a85;
+  --amber-hot: #adada8;
+  --rust: #4a4a47;
+  --rust-light: #8a8a85;
 
   /* ── Semantic ───────────────────────────────────────────────────────── */
   --bg: var(--cream);
   --fg: var(--charcoal);
   --muted: var(--taupe);
-  --line: rgba(10, 8, 18, 0.10);
+  --line: rgba(10, 10, 9, 0.10);
   --accent: var(--gold);
 
+  /* On ink, "accent" has to invert or it disappears. Sections that sit on the
+     dark field set this rather than reaching for a lighter grey by hand. */
+  --accent-on-ink: var(--offwhite);
+
   /* ── Type ───────────────────────────────────────────────────────────── */
-  --font-display: 'Fraunces Variable', 'Fraunces', Georgia, serif;
+  --font-display: 'Instrument Serif', Georgia, 'Times New Roman', serif;
   --font-body: 'Geist Variable', 'Geist', ui-sans-serif, system-ui, sans-serif;
   --font-mono: 'Geist Mono Variable', ui-monospace, monospace;
   --font-label: var(--font-body);

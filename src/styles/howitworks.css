@@ -63,7 +63,7 @@
   height: min(78svh, 720px);
   border-radius: 18px;
   overflow: hidden;
-  background: radial-gradient(120% 100% at 50% 40%, var(--charcoal-soft) 0%, #0d0c0b 100%);
+  background: radial-gradient(120% 100% at 50% 40%, var(--charcoal-soft) 0%, #0c0c0b 100%);
   will-change: transform;
   transform-origin: center;
 }
@@ -90,7 +90,7 @@
   letter-spacing: var(--track-label);
   text-transform: uppercase;
   color: var(--offwhite);
-  background: linear-gradient(to top, rgba(10, 9, 8, 0.75), transparent);
+  background: linear-gradient(to top, rgba(10, 10, 9, 0.75), transparent);
 }
 @keyframes how-float {
   from { translate: 0 -6px; }
