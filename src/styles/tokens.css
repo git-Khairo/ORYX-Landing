@@ -1,0 +1,64 @@
+:root {
+  /* ── Palette ──────────────────────────────────────────────────────────
+     Monochrome, warm-neutral. The electric blue is gone — it read as a tech
+     startup, not as a group that runs buildings and fleets. With no accent
+     competing, the footage supplies every colour on the page, which is the
+     only place colour is doing real work. Bronze appears at hairline scale
+     and nowhere else. */
+  --white: #ffffff;
+  --off: #f6f5f3;        /* recessed panels */
+  --off-2: #eae8e4;      /* fills, pressed states */
+
+  --black: #0b0b0a;      /* display */
+  --ink: #1c1c1a;        /* body — 15.6:1 */
+  --ink-2: #56564f;      /* secondary — 7.3:1 */
+  --ink-3: #85857c;      /* meta, uppercase only — 3.9:1 */
+
+  --bronze: #8a6a3b;     /* the one warm note, used at hairline scale */
+  --bronze-2: #6d5229;
+
+  --line: rgba(11, 11, 10, 0.13);
+  --line-soft: rgba(11, 11, 10, 0.07);
+
+  /* Film keeps its own colour. Type over it is white on a soft dark gradient —
+     never a solid plate, and never a white one. */
+  --film-bg: #0b0b0a;
+  --film-text: #ffffff;
+  --film-dim: rgba(255, 255, 255, 0.76);
+
+  /* ── Type ─────────────────────────────────────────────────────────────
+     Inter, one family, loaded with its optical-size axis. `opsz` is the whole
+     reason to choose Inter over any other grotesk: at display sizes it tightens
+     apertures and spacing automatically, so large type is refined rather than
+     merely enlarged, and small type stays open and readable. */
+  --font: 'Inter Variable', 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  /* The mark's face. Used for display only — at text sizes its hairlines
+     disappear and its wide tracking costs more than it earns. */
+  --font-display: 'Cormorant Garamond Variable', 'Cormorant Garamond', Georgia, serif;
+
+  --step--2: clamp(0.69rem, 0.67rem + 0.08vw, 0.75rem);
+  --step--1: clamp(0.79rem, 0.77rem + 0.12vw, 0.87rem);
+  --step-0: clamp(0.94rem, 0.91rem + 0.16vw, 1.04rem);
+  --step-1: clamp(1.13rem, 1.05rem + 0.34vw, 1.36rem);
+  --step-2: clamp(1.5rem, 1.24rem + 1.05vw, 2.35rem);
+  --step-3: clamp(2rem, 1.45rem + 2.3vw, 3.7rem);
+  --step-4: clamp(2.7rem, 1.8rem + 3.8vw, 5.6rem);
+  --step-5: clamp(3.4rem, 1.9rem + 6.6vw, 8.5rem);
+
+  /* Display tracking runs negative and tightens as size grows — the standard
+     correction for a grotesk set large. */
+  --track-3: -0.021em;
+  --track-4: -0.028em;
+  --track-5: -0.036em;
+  --track-label: 0.09em;
+
+  /* ── Space & shape ────────────────────────────────────────────────── */
+  --gutter: clamp(1.2rem, 4vw, 4.5rem);
+  --nav-h: 76px;
+  --maxw: 1440px;
+  --radius: 0px; /* nothing is rounded; the grid is the shape */
+
+  /* ── Motion ───────────────────────────────────────────────────────── */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-inout: cubic-bezier(0.65, 0, 0.35, 1);
+}

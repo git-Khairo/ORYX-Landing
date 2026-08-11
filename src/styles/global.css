@@ -1,0 +1,139 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  background: var(--white);
+}
+
+body {
+  min-height: 100svh;
+  background: var(--white);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: var(--step-0);
+  font-weight: 400;
+  line-height: 1.6;
+  /* Optical size follows the type size for free. */
+  font-variation-settings: 'opsz' 16;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: clip;
+}
+
+img,
+svg,
+video {
+  display: block;
+  max-width: 100%;
+}
+
+a { color: inherit; text-decoration: none; }
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+ul, ol { list-style: none; }
+
+::selection { background: var(--bronze); color: var(--white); }
+
+:focus-visible {
+  outline: 2px solid var(--bronze);
+  outline-offset: 3px;
+}
+
+/* ── Display voice ─────────────────────────────────────────────────────
+   High optical size and negative tracking. Inter's `opsz` tightens apertures
+   and spacing as it rises, so large type is refined rather than just bigger. */
+/* The mark's face, set light and tracked wide — Cormorant is drawn for large
+   sizes, where its hairlines survive and the wide fit reads as poise. It is
+   never used below display size. */
+h1, h2, h3 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  line-height: 1.06;
+  color: var(--black);
+  text-wrap: balance;
+}
+
+/* ── Operational voice ─────────────────────────────────────────────────
+   Low optical size, tracked out, tabular figures. For anything that is data
+   rather than language: indices, counters, section labels. */
+.label {
+  font-size: var(--step--2);
+  font-weight: 600;
+  font-variation-settings: 'opsz' 14;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.lede {
+  font-size: var(--step-1);
+  line-height: 1.55;
+  color: var(--ink-2);
+  max-width: 60ch;
+  text-wrap: pretty;
+}
+
+.shell {
+  width: 100%;
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding-inline: var(--gutter);
+}
+
+.rule {
+  height: 1px;
+  background: var(--line);
+  border: 0;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 200;
+  padding: 0.7rem 1.1rem;
+  background: var(--black);
+  color: var(--white);
+  font-size: var(--step--1);
+  font-weight: 600;
+  transform: translateY(-120%);
+  transition: transform 0.25s var(--ease-out);
+}
+.skip-link:focus-visible { transform: translateY(0); }
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

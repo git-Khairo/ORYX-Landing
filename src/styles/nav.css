@@ -1,0 +1,86 @@
+/* ══ Nav ════════════════════════════════════════════════════════════════
+   A compact glass pill, centred.
+
+   Rebuilt down from a much fussier version carrying an edge-refraction layer,
+   a chromatic fringe and a raking sheen. All three were attempts to simulate
+   glass, and together they read as a second object floating inside the first.
+   What actually sells it is unglamorous: one blur, one flat translucent fill,
+   one hairline border, one soft cast shadow. Nothing else. */
+.nav {
+  position: fixed;
+  top: clamp(0.8rem, 2vh, 1.4rem);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 60;
+  width: max-content;
+  max-width: calc(100vw - 2 * var(--gutter));
+
+  display: flex;
+  align-items: center;
+  gap: clamp(3.5rem, 14vw, 11rem);
+  padding: 0.42rem 1.4rem;
+  border-radius: 999px;
+
+  /* You have to be able to SEE THROUGH it.
+     The previous values — blur 26, brightness 1.35, plus a 16% white fill —
+     blew a bright sky out to a flat cream slab: three separate things all
+     erasing detail at once. Glass does not remove what is behind it, it
+     displaces it. So the blur drops far enough for shapes to survive, the
+     brightness lift becomes marginal, and the white fill is nearly nothing —
+     the frosted quality comes from the blur, never from opacity. */
+  backdrop-filter: blur(14px) saturate(150%) brightness(1.06) contrast(0.96);
+  -webkit-backdrop-filter: blur(14px) saturate(150%) brightness(1.06) contrast(0.96);
+  background: rgba(255, 255, 255, 0.06);
+  /* Bright rim, and brightest along the top edge where light would catch it. */
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.55),
+    0 10px 30px -16px rgba(0, 0, 0, 0.45);
+  color: #fff;
+  /* The panel is now bright, so white type needs its own edge to stay legible
+     over a pale frame. */
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+/* ── Mark ─────────────────────────────────────────────────────────────── */
+.nav-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  flex: none;
+}
+.nav-mark img {
+  width: 21px;
+  height: auto;
+  /* Black artwork, always shown white — the bar is dark on every surface. */
+  filter: invert(1) brightness(2);
+}
+.nav-mark span {
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 1.12rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  margin-right: -0.2em;
+}
+
+/* ── Action ───────────────────────────────────────────────────────────── */
+/* Plain white text. A filled pill inside a pill read as two nested ovals and
+   broke the single-object illusion the glass depends on. */
+.nav-cta {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: #fff;
+  font-family: var(--font);
+  font-size: var(--step--1);
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+.nav-cta i { font-style: normal; transition: transform 0.3s var(--ease-out); }
+.nav-cta:hover i { transform: translateX(4px); }
+
+@media (max-width: 860px) {
+  .nav { gap: 1.6rem; padding-inline: 1.1rem; }
+}

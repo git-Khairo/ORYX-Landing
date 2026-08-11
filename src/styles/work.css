@@ -1,0 +1,337 @@
+/* ══ Work — service rows and the group ══════════════════════════════════ */
+.work { min-height: 100svh; display: flex; background: var(--white); }
+.work-grid {
+  flex: 1;
+  min-height: 100svh;
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+}
+
+
+/* ── The three services, as rows ──────────────────────────────────────── */
+/* No top inset and no rules on the outside — the section meets the hero edge
+   to edge, and the only lines inside it are the ones between its own rows. */
+.rows {
+  background: var(--film-bg);
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+  /* rows sit on film, so their rules are light */
+.row {
+  position: relative;
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+  text-align: left;
+  padding: clamp(1rem, 2.4vh, 1.9rem) clamp(1.2rem, 2.4vw, 2.6rem);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+  transition: flex-grow 0.8s var(--ease-out);
+}
+.row:last-child { border-bottom: 0; }
+/* The first row sits directly under the bar, so it needs the headroom that the
+   rows below get from the row above them. */
+/* No reserved height: the pill floats above the layout, so the first row runs
+   straight up to the hero edge and only keeps the breathing room that the rows
+   below get from the row above them. */
+.rows > .row:first-child { padding-top: clamp(1.4rem, 4vh, 2.8rem); }
+.row.is-on { flex-grow: 1.9; }
+
+/* The film runs the whole time. Only its brightness responds to attention —
+   the open row's clip comes up, the other two sit back. */
+.row-film {
+  position: absolute;
+  inset: 0;
+  transition: opacity 0.7s var(--ease-out);
+  opacity: 0.5;
+}
+.row.is-on .row-film { opacity: 1; }
+.row-film video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.06);
+  transition: transform 2.6s var(--ease-out);
+}
+.row.is-on .row-film video { transform: scale(1); }
+/* A dark wash from the left, so white type reads without the picture being
+   flattened. Dark, not white — a white wipe bleached the footage to fog. */
+.row-film::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(8, 8, 7, 0.9) 0%,
+    rgba(8, 8, 7, 0.66) 34%,
+    rgba(8, 8, 7, 0.3) 66%,
+    rgba(8, 8, 7, 0.16) 100%
+  );
+}
+
+.row-line {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: baseline;
+  gap: clamp(0.9rem, 2vw, 1.8rem);
+}
+.row-index {
+  font-size: var(--step--2);
+  font-weight: 600;
+  font-variation-settings: 'opsz' 14;
+  letter-spacing: var(--track-label);
+  color: rgba(255, 255, 255, 0.6);
+  font-variant-numeric: tabular-nums;
+  transition: color 0.4s var(--ease-out);
+}
+.row.is-on .row-index { color: var(--film-text); }
+.row-title {
+  font-size: var(--step-3);
+  font-family: var(--font-display);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  color: var(--film-text);
+}
+.row-go {
+  font-size: var(--step-1);
+  color: rgba(255, 255, 255, 0.6);
+  transform: translateX(-6px);
+  opacity: 0;
+  transition: transform 0.5s var(--ease-out), opacity 0.4s var(--ease-out), color 0.4s var(--ease-out);
+}
+.row.is-on .row-go { opacity: 1; transform: translateX(0); color: var(--film-text); }
+
+.row-detail {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition: grid-template-rows 0.7s var(--ease-out), opacity 0.5s var(--ease-out);
+}
+.row-detail > span { overflow: hidden; display: block; }
+.row.is-on .row-detail { grid-template-rows: 1fr; opacity: 1; }
+.row-promise {
+  display: block;
+  padding-top: 1rem;
+  font-size: var(--step-1);
+  font-weight: 500;
+  color: var(--film-text);
+  max-width: 34ch;
+}
+.row-body {
+  display: block;
+  margin-top: 0.5rem;
+  font-size: var(--step-0);
+  line-height: 1.55;
+  color: var(--film-dim);
+  max-width: 46ch;
+}
+
+/* ── Vision / mission / values ────────────────────────────────────────
+   All closed at rest, so the column reads as three equal offers rather than
+   one answer with two footnotes. No fill and no accent colour — the only
+   things that change on open are height and the sign. Generous line height in
+   the head row is what makes a closed accordion look considered instead of
+   like a list that failed to load. */
+.pillars {
+  padding-top: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  min-width: 0;
+  background: var(--white);
+}
+
+.pillar {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 0 0 auto;
+  border-bottom: 1px solid var(--line-soft);
+  /* Slower and softer than the rest of the page. An accordion that snaps draws
+     attention to the mechanism; this one should just settle. */
+  transition: flex 0.9s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.pillar:last-child { border-bottom: 0; }
+.pillar.is-open { flex: 1 1 auto; }
+
+.pillar-head {
+  display: grid;
+  grid-template-columns: 2.4rem 1fr auto;
+  align-items: baseline;
+  gap: 0 1rem;
+  width: 100%;
+  /* Roomy. The head row is the resting state of this column and carries it. */
+  padding: clamp(1.5rem, 3.4vh, 2.4rem) clamp(1.4rem, 2.2vw, 2.4rem);
+  text-align: left;
+  transition: opacity 0.4s var(--ease-out);
+}
+.pillar-head:hover { opacity: 0.62; }
+
+.pillar-n {
+  font-size: var(--step--2);
+  font-weight: 500;
+  font-variation-settings: 'opsz' 14;
+  letter-spacing: var(--track-label);
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+.pillar-label {
+  font-family: var(--font-display);
+  font-size: var(--step-2);
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  line-height: 1;
+  color: var(--black);
+}
+
+/* A plus that loses its stem. No colour change — the shape carries the state. */
+.pillar-arrow {
+  position: relative;
+  flex: none;
+  width: 12px;
+  height: 12px;
+  align-self: center;
+}
+.pillar-arrow::before,
+.pillar-arrow::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  background: var(--ink);
+  transition: transform 0.5s var(--ease-out);
+}
+.pillar-arrow::before { width: 12px; height: 1px; }
+.pillar-arrow::after { width: 1px; height: 12px; }
+.pillar.is-open .pillar-arrow::after { transform: scaleY(0); }
+
+.pillar-panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition: grid-template-rows 0.9s cubic-bezier(0.32, 0.72, 0, 1),
+    opacity 0.5s var(--ease-out);
+}
+/* The fade trails the height so contents arrive into a space already opening,
+   rather than being revealed by the edge of a clip as it passes over them. */
+.pillar.is-open .pillar-panel {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  transition: grid-template-rows 0.9s cubic-bezier(0.32, 0.72, 0, 1),
+    opacity 0.6s var(--ease-out) 0.16s;
+}
+/* Indented to the number column, so the panel hangs off the same axis as the
+   label above it rather than starting at the section edge. */
+.pillar-inner {
+  overflow: hidden;
+  padding-left: calc(clamp(1.4rem, 2.2vw, 2.4rem) + 3.4rem);
+  padding-right: clamp(1.4rem, 2.2vw, 2.4rem);
+}
+.pillar.is-open .pillar-inner { padding-bottom: clamp(1.6rem, 3.4vh, 2.4rem); }
+
+/* Quieter than the label above it. The panel is supporting detail, so it reads
+   at body size and body weight — set larger it competed with the very heading
+   that opened it. */
+.pillar-headline {
+  font-size: var(--step-0);
+  font-weight: 400;
+  line-height: 1.5;
+  letter-spacing: -0.006em;
+  color: var(--ink);
+  max-width: 32ch;
+}
+
+/* Three named values, term and gloss on one line each. */
+.pillar-points {
+  margin-top: 1.3rem;
+  display: grid;
+  gap: 0.7rem;
+}
+.pillar-points div {
+  display: grid;
+  grid-template-columns: 8.5rem 1fr;
+  gap: 0.2rem 1rem;
+  padding-top: 0.7rem;
+  border-top: 1px solid var(--line-soft);
+}
+.pillar-points dt {
+  font-size: var(--step--2);
+  font-weight: 500;
+  letter-spacing: 0.005em;
+  color: var(--ink);
+}
+.pillar-points dd {
+  font-size: var(--step--2);
+  line-height: 1.55;
+  color: var(--ink-2);
+}
+
+/* ══ Small screens ══════════════════════════════════════════════════════
+   The desktop layout is built on two things that do not exist on a phone: a
+   viewport wide enough to hold two columns, and a pointer to reveal with. Both
+   assumptions are dropped here rather than scaled down.
+
+   - The screen stops being one viewport tall. Squeezing six blocks into 100svh
+     gave every one of them about a sixth of a phone screen.
+   - Rows no longer compete for height with flex-grow — each is a fixed, honest
+     block, and none of them is "active".
+   - Nothing hides behind hover. Every row shows its promise outright, because
+     a tap that reveals text the visitor cannot see is not discoverable. */
+@media (max-width: 1000px) {
+  .work,
+  .work-grid {
+    min-height: 0;
+    display: block;
+  }
+  .rows { border-right: 0; }
+
+  .row,
+  .row.is-on,
+  .row.is-dim {
+    flex: none;
+    min-height: 0;
+    padding: clamp(1.6rem, 5vw, 2.2rem) var(--gutter);
+  }
+  /* The first row clears the floating pill. */
+  .rows > .row:first-child { padding-top: clamp(1.6rem, 5vw, 2.2rem); }
+
+  /* Film stays visible on every row: with no hover there is no "chosen" one. */
+  .row-film { opacity: 1; }
+  .row-film::after {
+    background: linear-gradient(
+      to top,
+      rgba(8, 8, 7, 0.94) 0%,
+      rgba(8, 8, 7, 0.72) 55%,
+      rgba(8, 8, 7, 0.55) 100%
+    );
+  }
+
+  .row-line { grid-template-columns: auto 1fr auto; align-items: center; }
+  .row-title { font-size: var(--step-2); }
+  .row-go { opacity: 1; transform: none; color: var(--film-text); }
+
+  /* The promise is always readable; only the long body stays folded away. */
+  .row-detail,
+  .row.is-on .row-detail { grid-template-rows: 1fr; opacity: 1; }
+  .row-promise { padding-top: 0.8rem; font-size: var(--step-0); }
+  .row-body { display: none; }
+
+  .pillars { padding-top: 0; }
+  .pillar,
+  .pillar.is-open { flex: none; }
+  .pillar-head { padding: 1.2rem var(--gutter); }
+  .pillar-inner {
+    padding-left: var(--gutter);
+    padding-right: var(--gutter);
+  }
+  .pillar-points div { grid-template-columns: 1fr; gap: 0.15rem; }
+}
