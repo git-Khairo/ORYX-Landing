@@ -1,0 +1,517 @@
+/* ══ Transport — "The Route" ════════════════════════════════════════════
+   A line, a marker that travels it, and content that arrives from the right
+   like passing scenery. Tabular figures throughout: on a page about schedules,
+   numerals that do not line up are a mistake you can see. */
+
+.world--transport { --rule: rgba(200, 169, 120, 0.28); }
+
+/* ── Manifest strip ───────────────────────────────────────────────────── */
+.t-manifest {
+  position: absolute;
+  left: var(--gutter);
+  right: var(--gutter);
+  bottom: 0;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--line);
+  border-top: 1px solid var(--rule);
+  transform: translateY(50%);
+}
+.t-manifest > div {
+  background: var(--tone);
+  padding: 0.9rem 1.1rem;
+  display: grid;
+  gap: 0.25rem;
+}
+.t-manifest dt {
+  font-size: var(--step--2);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+.t-manifest dd {
+  font-size: var(--step--1);
+  color: var(--oryx-white);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── The network map ──────────────────────────────────────────────────
+   The one section on the site that is a map. It carries the page's identity
+   more than any amount of copy does. */
+.t-map-block {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: clamp(4rem, 11vh, 7rem) var(--gutter) clamp(1rem, 3vh, 2rem);
+  display: grid;
+  gap: clamp(1.8rem, 4vh, 2.6rem);
+}
+.t-map-head { display: grid; gap: 1rem; }
+
+.t-map { margin: 0; overflow: hidden; }
+.t-map svg { width: 100%; height: auto; overflow: visible; }
+
+/* Faint enough to read as paper, not as a table. */
+.t-map-grid { color: rgba(244, 241, 232, 0.06); }
+
+.t-map-track {
+  fill: none;
+  stroke: var(--line);
+  stroke-width: 2;
+}
+
+/* Draws itself once, when the section is reached. `pathLength` is normalised to
+   1 by the dash values below, so the same numbers work whatever the path's real
+   length is — no measuring in JS. */
+.t-map-route {
+  fill: none;
+  stroke: var(--sand);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  transition: stroke-dashoffset 2.4s var(--ease-out) 0.15s;
+}
+.t-map.is-in .t-map-route { stroke-dashoffset: 0; }
+
+/* A short bright dash running the route on a loop — the consignment, moving. */
+.t-map-runner {
+  fill: none;
+  stroke: var(--oryx-white);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-dasharray: 0.035 0.965;
+  opacity: 0;
+}
+.t-map.is-in .t-map-runner {
+  opacity: 0.9;
+  animation: t-run 6s linear 2.2s infinite;
+}
+@keyframes t-run {
+  from { stroke-dashoffset: 1; }
+  to { stroke-dashoffset: 0; }
+}
+
+.t-map-node circle {
+  fill: var(--tone);
+  stroke: var(--sand);
+  stroke-width: 2;
+  opacity: 0;
+  transition: opacity 0.5s var(--ease-out);
+  transition-delay: calc(0.3s + var(--i) * 0.32s);
+}
+.t-map-node text {
+  opacity: 0;
+  transition: opacity 0.6s var(--ease-out);
+  transition-delay: calc(0.42s + var(--i) * 0.32s);
+}
+.t-map.is-in .t-map-node circle,
+.t-map.is-in .t-map-node text { opacity: 1; }
+
+.t-map-k {
+  fill: var(--oryx-white);
+  font-family: var(--font);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-anchor: middle;
+}
+.t-map-s {
+  fill: var(--text-3);
+  font-family: var(--font);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-anchor: middle;
+}
+
+@media (max-width: 700px) {
+  /* The labels stop being readable long before the map does. */
+  .t-map-s { display: none; }
+  .t-map-k { font-size: 22px; }
+}
+
+/* ── The route ────────────────────────────────────────────────────────── */
+.t-route {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: clamp(6rem, 14vh, 9rem) var(--gutter) clamp(4rem, 10vh, 7rem);
+  display: grid;
+  grid-template-columns: 1fr 1.15fr;
+  gap: clamp(2.5rem, 6vw, 6rem);
+  align-items: start;
+  /* The marker needs somewhere to travel. Sized by content alone this section
+     came out barely taller than the viewport, so the whole run completed within
+     the first flick of the wheel and the device never read as movement. The
+     floor guarantees the journey takes real scrolling however short the copy
+     gets. */
+  min-height: 190svh;
+}
+
+.t-route-intro { position: sticky; top: 2rem; display: grid; gap: 1.4rem; }
+.t-route-shot { margin-top: 1rem; overflow: hidden; }
+.t-route-shot img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
+
+/* Spaced generously for the same reason: stops packed tightly are a list, and
+   a list does not need a marker travelling down it. */
+.t-stops {
+  position: relative;
+  padding-left: 4.6rem;
+  display: grid;
+  /* Stretched against the parent's `align-items: start`, so the list fills the
+     tall row and the stops distribute down it. Left at content height the
+     min-height above would have produced empty space under the last stop
+     instead of distance between them. */
+  align-self: stretch;
+  align-content: space-between;
+  gap: clamp(3.5rem, 12vh, 7rem);
+}
+.t-stop { min-height: 76px; }
+
+/* The line, and the run of it already travelled. `--run` is written by the
+   component on every scroll frame. */
+.t-line {
+  position: absolute;
+  left: 3rem;
+  top: 0.6rem;
+  bottom: 0.6rem;
+  width: 1px;
+  background: var(--line);
+}
+.t-line-run {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 100%;
+  background: var(--sand);
+  transform: scaleY(var(--run, 0));
+  transform-origin: top;
+}
+/* The marker rides the line. It is a chevron, not a dot — the same shape the
+   film cuts on, so the brand's one gesture is doing a job here too. */
+.t-marker {
+  position: absolute;
+  left: 50%;
+  top: calc(var(--run, 0) * 100%);
+  width: 13px;
+  aspect-ratio: 0.4161;
+  translate: -50% -50%;
+  background: var(--sand);
+  -webkit-mask: url('/mark.png') center / contain no-repeat;
+  mask: url('/mark.png') center / contain no-repeat;
+}
+
+.t-stop {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.35rem 1.2rem;
+  align-items: baseline;
+  opacity: 0.4;
+  transform: translateX(18px);
+  transition: opacity 0.6s var(--ease-out), transform 0.6s var(--ease-out);
+}
+.t-stop.is-passed { opacity: 1; transform: translateX(0); }
+
+.t-stop-dot {
+  position: absolute;
+  left: -1.72rem;
+  top: 0.55rem;
+  width: 9px;
+  height: 9px;
+  border: 1px solid var(--sand);
+  background: var(--tone);
+  border-radius: 50%;
+  transition: background 0.4s var(--ease-out);
+}
+.t-stop.is-passed .t-stop-dot { background: var(--sand); }
+
+.t-stop-t {
+  font-size: var(--step--1);
+  font-weight: 600;
+  color: var(--sand-text);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+.t-stop-body { display: grid; gap: 0.3rem; }
+.t-stop-k {
+  font-family: var(--font-display);
+  font-size: var(--step-2);
+  text-transform: uppercase;
+  letter-spacing: var(--track-display);
+  color: var(--oryx-white);
+  line-height: 1.1;
+}
+.t-stop-d { font-size: var(--step-0); color: var(--text-2); max-width: 40ch; }
+
+/* ── The load ─────────────────────────────────────────────────────────
+   Four crates going onto a lorry, and the lorry leaving. A tall section with a
+   sticky stage: the scroll through it is the loading, so the scene has to stay
+   on screen while it happens rather than passing by.
+
+   `--p` (0 → 1) is written by the component on each scroll frame and drives
+   everything below. Each crate slices its own window out of it with clamp(),
+   so the sequence needs no per-element JavaScript and cannot desynchronise. */
+.t-load {
+  height: 300svh;
+  border-top: 1px solid var(--line);
+}
+.t-load-sticky {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: var(--gutter);
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  align-content: center;
+  gap: clamp(1rem, 3vh, 2rem);
+}
+
+.t-load-scene { display: grid; place-items: center; min-height: 0; }
+.t-load-scene svg { width: 100%; height: 100%; max-height: 52svh; overflow: visible; }
+
+/* ── Road ── */
+.t-road { stroke: var(--line); stroke-width: 2; fill: none; }
+.t-road-dash {
+  stroke: var(--line-sand);
+  stroke-width: 2;
+  fill: none;
+  stroke-dasharray: 26 22;
+  /* The road runs under the lorry as it pulls away — the surface moving is
+     what sells the departure as travel rather than as a slide. */
+  stroke-dashoffset: calc(var(--p, 0) * -520);
+}
+
+/* ── The rig ──
+   Everything that travels is one group, so leaving is a single transform. The
+   drive occupies the last third of the scroll; before that it is parked. */
+.t-rig {
+  transform: translateX(calc(clamp(0, (var(--p, 0) - 0.66) / 0.34, 1) * 118%));
+  /* No transition. `--p` is already eased frame by frame by useSmoothProgress,
+     and a transition layered on top of a value that changes every frame only
+     adds lag and fights the easing underneath it. */
+}
+
+.t-trailer,
+.t-cab {
+  fill: none;
+  stroke: var(--sand);
+  stroke-width: 3;
+  stroke-linejoin: round;
+}
+.t-trailer-floor { stroke: var(--sand); stroke-width: 5; fill: none; }
+.t-glass { fill: rgba(200, 169, 120, 0.16); stroke: none; }
+
+.t-wheel circle { fill: var(--sunk); stroke: var(--sand); stroke-width: 3; }
+.t-hub { fill: none; stroke: var(--line-sand); stroke-width: 3; }
+
+/* ── Crates ──
+   Each one flies in from up and to the right — the direction a crate arrives
+   from if it is being swung in off a dock — and lands in its slot. */
+.t-crate {
+  --l: clamp(0, (var(--p, 0) - var(--i) * 0.13) / 0.2, 1);
+  opacity: var(--l);
+  transform:
+    translate(
+      calc((1 - var(--l)) * 190px),
+      calc((1 - var(--l)) * -230px)
+    )
+    rotate(calc((1 - var(--l)) * 8deg));
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.t-crate rect {
+  fill: rgba(200, 169, 120, 0.1);
+  stroke: var(--sand);
+  stroke-width: 2.5;
+}
+.t-crate path { stroke: var(--line-sand); stroke-width: 1.5; fill: none; }
+.t-crate text {
+  fill: var(--oryx-white);
+  font-family: var(--font);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-anchor: middle;
+}
+
+/* ── The manifest beside the scene ── */
+.t-load-list {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  background: var(--line);
+  border-block: 1px solid var(--line);
+}
+.t-load-list li {
+  background: var(--tone);
+  padding: clamp(0.9rem, 2.4vh, 1.4rem) clamp(0.9rem, 1.6vw, 1.4rem);
+  display: grid;
+  gap: 0.35rem;
+  align-content: start;
+  opacity: 0.32;
+  transition: opacity 0.5s var(--ease-out);
+}
+.t-load-list li.is-on { opacity: 1; }
+.t-load-k {
+  font-family: var(--font-display);
+  font-size: var(--step-0);
+  text-transform: uppercase;
+  letter-spacing: var(--track-display);
+  color: var(--oryx-white);
+}
+.t-load-d { font-size: var(--step--2); line-height: 1.5; color: var(--text-2); }
+
+@media (max-width: 760px) {
+  /* The scene needs width to read; below this the four-up manifest is what
+     survives, and the lorry gets what room is left. */
+  .t-load { height: 240svh; }
+  .t-load-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .t-load-scene svg { max-height: 38svh; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .t-rig { transform: none; }
+  .t-crate { opacity: 1; transform: none; }
+  .t-road-dash { stroke-dashoffset: 0; }
+}
+
+/* ── Interlude ────────────────────────────────────────────────────────── */
+.t-interlude {
+  position: relative;
+  min-height: 68svh;
+  display: grid;
+  place-items: center;
+  padding: var(--gutter);
+  isolation: isolate;
+}
+.t-interlude .world-film::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(13, 13, 12, 0.7);
+}
+.t-interlude-line {
+  position: relative;
+  z-index: 1;
+  max-width: 30ch;
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: var(--step-2);
+  text-transform: uppercase;
+  letter-spacing: var(--track-display);
+  line-height: 1.35;
+  color: var(--oryx-white);
+}
+
+/* ── The board ────────────────────────────────────────────────────────── */
+.t-board {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: clamp(3.5rem, 9vh, 6rem) var(--gutter);
+}
+.t-figs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+}
+.t-figs li { background: var(--tone); padding: clamp(1.4rem, 4vh, 2.2rem); display: grid; gap: 0.4rem; }
+.t-fig-n {
+  font-family: var(--font-display);
+  font-size: var(--step-3);
+  color: var(--sand);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+.t-fig-l { font-size: var(--step--2); color: var(--text-3); letter-spacing: 0.02em; }
+
+.t-for { margin-top: clamp(2.5rem, 6vh, 4rem); }
+.t-for-line { font-size: var(--step-1); color: var(--text); max-width: 44ch; }
+.t-chips {
+  margin-top: 1.6rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1px;
+  background: var(--line);
+}
+.t-chips li { background: var(--tone); padding: 1.1rem 1.2rem; display: grid; gap: 0.3rem; }
+.t-chips span { font-size: var(--step-0); font-weight: 600; color: var(--oryx-white); }
+.t-chips small { font-size: var(--step--2); color: var(--text-2); line-height: 1.5; }
+
+/* ── Inside, against the proof of delivery ────────────────────────────── */
+.t-inside-block {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: clamp(3rem, 8vh, 5rem) var(--gutter) clamp(4rem, 10vh, 7rem);
+  display: grid;
+  grid-template-columns: 1.2fr 0.9fr;
+  gap: clamp(2.5rem, 6vw, 5rem);
+  align-items: start;
+}
+.t-inside-copy { display: grid; gap: 1.2rem; }
+.t-inside { margin-top: 0.6rem; display: grid; }
+.t-inside li {
+  display: grid;
+  grid-template-columns: 3rem 1fr;
+  gap: 1rem;
+  padding: 1.1rem 0;
+  border-top: 1px solid var(--line);
+}
+.t-inside-n {
+  font-size: var(--step--2);
+  font-weight: 600;
+  color: var(--sand-text);
+  font-variant-numeric: tabular-nums;
+}
+.t-inside-body { display: grid; gap: 0.3rem; }
+.t-inside-k { font-size: var(--step-1); font-weight: 500; color: var(--oryx-white); }
+.t-inside-d { font-size: var(--step--1); color: var(--text-2); }
+
+/* The stamp. Rotated and set on the picture, because a proof of delivery is a
+   thing that gets stamped — a neat caption underneath would have been a
+   description of the artefact rather than the artefact. */
+.t-pod { position: relative; position: sticky; top: 2rem; }
+.t-pod img { width: 100%; aspect-ratio: 3 / 4; object-fit: cover; }
+.t-pod-stamp {
+  position: absolute;
+  right: 6%;
+  bottom: 8%;
+  display: grid;
+  gap: 0.2rem;
+  padding: 0.7rem 1rem;
+  border: 2px solid var(--sand);
+  background: color-mix(in srgb, var(--sunk) 74%, transparent);
+  rotate: -6deg;
+  transition: rotate 0.7s var(--ease-out), opacity 0.7s var(--ease-out);
+}
+.t-pod:not(.is-in) .t-pod-stamp { rotate: -22deg; }
+.t-pod-mark {
+  font-family: var(--font-display);
+  font-size: var(--step-1);
+  text-transform: uppercase;
+  letter-spacing: var(--track-display);
+  color: var(--sand);
+}
+.t-pod-meta {
+  font-size: var(--step--2);
+  color: var(--text-2);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 900px) {
+  .t-manifest { grid-template-columns: repeat(2, 1fr); }
+  .t-route,
+  .t-inside-block { grid-template-columns: 1fr; }
+  .t-route-intro,
+  .t-pod { position: static; }
+  .t-figs { grid-template-columns: 1fr; }
+  .t-stops { padding-left: 3.4rem; }
+  .t-line { left: 1.8rem; }
+}

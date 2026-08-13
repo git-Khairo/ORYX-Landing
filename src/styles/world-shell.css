@@ -1,0 +1,255 @@
+/* ══ World shell ════════════════════════════════════════════════════════
+   The frame the three service worlds share: the overlay, the bar, the scroll
+   container, and the handful of primitives every page needs (a kicker, an
+   opening frame, the closing frame). Everything with real layout in it lives
+   in the world's own stylesheet. */
+
+.world {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  /* Each world sits in its own light — three near-blacks a degree apart. */
+  background: var(--tone, var(--ground));
+  color: var(--text-2);
+  /* `both` so the overlay holds the animation's end state, and an animation
+     rather than a JS-toggled class so it cannot stall half-transparent while
+     still trapping focus — see WorldShell. Reduced motion collapses the
+     duration globally, which leaves the end state intact. */
+  animation: world-in 0.45s var(--ease-out) both;
+}
+
+@keyframes world-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.world-shell { position: relative; height: 100%; display: flex; flex-direction: column; }
+
+/* ── Bar ──────────────────────────────────────────────────────────────── */
+.world-bar {
+  position: relative;
+  z-index: 3;
+  flex: none;
+  background: color-mix(in srgb, var(--tone, var(--ground)) 82%, transparent);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--line);
+}
+
+/* Read straight off the scroller's own position by `useScrollProgress`. */
+.world-progress {
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  height: 2px;
+  width: 100%;
+  background: var(--sand);
+  transform: scaleX(var(--scrolled, 0));
+  transform-origin: left;
+}
+
+.world-bar-inner {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 0.85rem var(--gutter);
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 1rem;
+}
+
+.world-back {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: var(--step--2);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--text-3);
+  transition: color 0.25s var(--ease-out);
+}
+.world-back:hover { color: var(--oryx-white); }
+.world-back i { font-style: normal; transition: transform 0.25s var(--ease-out); }
+.world-back:hover i { transform: translateX(-3px); }
+
+.world-brand {
+  font-family: var(--font-display);
+  font-size: var(--step-0);
+  font-weight: 600;
+  letter-spacing: var(--track-display-lg);
+  margin-right: calc(-1 * var(--track-display-lg));
+  color: var(--oryx-white);
+}
+
+.world-index {
+  justify-self: end;
+  font-size: var(--step--2);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  color: var(--sand-text);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Scroller ─────────────────────────────────────────────────────────── */
+.world-scroll {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  scroll-behavior: smooth;
+}
+
+/* ── Film ─────────────────────────────────────────────────────────────── */
+.world-film { position: absolute; inset: 0; background: var(--sunk); overflow: hidden; }
+.world-film img,
+.world-film video { width: 100%; height: 100%; object-fit: cover; }
+
+/* ── Shared primitives ────────────────────────────────────────────────── */
+.world-kicker {
+  font-size: var(--step--2);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--sand-text);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+/* The one sand hairline, opening a section rather than boxing one in. */
+.world-kicker::after {
+  content: '';
+  height: 1px;
+  width: 42px;
+  background: var(--line-sand);
+}
+
+.world-eyebrow {
+  font-size: var(--step--2);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--sand-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.world-lede {
+  font-size: var(--step-1);
+  line-height: 1.6;
+  color: var(--text);
+  max-width: 46ch;
+  text-wrap: pretty;
+}
+
+.world-line { font-size: var(--step-0); color: var(--text-2); max-width: 44ch; }
+
+.world-promise {
+  font-size: var(--step-1);
+  font-weight: 300;
+  color: var(--sand-text);
+  max-width: 40ch;
+}
+
+/* ── Reveal ───────────────────────────────────────────────────────────
+   The hidden state is scoped to `[data-reveal]:not(.is-in)`, so if the hook
+   never runs the markup is simply visible. Content is never lost to a trigger
+   that failed to fire — see `useReveal`. */
+[data-reveal] {
+  opacity: 1;
+  transform: none;
+  transition: opacity 0.7s var(--ease-out), transform 0.7s var(--ease-out);
+}
+.world:not(.is-still) [data-reveal]:not(.is-in) {
+  opacity: 0;
+  transform: translateY(22px);
+}
+
+/* ── Closing frame ────────────────────────────────────────────────────── */
+.world-close {
+  position: relative;
+  min-height: 92svh;
+  display: grid;
+  place-items: end start;
+  padding: var(--gutter);
+  isolation: isolate;
+}
+.world-close .world-film::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(13, 13, 12, 0.94) 0%,
+    rgba(13, 13, 12, 0.72) 40%,
+    rgba(13, 13, 12, 0.4) 100%
+  );
+}
+.world-close-copy { position: relative; z-index: 1; max-width: 46ch; }
+.world-close-copy h3 { font-size: var(--step-3); color: var(--oryx-white); }
+.world-close-copy p { margin-top: 1rem; color: var(--text-2); }
+
+.world-actions {
+  margin-top: 1.8rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem 1.6rem;
+}
+
+.world-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.9rem 1.6rem;
+  background: var(--sand);
+  color: var(--oryx-black);
+  font-size: var(--step--1);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  transition: background 0.25s var(--ease-out);
+}
+.world-cta:hover { background: var(--oryx-white); }
+.world-cta i { font-style: normal; transition: transform 0.25s var(--ease-out); }
+.world-cta:hover i { transform: translateX(4px); }
+
+.world-text-action {
+  font-size: var(--step--1);
+  color: var(--text-3);
+  transition: color 0.25s var(--ease-out);
+}
+.world-text-action:hover { color: var(--oryx-white); }
+
+/* ── Shared opening frame ─────────────────────────────────────────────
+   The three worlds diverge immediately below this, but they all start on a
+   full screen of film with the title on it — the point of difference is what
+   the page does next, not how it introduces itself. */
+.t-open,
+.w-open,
+.r-open {
+  position: relative;
+  min-height: 88svh;
+  display: grid;
+  place-items: end start;
+  padding: var(--gutter);
+  isolation: isolate;
+}
+.t-open .world-film::after,
+.w-open .world-film::after,
+.r-open .world-film::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(13, 13, 12, 0.94) 0%,
+    rgba(13, 13, 12, 0.6) 44%,
+    rgba(13, 13, 12, 0.28) 100%
+  );
+}
+.t-open-copy,
+.w-open-copy,
+.r-open-copy { position: relative; z-index: 1; display: grid; gap: 0.8rem; }
+.t-open-copy h2,
+.w-open-copy h2,
+.r-open-copy h2 { font-size: var(--step-4); color: var(--oryx-white); }

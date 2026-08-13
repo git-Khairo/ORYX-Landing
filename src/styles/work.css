@@ -1,5 +1,10 @@
-/* ══ Work — service rows and the group ══════════════════════════════════ */
-.work { min-height: 100svh; display: flex; background: var(--white); }
+/* ══ Work — service rows and the group ══════════════════════════════════
+   The split is the board's own: film on the left, a cream panel on the right.
+   That is exactly how the identity sheet is laid out — a black field carrying
+   the imagery with one Oryx White column of reading beside it — so the page
+   inherits the composition rather than inventing a new one. It also gives the
+   dark run its first intermission at the point where the text gets longest. */
+.work { min-height: 100svh; display: flex; background: var(--ground); }
 .work-grid {
   flex: 1;
   min-height: 100svh;
@@ -7,18 +12,16 @@
   grid-template-columns: 2fr 1fr;
 }
 
-
 /* ── The three services, as rows ──────────────────────────────────────── */
 /* No top inset and no rules on the outside — the section meets the hero edge
    to edge, and the only lines inside it are the ones between its own rows. */
 .rows {
-  background: var(--film-bg);
+  background: var(--sunk);
   display: flex;
   flex-direction: column;
   min-width: 0;
 }
 
-  /* rows sit on film, so their rules are light */
 .row {
   position: relative;
   flex: 1 1 0;
@@ -29,17 +32,32 @@
   overflow: hidden;
   text-align: left;
   padding: clamp(1rem, 2.4vh, 1.9rem) clamp(1.2rem, 2.4vw, 2.6rem);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+  border-bottom: 1px solid var(--line);
   transition: flex-grow 0.8s var(--ease-out);
 }
 .row:last-child { border-bottom: 0; }
-/* The first row sits directly under the bar, so it needs the headroom that the
-   rows below get from the row above them. */
 /* No reserved height: the pill floats above the layout, so the first row runs
    straight up to the hero edge and only keeps the breathing room that the rows
    below get from the row above them. */
 .rows > .row:first-child { padding-top: clamp(1.4rem, 4vh, 2.8rem); }
 .row.is-on { flex-grow: 1.9; }
+
+/* A sand hairline marks the open row. One accent, doing one job — saying which
+   of the three you are pointed at, which nothing else on this panel says. */
+.row::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--sand);
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: transform 0.6s var(--ease-out);
+  z-index: 2;
+}
+.row.is-on::before { transform: scaleY(1); }
 
 /* The film runs the whole time. Only its brightness responds to attention —
    the open row's clip comes up, the other two sit back. */
@@ -47,7 +65,7 @@
   position: absolute;
   inset: 0;
   transition: opacity 0.7s var(--ease-out);
-  opacity: 0.5;
+  opacity: 0.42;
 }
 .row.is-on .row-film { opacity: 1; }
 .row-film video {
@@ -66,10 +84,10 @@
   inset: 0;
   background: linear-gradient(
     90deg,
-    rgba(8, 8, 7, 0.9) 0%,
-    rgba(8, 8, 7, 0.66) 34%,
-    rgba(8, 8, 7, 0.3) 66%,
-    rgba(8, 8, 7, 0.16) 100%
+    rgba(13, 13, 12, 0.92) 0%,
+    rgba(13, 13, 12, 0.7) 34%,
+    rgba(13, 13, 12, 0.34) 66%,
+    rgba(13, 13, 12, 0.18) 100%
   );
 }
 
@@ -84,29 +102,30 @@
 .row-index {
   font-size: var(--step--2);
   font-weight: 600;
-  font-variation-settings: 'opsz' 14;
   letter-spacing: var(--track-label);
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--text-3);
   font-variant-numeric: tabular-nums;
   transition: color 0.4s var(--ease-out);
 }
-.row.is-on .row-index { color: var(--film-text); }
+.row.is-on .row-index { color: var(--sand-text); }
 .row-title {
   font-size: var(--step-3);
   font-family: var(--font-display);
-  font-weight: 500;
-  letter-spacing: 0.02em;
-  line-height: 1;
-  color: var(--film-text);
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: var(--track-display);
+  line-height: 1.1;
+  color: var(--oryx-white);
 }
 .row-go {
   font-size: var(--step-1);
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--text-3);
   transform: translateX(-6px);
   opacity: 0;
-  transition: transform 0.5s var(--ease-out), opacity 0.4s var(--ease-out), color 0.4s var(--ease-out);
+  transition: transform 0.5s var(--ease-out), opacity 0.4s var(--ease-out),
+    color 0.4s var(--ease-out);
 }
-.row.is-on .row-go { opacity: 1; transform: translateX(0); color: var(--film-text); }
+.row.is-on .row-go { opacity: 1; transform: translateX(0); color: var(--sand); }
 
 .row-detail {
   position: relative;
@@ -123,7 +142,7 @@
   padding-top: 1rem;
   font-size: var(--step-1);
   font-weight: 500;
-  color: var(--film-text);
+  color: var(--oryx-white);
   max-width: 34ch;
 }
 .row-body {
@@ -131,23 +150,31 @@
   margin-top: 0.5rem;
   font-size: var(--step-0);
   line-height: 1.55;
-  color: var(--film-dim);
+  color: var(--text-2);
   max-width: 46ch;
 }
 
 /* ── Vision / mission / values ────────────────────────────────────────
-   All closed at rest, so the column reads as three equal offers rather than
-   one answer with two footnotes. No fill and no accent colour — the only
-   things that change on open are height and the sign. Generous line height in
-   the head row is what makes a closed accordion look considered instead of
-   like a list that failed to load. */
+   The cream panel. One item is always open, so the column reads as an answer
+   rather than three closed doors. No fill and no accent inside it — the only
+   things that change on open are height and the sign. */
 .pillars {
   padding-top: 0;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   min-width: 0;
-  background: var(--white);
+
+  /* The inverted band, declared through the same tokens the rest of the site
+     uses, so everything nested inside flips with it. */
+  background: var(--invert-bg);
+  color: var(--invert-text-2);
+  --text: var(--invert-text);
+  --text-2: var(--invert-text-2);
+  --text-3: #7d7a72;
+  --sand-text: #8a6a3b;
+  --line: var(--invert-line);
+  --line-soft: rgba(28, 28, 26, 0.07);
 }
 
 .pillar {
@@ -178,19 +205,19 @@
 
 .pillar-n {
   font-size: var(--step--2);
-  font-weight: 500;
-  font-variation-settings: 'opsz' 14;
+  font-weight: 600;
   letter-spacing: var(--track-label);
-  color: var(--ink-3);
+  color: var(--text-3);
   font-variant-numeric: tabular-nums;
 }
 .pillar-label {
   font-family: var(--font-display);
   font-size: var(--step-2);
-  font-weight: 500;
-  letter-spacing: 0.03em;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: var(--track-display);
   line-height: 1;
-  color: var(--black);
+  color: var(--invert-text);
 }
 
 /* A plus that loses its stem. No colour change — the shape carries the state. */
@@ -207,7 +234,7 @@
   position: absolute;
   inset: 0;
   margin: auto;
-  background: var(--ink);
+  background: var(--invert-text);
   transition: transform 0.5s var(--ease-out);
 }
 .pillar-arrow::before { width: 12px; height: 1px; }
@@ -243,14 +270,13 @@
    that opened it. */
 .pillar-headline {
   font-size: var(--step-0);
-  font-weight: 400;
+  font-weight: 500;
   line-height: 1.5;
-  letter-spacing: -0.006em;
-  color: var(--ink);
+  color: var(--invert-text);
   max-width: 32ch;
 }
 
-/* Three named values, term and gloss on one line each. */
+/* Four named values, term and gloss on one line each. */
 .pillar-points {
   margin-top: 1.3rem;
   display: grid;
@@ -265,14 +291,13 @@
 }
 .pillar-points dt {
   font-size: var(--step--2);
-  font-weight: 500;
-  letter-spacing: 0.005em;
-  color: var(--ink);
+  font-weight: 600;
+  color: var(--invert-text);
 }
 .pillar-points dd {
   font-size: var(--step--2);
   line-height: 1.55;
-  color: var(--ink-2);
+  color: var(--invert-text-2);
 }
 
 /* ══ Small screens ══════════════════════════════════════════════════════
@@ -295,29 +320,30 @@
   .rows { border-right: 0; }
 
   .row,
-  .row.is-on,
-  .row.is-dim {
+  .row.is-on {
     flex: none;
     min-height: 0;
     padding: clamp(1.6rem, 5vw, 2.2rem) var(--gutter);
   }
-  /* The first row clears the floating pill. */
   .rows > .row:first-child { padding-top: clamp(1.6rem, 5vw, 2.2rem); }
+
+  /* With no hover there is no "chosen" row, so the sand rule would be lying. */
+  .row::before { display: none; }
 
   /* Film stays visible on every row: with no hover there is no "chosen" one. */
   .row-film { opacity: 1; }
   .row-film::after {
     background: linear-gradient(
       to top,
-      rgba(8, 8, 7, 0.94) 0%,
-      rgba(8, 8, 7, 0.72) 55%,
-      rgba(8, 8, 7, 0.55) 100%
+      rgba(13, 13, 12, 0.94) 0%,
+      rgba(13, 13, 12, 0.74) 55%,
+      rgba(13, 13, 12, 0.58) 100%
     );
   }
 
   .row-line { grid-template-columns: auto 1fr auto; align-items: center; }
   .row-title { font-size: var(--step-2); }
-  .row-go { opacity: 1; transform: none; color: var(--film-text); }
+  .row-go { opacity: 1; transform: none; color: var(--sand); }
 
   /* The promise is always readable; only the long body stays folded away. */
   .row-detail,

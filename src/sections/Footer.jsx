@@ -24,9 +24,9 @@ export default function Footer({ onOpenService }) {
 
       <div className="footer-inner">
         <div className="footer-band-copy shell">
-          <img className="footer-logo" src="/logo.png" alt="" />
-          <p className="footer-band-line">{brand.tagline}</p>
-          <p className="footer-band-sub">{brand.full}</p>
+          <span className="footer-logo" aria-hidden="true" />
+          <p className="footer-band-line">{brand.slogan}</p>
+          <p className="footer-band-sub">{brand.descriptor.join(' · ')}</p>
         </div>
 
         <div className="footer-bar shell">

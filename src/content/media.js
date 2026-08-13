@@ -10,17 +10,28 @@
  * downloaded into `public/film/`. Every URL verified in session: 200, video/mp4.
  */
 export const film = {
-  /* A still, not a clip — and deliberately so.
-     There is no Arabian oryx footage in the free libraries. Pexels holds
-     exactly two oryx videos (a scimitar oryx on grass and a backlit silhouette,
-     both rejected) and Pixabay's single result is a gemsbok on savanna. What
-     does exist is good Arabian oryx *photography* in actual desert. For a
-     three-second act a still under a slow push reads as deliberate — a title
-     card — where a wrong animal in the wrong landscape reads as a mistake. */
+  /* The origin shot, and the only frame on the site where the animal appears.
+     A still rather than a clip, deliberately: the free libraries have no
+     front-facing oryx footage, and this shot needs the head square to camera
+     because the mark has to sit on it as the horns.
+
+     The previous plate (16573757) was replaced — both animals faced away, the
+     adult's head was cropped out of frame entirely, and there was nothing to
+     align the mark to. This is a gemsbok, head to camera, real horns rising
+     straight out of the top of frame with the same splay as the mark, on a
+     dark background that takes the brand grade without a fight. Gemsbok is
+     Oryx gazella and is the animal on the identity board itself. */
   oryx: {
     kind: 'image',
-    src: 'https://images.pexels.com/photos/16573757/pexels-photo-16573757.jpeg?auto=compress&cs=tinysrgb&w=1920',
-    credit: 'https://www.pexels.com/photo/antelope-on-sand-16573757/',
+    /* Requested large: the shot is framed as a close-up on the head, so the
+       plate is rendered about twice viewport width and a 1920 source would be
+       upscaled and soft exactly where the mark meets the horns. */
+    src: 'https://images.pexels.com/photos/37177683/pexels-photo-37177683.jpeg?auto=compress&cs=tinysrgb&w=2400',
+    credit: 'https://www.pexels.com/photo/close-up-of-a-gemsbok-37177683/',
+    /* Where the animal's horns converge, as a fraction of the plate. The
+       overlay mark is positioned from these, so if the plate is ever swapped
+       these three numbers are the only thing that needs re-measuring. */
+    horn: { x: 0.62, y: 0.32, spread: 0.144 },
   },
   facilities: {
     src: 'https://videos.pexels.com/video-files/8783705/8783705-hd_1920_1080_30fps.mp4',
@@ -106,9 +117,18 @@ export const gallery = {
     { src: shot(4353622), alt: 'Uniformed team preparing equipment' },
     { src: shot(19038677), alt: 'Facility crew on shift' },
   ],
+  /* [0] and [2] are the two halves of the before/after scrub, so they are
+     chosen as a pair rather than individually: both are empty interiors shot
+     square-on, which is what lets the slider read as one space changing rather
+     than two unrelated photographs meeting at a line.
+
+     The previous [2] was a pair of orange tower cranes against a blue sky —
+     wrong subject for "finished and handed back", and the only primary colour
+     anywhere on the site. [1] was two unfinished tower blocks on a building
+     plot, which is development, not refurbishment. */
   renovation: [
-    { src: shot(5691533), alt: 'Interior strip-out in progress' },
-    { src: shot(2590716), alt: 'Fit-out underway on a commercial floor' },
-    { src: shot(1804173), alt: 'Finished interior after refurbishment' },
+    { src: shot(5691533), alt: 'Stripped interior under dust sheets, before refurbishment' },
+    { src: shot(12526862), alt: 'Commercial floor part-cleared during fit-out' },
+    { src: shot(19837082), alt: 'Finished interior, daylit and handed back clean' },
   ],
 }

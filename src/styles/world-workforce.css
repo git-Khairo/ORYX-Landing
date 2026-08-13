@@ -1,0 +1,456 @@
+/* ══ Workforce — "The Roster" ═══════════════════════════════════════════
+   A timetable and a wall of badges. Nothing on this page travels: it fills in.
+   Where Transport runs a line down the left, this runs a clock down it, and
+   the second half of the page is a grid that populates person by person. */
+
+/* ── The shift ────────────────────────────────────────────────────────── */
+.w-shift {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: clamp(4rem, 11vh, 7rem) var(--gutter);
+  display: grid;
+  grid-template-columns: 0.95fr 1.2fr;
+  gap: clamp(2.5rem, 6vw, 6rem);
+  align-items: start;
+}
+.w-shift-intro { position: sticky; top: 2rem; display: grid; gap: 1.4rem; }
+
+.w-blocks { display: grid; }
+
+/* Each block hangs off its own time, the way a rota is read. The rule is on
+   the left of the body rather than under the row, so the column of times reads
+   as a gutter and not as a first table column. */
+.w-block {
+  display: grid;
+  grid-template-columns: 5.2rem 1fr;
+  gap: 1.4rem;
+  padding: clamp(1.2rem, 3vh, 1.8rem) 0;
+  border-top: 1px solid var(--line);
+}
+.w-block:last-child { border-bottom: 1px solid var(--line); }
+
+.w-block-t {
+  font-size: var(--step-1);
+  font-weight: 600;
+  color: var(--sand-text);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.01em;
+  line-height: 1.3;
+}
+.w-block-body {
+  display: grid;
+  gap: 0.35rem;
+  padding-left: 1.4rem;
+  border-left: 1px solid var(--line-sand);
+}
+.w-block-k {
+  font-family: var(--font-display);
+  font-size: var(--step-2);
+  text-transform: uppercase;
+  letter-spacing: var(--track-display);
+  color: var(--oryx-white);
+  line-height: 1.1;
+}
+.w-block-d { font-size: var(--step-0); color: var(--text-2); max-width: 42ch; }
+
+/* ── The crew ─────────────────────────────────────────────────────────
+   Badges, not cards. An ID badge is the object this service actually hands
+   over: a coloured strip, a role, and what that role covers. */
+.w-crew {
+  background: var(--sunk);
+  border-block: 1px solid var(--line);
+  padding: clamp(3.5rem, 9vh, 6rem) var(--gutter);
+}
+.w-crew-head {
+  max-width: var(--maxw);
+  margin: 0 auto clamp(2rem, 5vh, 3rem);
+  display: grid;
+  gap: 1rem;
+}
+
+/* Three across, not `auto-fit`. Auto-fitting six badges into a 1280 viewport
+   produced five and a stranded one — a crew that looks like somebody is
+   missing, on the one page whose whole argument is that the right number of
+   people turn up. Fixed counts keep the grid full at every breakpoint. */
+.w-badges {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(0.8rem, 1.6vw, 1.2rem);
+}
+@media (max-width: 900px) {
+  .w-badges { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 520px) {
+  .w-badges { grid-template-columns: 1fr; }
+}
+
+/* The stagger is what makes the grid assemble rather than appear. `--i` comes
+   off the index, so each badge lands a beat after the one before it. */
+.w-badge {
+  position: relative;
+  background: var(--raise);
+  border: 1px solid var(--line);
+  padding: 1.3rem 1.2rem 1.2rem;
+  display: grid;
+  gap: 0.35rem;
+  align-content: start;
+  min-height: 148px;
+  transition-delay: calc(var(--i, 0) * 70ms);
+}
+.w-badge-strip {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--sand);
+}
+.w-badge-r {
+  font-family: var(--font-display);
+  font-size: var(--step-1);
+  text-transform: uppercase;
+  letter-spacing: var(--track-display);
+  color: var(--oryx-white);
+  line-height: 1.15;
+}
+.w-badge-n { font-size: var(--step--2); color: var(--text-2); letter-spacing: 0.02em; }
+/* The mark, small, in the corner — the badge is issued by somebody. */
+.w-badge-mark {
+  position: absolute;
+  right: 1rem;
+  bottom: 1rem;
+  width: 11px;
+  aspect-ratio: 0.4161;
+  background: var(--line-sand);
+  -webkit-mask: url('/mark.png') center / contain no-repeat;
+  mask: url('/mark.png') center / contain no-repeat;
+}
+
+.w-crew-shot {
+  max-width: var(--maxw);
+  margin: clamp(2rem, 5vh, 3rem) auto 0;
+  overflow: hidden;
+}
+.w-crew-shot img { width: 100%; aspect-ratio: 21 / 9; object-fit: cover; }
+
+/* ── The day, as a dial ───────────────────────────────────────────────
+   Concentric arcs on a 24-hour clock. Each ring is one crew; overlaps at
+   handover are visible as rings sitting alongside each other, and night cover
+   simply carries on past the top of the dial — the one shift a rectangular
+   rota has to cut in half.
+
+   `pathLength="24"` on every circle makes one dash unit equal one hour, so the
+   arcs are authored in the data's own units with no trigonometry anywhere. */
+
+/* Registered so it can be transitioned. An unregistered custom property is a
+   token stream and jumps from one value to the next; typed as a number, the
+   browser interpolates it and the arcs sweep. */
+@property --h {
+  syntax: '<number>';
+  initial-value: 0;
+  inherits: false;
+}
+
+.w-day-block {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: clamp(3.5rem, 9vh, 6rem) var(--gutter);
+  display: grid;
+  gap: clamp(1.8rem, 4vh, 2.6rem);
+}
+.w-day-head { display: grid; gap: 1rem; }
+
+.w-dial {
+  margin: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr);
+  gap: clamp(2rem, 5vw, 4rem);
+  align-items: center;
+}
+.w-dial svg { width: 100%; max-width: 460px; height: auto; justify-self: center; }
+
+.w-dial-rail {
+  fill: none;
+  stroke: var(--line);
+  stroke-width: 12;
+}
+
+.w-dial-arc {
+  --h: 0;
+  fill: none;
+  stroke: var(--sand);
+  stroke-width: 12;
+  stroke-linecap: butt;
+  /* One hour per unit: the visible run, then the rest of the day as gap. */
+  stroke-dasharray: var(--h) calc(24 - var(--h));
+  stroke-dashoffset: var(--from);
+  transition: --h 1.1s var(--ease-out);
+  transition-delay: calc(var(--i) * 0.14s);
+}
+.w-dial.is-in .w-dial-arc { --h: var(--hours); }
+
+/* The innermost rings are the busiest hours; stepping the opacity outward
+   keeps five sand arcs from flattening into one solid disc. */
+.w-dial-arc { opacity: calc(0.55 + var(--i) * 0.11); }
+
+.w-dial-h {
+  fill: var(--text-3);
+  font-family: var(--font);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-anchor: middle;
+  font-variant-numeric: tabular-nums;
+}
+.w-dial-c {
+  fill: var(--oryx-white);
+  font-family: var(--font-display);
+  font-size: 44px;
+  text-anchor: middle;
+}
+.w-dial-s {
+  fill: var(--sand-text);
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  text-anchor: middle;
+}
+
+.w-dial-key { display: grid; gap: 1px; background: var(--line); border: 1px solid var(--line); }
+.w-dial-key li {
+  background: var(--tone);
+  padding: 0.85rem 1rem;
+  display: grid;
+  grid-template-columns: 14px 1fr auto;
+  gap: 0.8rem;
+  align-items: center;
+}
+.w-dial-swatch {
+  width: 14px;
+  height: 14px;
+  background: var(--sand);
+  opacity: calc(0.55 + var(--i) * 0.11);
+}
+.w-dial-k { font-size: var(--step--1); color: var(--oryx-white); }
+.w-dial-t {
+  font-size: var(--step--2);
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+}
+
+@media (max-width: 860px) {
+  .w-dial { grid-template-columns: 1fr; }
+}
+
+/* ── The week ─────────────────────────────────────────────────────────
+   The rota grid. Seven fixed columns against a label — never `auto-fit`, since
+   a week that reflows to five columns on a narrow screen is not a week. */
+.w-roster {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: clamp(3.5rem, 9vh, 6rem) var(--gutter);
+  display: grid;
+  gap: clamp(1.8rem, 4vh, 2.6rem);
+}
+.w-roster-head { display: grid; gap: 1rem; }
+
+.w-grid { display: grid; gap: 4px; }
+
+.w-grid-days,
+.w-grid-row {
+  display: grid;
+  grid-template-columns: minmax(7rem, 12rem) repeat(7, minmax(0, 1fr));
+  gap: 4px;
+  align-items: center;
+}
+
+.w-day {
+  font-size: var(--step--2);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  color: var(--text-3);
+  text-align: center;
+}
+
+.w-grid-r {
+  font-size: var(--step--1);
+  font-weight: 500;
+  color: var(--text-2);
+  padding-right: 0.6rem;
+}
+
+/* Height, not colour, is doing most of the work — a cell you can read at a
+   glance from its silhouette survives being looked at on a phone. */
+.w-cell {
+  display: block;
+  height: clamp(28px, 4.4vh, 40px);
+  background: var(--raise-2);
+  border: 1px solid transparent;
+  transition: opacity 0.5s var(--ease-out), transform 0.5s var(--ease-out);
+  transition-delay: calc(var(--i, 0) * 45ms);
+}
+.w-cell--2 { background: var(--sand); }
+.w-cell--1 { background: rgba(200, 169, 120, 0.34); }
+.w-cell--0 {
+  background: transparent;
+  border-color: var(--line);
+}
+
+.w-key {
+  margin-top: 0.8rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem 1.6rem;
+  font-size: var(--step--2);
+  letter-spacing: 0.04em;
+  color: var(--text-3);
+}
+.w-key li { display: inline-flex; align-items: center; gap: 0.55rem; }
+.w-key .w-cell { width: 26px; height: 14px; }
+
+@media (max-width: 700px) {
+  .w-grid-days,
+  .w-grid-row { grid-template-columns: minmax(5.5rem, 8rem) repeat(7, minmax(0, 1fr)); }
+  .w-grid-r { font-size: var(--step--2); }
+}
+
+/* ── What it is ───────────────────────────────────────────────────────
+   Rows, not cards: four short definitions read faster as a list with a hard
+   left edge than as four boxes competing for the same attention. */
+.w-define {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: clamp(3.5rem, 9vh, 6rem) var(--gutter);
+  display: grid;
+}
+.w-define-row {
+  display: grid;
+  grid-template-columns: 14rem minmax(0, 1fr);
+  gap: 1.5rem;
+  align-items: baseline;
+  padding: clamp(1.1rem, 3vh, 1.6rem) 0;
+  border-top: 1px solid var(--line);
+}
+.w-define-row:last-child { border-bottom: 1px solid var(--line); }
+/* One step down from the section headings. At `--step-2` the longest of these
+   labels — "Accountable", in tracked capitals — overran a fixed column and
+   collided with its own definition; at `--step-1` all four sit inside 14rem, so
+   the definitions start on one axis and the rows read as a list rather than as
+   four headings that happen to have text beside them. */
+.w-define-row h3 {
+  font-size: var(--step-1);
+  color: var(--oryx-white);
+}
+.w-define-row p { font-size: var(--step-0); color: var(--text-2); max-width: 46ch; }
+
+/* ── Interlude ────────────────────────────────────────────────────────── */
+.w-interlude {
+  position: relative;
+  min-height: 68svh;
+  display: grid;
+  place-items: center;
+  padding: var(--gutter);
+  isolation: isolate;
+}
+.w-interlude .world-film::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(13, 13, 12, 0.7);
+}
+.w-interlude-line {
+  position: relative;
+  z-index: 1;
+  max-width: 30ch;
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: var(--step-2);
+  text-transform: uppercase;
+  letter-spacing: var(--track-display);
+  line-height: 1.35;
+  color: var(--oryx-white);
+}
+
+/* ── Proof ────────────────────────────────────────────────────────────── */
+.w-proof {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: clamp(3.5rem, 9vh, 6rem) var(--gutter);
+  display: grid;
+  grid-template-columns: 0.8fr 1.2fr;
+  gap: clamp(2.5rem, 6vw, 5rem);
+  align-items: start;
+}
+.w-figs { display: grid; gap: 1px; background: var(--line); border: 1px solid var(--line); }
+.w-figs li {
+  background: var(--tone);
+  padding: clamp(1.2rem, 3vh, 1.8rem);
+  display: grid;
+  gap: 0.3rem;
+}
+.w-fig-n {
+  font-family: var(--font-display);
+  font-size: var(--step-3);
+  color: var(--sand);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+.w-fig-l { font-size: var(--step--2); color: var(--text-3); }
+
+.w-for-line { font-size: var(--step-1); color: var(--text); max-width: 44ch; }
+.w-sectors { margin-top: 1.6rem; display: grid; }
+.w-sectors div {
+  display: grid;
+  grid-template-columns: 12rem 1fr;
+  gap: 0.2rem 1.2rem;
+  padding: 0.9rem 0;
+  border-top: 1px solid var(--line);
+}
+.w-sectors dt { font-size: var(--step-0); font-weight: 600; color: var(--oryx-white); }
+.w-sectors dd { font-size: var(--step--1); color: var(--text-2); }
+
+/* ── Inside ───────────────────────────────────────────────────────────── */
+.w-inside-block {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: clamp(3rem, 8vh, 5rem) var(--gutter) clamp(4rem, 10vh, 7rem);
+  display: grid;
+  grid-template-columns: 1.2fr 0.9fr;
+  gap: clamp(2.5rem, 6vw, 5rem);
+  align-items: start;
+}
+.w-inside-copy { display: grid; gap: 1.2rem; }
+.w-inside { margin-top: 0.6rem; display: grid; }
+.w-inside li {
+  display: grid;
+  grid-template-columns: 3rem 1fr;
+  gap: 1rem;
+  padding: 1.1rem 0;
+  border-top: 1px solid var(--line);
+}
+.w-inside-n {
+  font-size: var(--step--2);
+  font-weight: 600;
+  color: var(--sand-text);
+  font-variant-numeric: tabular-nums;
+}
+.w-inside-body { display: grid; gap: 0.3rem; }
+.w-inside-k { font-size: var(--step-1); font-weight: 500; color: var(--oryx-white); }
+.w-inside-d { font-size: var(--step--1); color: var(--text-2); }
+.w-inside-shot { position: sticky; top: 2rem; }
+.w-inside-shot img { width: 100%; aspect-ratio: 3 / 4; object-fit: cover; }
+
+@media (max-width: 900px) {
+  .w-shift,
+  .w-proof,
+  .w-inside-block { grid-template-columns: 1fr; }
+  .w-shift-intro,
+  .w-inside-shot { position: static; }
+  .w-define-row,
+  .w-sectors div { grid-template-columns: 1fr; gap: 0.4rem; }
+  .w-block { grid-template-columns: 4.2rem 1fr; gap: 1rem; }
+}

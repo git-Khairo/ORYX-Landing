@@ -14,7 +14,9 @@ export default function Nav() {
   return (
     <header className="nav">
       <a className="nav-mark" href="#hero">
-        <img src="/logo.png" alt="" />
+        {/* Painted from the mask, not an inverted PNG — the mark is sand here
+            and has to be able to change colour on hover. */}
+        <i aria-hidden="true" />
         <span>{brand.name}</span>
       </a>
 

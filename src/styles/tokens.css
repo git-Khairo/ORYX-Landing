@@ -1,40 +1,51 @@
 :root {
   /* ── Palette ──────────────────────────────────────────────────────────
-     Monochrome, warm-neutral. The electric blue is gone — it read as a tech
-     startup, not as a group that runs buildings and fleets. With no accent
-     competing, the footage supplies every colour on the page, which is the
-     only place colour is doing real work. Bronze appears at hairline scale
-     and nowhere else. */
-  --white: #ffffff;
-  --off: #f6f5f3;        /* recessed panels */
-  --off-2: #eae8e4;      /* fills, pressed states */
+     Straight from the brand board. Five colours, no sixth. The ground is
+     Oryx Black and stays Oryx Black — sand is the only accent, and it is
+     rationed, because a gold that appears everywhere stops reading as gold
+     and starts reading as a highlighter. Footage supplies the rest. */
+  --oryx-black: #1c1c1a;
+  --oryx-white: #f4f1e8;
+  --sand: #c8a978;
+  --warm-gray: #77746d;
+  --deep-brown: #4a3828;
 
-  --black: #0b0b0a;      /* display */
-  --ink: #1c1c1a;        /* body — 15.6:1 */
-  --ink-2: #56564f;      /* secondary — 7.3:1 */
-  --ink-3: #85857c;      /* meta, uppercase only — 3.9:1 */
+  /* Grounds, darkest to lightest. `--ground` is the page; `--raise` lifts a
+     panel off it without a border; `--sunk` pushes one behind it. Three steps
+     is enough depth for a flat design and stops the page becoming a stack of
+     grey rectangles. */
+  --ground: #131311;
+  --raise: #1c1c1a;
+  --raise-2: #24241f;
+  --sunk: #0d0d0c;
 
-  --bronze: #8a6a3b;     /* the one warm note, used at hairline scale */
-  --bronze-2: #6d5229;
+  /* Type on dark. Contrast measured against --ground (#131311). */
+  --text: #f4f1e8;         /* 15.9:1 */
+  --text-2: #b8b4a8;       /* 8.4:1  — secondary prose */
+  --text-3: #8a877e;       /* 4.8:1  — meta and labels */
+  --sand-text: #d4b98d;    /* 8.1:1  — sand is too dark at #c8a978 for body */
 
-  --line: rgba(11, 11, 10, 0.13);
-  --line-soft: rgba(11, 11, 10, 0.07);
+  /* The inverted band. Two or three of these break the dark run so the page
+     is a film with intermissions rather than a tunnel. */
+  --invert-bg: #f4f1e8;
+  --invert-text: #1c1c1a;
+  --invert-text-2: #55534c;
+  --invert-line: rgba(28, 28, 26, 0.14);
 
-  /* Film keeps its own colour. Type over it is white on a soft dark gradient —
-     never a solid plate, and never a white one. */
-  --film-bg: #0b0b0a;
-  --film-text: #ffffff;
-  --film-dim: rgba(255, 255, 255, 0.76);
+  --line: rgba(244, 241, 232, 0.13);
+  --line-soft: rgba(244, 241, 232, 0.07);
+  --line-sand: rgba(200, 169, 120, 0.32);
 
   /* ── Type ─────────────────────────────────────────────────────────────
-     Inter, one family, loaded with its optical-size axis. `opsz` is the whole
-     reason to choose Inter over any other grotesk: at display sizes it tightens
-     apertures and spacing automatically, so large type is refined rather than
-     merely enlarged, and small type stays open and readable. */
-  --font: 'Inter Variable', 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
-  /* The mark's face. Used for display only — at text sizes its hairlines
-     disappear and its wide tracking costs more than it earns. */
-  --font-display: 'Cormorant Garamond Variable', 'Cormorant Garamond', Georgia, serif;
+     Cinzel stands in for Trajan Pro — inscriptional Roman capitals, the same
+     genre, and the only one of the free faces that gets the flared stems and
+     the wide, quiet fit right. Caps only, always: Cinzel has lowercase but
+     Trajan does not, and using it would break the reference.
+
+     Montserrat is the board's own secondary and needs no substitute. It does
+     every job below display size. */
+  --font-display: 'Cinzel', 'Trajan Pro', 'Trajan', Georgia, serif;
+  --font: 'Montserrat Variable', 'Montserrat', ui-sans-serif, system-ui, -apple-system, sans-serif;
 
   --step--2: clamp(0.69rem, 0.67rem + 0.08vw, 0.75rem);
   --step--1: clamp(0.79rem, 0.77rem + 0.12vw, 0.87rem);
@@ -45,12 +56,12 @@
   --step-4: clamp(2.7rem, 1.8rem + 3.8vw, 5.6rem);
   --step-5: clamp(3.4rem, 1.9rem + 6.6vw, 8.5rem);
 
-  /* Display tracking runs negative and tightens as size grows — the standard
-     correction for a grotesk set large. */
-  --track-3: -0.021em;
-  --track-4: -0.028em;
-  --track-5: -0.036em;
-  --track-label: 0.09em;
+  /* Inscriptional capitals track OUT, not in — the opposite of a grotesk.
+     Roman letterforms were cut with space around them and collapse into a
+     wall without it. The board sets ORYX very wide; these follow. */
+  --track-display: 0.14em;
+  --track-display-lg: 0.18em;
+  --track-label: 0.16em;
 
   /* ── Space & shape ────────────────────────────────────────────────── */
   --gutter: clamp(1.2rem, 4vw, 4.5rem);
@@ -61,4 +72,9 @@
   /* ── Motion ───────────────────────────────────────────────────────── */
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-inout: cubic-bezier(0.65, 0, 0.35, 1);
+
+  /* The chevron. The logo's own angle, reused as the wipe that cuts every
+     shot in the film and as the notch on buttons and cards. One shape,
+     stated once, so every use of it is the same use. */
+  --chevron: polygon(0 0, 100% 0, 100% 100%, 50% 72%, 0 100%);
 }

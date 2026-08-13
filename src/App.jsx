@@ -8,7 +8,12 @@ import { services } from './content/copy'
 import './styles/nav.css'
 import './styles/hero.css'
 import './styles/work.css'
-import './styles/service.css'
+/* One shell, three worlds. `service.css` is gone with the single-template
+   component it styled — see ServiceWorld. */
+import './styles/world-shell.css'
+import './styles/world-transport.css'
+import './styles/world-workforce.css'
+import './styles/world-renovation.css'
 import './styles/footer.css'
 
 /**

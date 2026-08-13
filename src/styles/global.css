@@ -8,19 +8,18 @@
 
 html {
   -webkit-text-size-adjust: 100%;
-  background: var(--white);
+  background: var(--ground);
+  color-scheme: dark;
 }
 
 body {
   min-height: 100svh;
-  background: var(--white);
-  color: var(--ink);
+  background: var(--ground);
+  color: var(--text-2);
   font-family: var(--font);
   font-size: var(--step-0);
   font-weight: 400;
-  line-height: 1.6;
-  /* Optical size follows the type size for free. */
-  font-variation-settings: 'opsz' 16;
+  line-height: 1.65;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   overflow-x: clip;
@@ -45,45 +44,54 @@ button {
 
 ul, ol { list-style: none; }
 
-::selection { background: var(--bronze); color: var(--white); }
+::selection { background: var(--sand); color: var(--oryx-black); }
 
 :focus-visible {
-  outline: 2px solid var(--bronze);
+  outline: 2px solid var(--sand);
   outline-offset: 3px;
 }
 
 /* ── Display voice ─────────────────────────────────────────────────────
-   High optical size and negative tracking. Inter's `opsz` tightens apertures
-   and spacing as it rises, so large type is refined rather than just bigger. */
-/* The mark's face, set light and tracked wide — Cormorant is drawn for large
-   sizes, where its hairlines survive and the wide fit reads as poise. It is
-   never used below display size. */
+   Cinzel, capitals, tracked wide. Roman inscriptional letterforms were cut
+   with air around them and turn into a wall without it — so where a grotesk
+   would tighten as it grows, this opens up. Never set below display size:
+   at 16px the tracking costs more than the character earns. */
 h1, h2, h3 {
   font-family: var(--font-display);
-  font-weight: 500;
-  letter-spacing: 0.02em;
-  line-height: 1.06;
-  color: var(--black);
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: var(--track-display);
+  line-height: 1.18;
+  color: var(--text);
   text-wrap: balance;
 }
 
+/* The largest sizes get more air still, matching the board's ORYX lockup. */
+.display-xl {
+  font-size: var(--step-5);
+  letter-spacing: var(--track-display-lg);
+  line-height: 1;
+}
+
 /* ── Operational voice ─────────────────────────────────────────────────
-   Low optical size, tracked out, tabular figures. For anything that is data
-   rather than language: indices, counters, section labels. */
+   Montserrat, tracked out, tabular figures. For anything that is data rather
+   than language: indices, counters, section labels, timestamps. */
 .label {
+  font-family: var(--font);
   font-size: var(--step--2);
   font-weight: 600;
-  font-variation-settings: 'opsz' 14;
   letter-spacing: var(--track-label);
   text-transform: uppercase;
-  color: var(--ink-2);
+  color: var(--text-3);
   font-variant-numeric: tabular-nums;
 }
 
+.label-sand { color: var(--sand-text); }
+
 .lede {
   font-size: var(--step-1);
-  line-height: 1.55;
-  color: var(--ink-2);
+  line-height: 1.6;
+  color: var(--text-2);
   max-width: 60ch;
   text-wrap: pretty;
 }
@@ -99,6 +107,31 @@ h1, h2, h3 {
   height: 1px;
   background: var(--line);
   border: 0;
+}
+
+/* The one sand hairline. Used to open a section, never to box one in. */
+.rule-sand {
+  height: 1px;
+  width: 64px;
+  background: var(--sand);
+  border: 0;
+}
+
+/* ── Inverted band ─────────────────────────────────────────────────────
+   Oryx White ground for the sections that carry long reading. Declared once
+   here so every band inverts identically and the tokens do the work. */
+.invert {
+  background: var(--invert-bg);
+  color: var(--invert-text-2);
+  --text: var(--invert-text);
+  --text-2: var(--invert-text-2);
+  --text-3: #7d7a72;
+  --sand-text: #8a6a3b;
+  --line: var(--invert-line);
+  --line-soft: rgba(28, 28, 26, 0.07);
+  --ground: var(--invert-bg);
+  --raise: #eae6da;
+  --raise-2: #e0dbcd;
 }
 
 .sr-only {
@@ -119,8 +152,8 @@ h1, h2, h3 {
   left: 0;
   z-index: 200;
   padding: 0.7rem 1.1rem;
-  background: var(--black);
-  color: var(--white);
+  background: var(--sand);
+  color: var(--oryx-black);
   font-size: var(--step--1);
   font-weight: 600;
   transform: translateY(-120%);

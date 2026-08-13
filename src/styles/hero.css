@@ -1,223 +1,405 @@
-/* ══ Hero — the opening film ════════════════════════════════════════════
-   Full-bleed footage with white type straight on it. The only thing between
-   the two is a soft dark gradient weighted to the foot of the frame — no box,
-   no white plate, no colour cast. */
+/* `--t` drives the origin shot's detach — position, scale and colour all read
+   from this one number. Registering it makes it a real animatable number rather
+   than a string GSAP happens to be rewriting, which is what lets `calc()` use
+   it and the browser interpolate it. */
+@property --t {
+  syntax: '<number>';
+  initial-value: 0;
+  inherits: false;
+}
+
 .hero {
   position: relative;
   min-height: 100svh;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
+  display: grid;
+  grid-template-rows: 1fr auto;
   overflow: hidden;
-  background: var(--film-bg);
+  background: var(--sunk);
+  isolation: isolate;
 }
 
-.stage { position: absolute; inset: 0; }
+/* ── The film layer ──────────────────────────────────────────────────── */
+.stage {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: var(--sunk);
+}
+
 .stage-clip {
   position: absolute;
   inset: 0;
   opacity: 0;
-  /* The incoming clip is up before the outgoing one is gone, so a cut never
-     flashes black between acts. */
-  transition: opacity 1.1s var(--ease-out);
+  /* No transition on opacity. The chevron wipe is the cut; a crossfade running
+     underneath it would soften the edit into a dissolve and undo the point. */
 }
-.stage-clip.is-live { opacity: 1; }
-.stage-clip video,
-.stage-clip img {
+
+/* The outgoing shot holds the frame for the length of the cut so the wipe has
+   something to travel over. */
+.stage-clip.is-prev { opacity: 1; z-index: 1; }
+.stage-clip.is-live { opacity: 1; z-index: 2; }
+
+.stage-clip img,
+.stage-clip video {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transform: scale(1.04);
-  transition: transform 8s linear;
 }
-.stage-clip.is-live video { transform: scale(1); }
-/* A still has no motion of its own, so it gets a longer, deeper push — that
-   move is the only thing keeping the act from reading as a frozen frame. */
-/* Full photo, framed high, and the push runs the other way.
-   Starting at 1.12 and settling to 1 meant the act opened on its tightest
-   crop — the exact moment the subject most needed room. It now opens on the
-   whole frame and pushes gently in, so nothing is ever cut at the start.
-   `--focus` biases the window vertically: lower shows more sky. */
-.stage-clip img {
-  object-position: 50% var(--focus, 32%);
-  transform: scale(1);
-  transition: transform 16s linear;
-}
-.stage-clip.is-live img { transform: scale(1.06); }
 
-/* Bottom-weighted, so the top two-thirds of every frame is untouched. */
+/* ── One camera, one grade ───────────────────────────────────────────────
+   The two things that decide whether six clips read as a film or as a stack
+   of slides, and neither of them is the transition.
+
+   The camera: the push runs on every clip from mount, on one clock, whether or
+   not the clip is on screen. Attached to `.is-live` it restarted from scale 1
+   on each cut, so every shot opened by announcing itself as a new shot — which
+   is exactly what a carousel does. Sharing the clock means a shot appearing
+   twelve seconds in is already where the camera would have got to, so the move
+   carries straight through the edit.
+
+   The grade: stock footage from six different shoots has six different white
+   balances, and no transition can disguise that. One filter over all of them
+   pulls the lot toward the board's warm near-black, which is what actually
+   makes them feel shot for the same film. */
+.stage-clip img,
+.stage-clip video {
+  animation: push 24s linear both;
+  filter: saturate(0.7) contrast(1.06) brightness(0.82) sepia(0.14);
+}
+
+/* The origin shot keeps its own camera — the mark detaching — so it is exempt
+   from the shared push. It is graded harder than any other shot instead: the
+   mark is sand and sits directly on the horns, so the horns have to go down to
+   a ghost or the two simply merge. A blend-mode wash alone could not get there
+   predictably; a filter on the photograph can. */
+.origin img {
+  animation: none;
+  filter: brightness(0.44) saturate(0.5) contrast(1.1) sepia(0.16);
+}
+
+@keyframes push {
+  from { transform: scale(1.03); }
+  to { transform: scale(1.16); }
+}
+
 .stage-scrim {
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    to top,
-    rgba(8, 8, 7, 0.82) 0%,
-    rgba(8, 8, 7, 0.5) 26%,
-    rgba(8, 8, 7, 0.12) 55%,
-    rgba(8, 8, 7, 0.22) 100%
-  );
+  z-index: 3;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      to top,
+      rgba(13, 13, 12, 0.92) 0%,
+      rgba(13, 13, 12, 0.66) 26%,
+      rgba(13, 13, 12, 0.14) 58%,
+      rgba(13, 13, 12, 0.3) 100%
+    );
 }
 
-/* ── The copy, directly on the film ───────────────────────────────────── */
+/* ── The origin shot ─────────────────────────────────────────────────────
+   A 3:2 plate scaled to cover the viewport. The photograph and the mark both
+   live inside it and are measured in its units, so they scale as one object and
+   stay aligned at every window size. Positioning the mark against the viewport
+   would let the two drift apart the moment the aspect ratio changed. */
+.origin {
+  /* Where the animal's horns converge in the source frame, as fractions. The
+     plate offset and the mark's placement are both derived from these two
+     numbers, so re-aiming after a photo swap means measuring them once. */
+  --horn-fx: 0.62;
+  --horn-fy: 0.307;
+
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+/* The plate is not centred — the *head* is.
+   Centring the plate put the animal wherever the photographer happened to
+   leave it, which on this frame is well right of centre with a wall of flank
+   filling the left. So the plate is offset by exactly the head's own position
+   in the source, which lands the skull — and therefore the mark standing in
+   for its horns — in the middle of the screen.
+
+   It is also rendered at about twice viewport width, which turns a 3/4 body
+   shot into a close-up on the head. Both numbers are chosen so the plate still
+   covers the frame in every direction; nothing here may let an edge show. */
+.origin-plate {
+  --plate-w: max(150vw, 225svh);
+  position: absolute;
+  width: var(--plate-w);
+  aspect-ratio: 3 / 2;
+  left: calc(50vw - var(--horn-fx) * var(--plate-w));
+  /* The skull sits at 38% of the height, not the middle. Centred vertically,
+     the horns ran out of headroom at the top and the muzzle was sliced off at
+     the bottom; held high, the whole face clears the frame and the horns keep
+     the room they need to leave it. */
+  top: calc(38svh - var(--horn-fy) * var(--plate-w) / 1.4993);
+}
+
+.origin-photo {
+  position: absolute;
+  inset: 0;
+  transform-origin: 62% 32%; /* the animal's head — the recede pulls away from
+                                the mark, not from the middle of the frame */
+}
+
+.origin-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* The source is a warm daylight photograph and the film is near-black, so it is
+   graded before anything is drawn on top of it. Multiply keeps the animal's
+   own tonal separation instead of flattening it under a wash.
+
+   The head is held down hard rather than left as the brightest point. The
+   earlier grade lit the centre and darkened the edges, which is the ordinary
+   thing to do and was wrong here: the mark is sand, it sits directly on the
+   horns, and lighting the horns is what made it disappear into them. Ghosting
+   the animal is also what the identity board does on this exact composition. */
+.origin-grade {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(
+      64% 56% at var(--horn-fx) 32%,
+      rgba(13, 13, 12, 0) 0%,
+      rgba(13, 13, 12, 0.45) 58%,
+      rgba(13, 13, 12, 0.82) 100%
+    );
+}
+
+/* The mark.
+   `mark.png` (logo.png, trimmed) as a mask rather than an image, so the shape can be painted — it
+   travels from sand to near-white as it detaches, which an `<img>` could not
+   do and an inline SVG would only manage by duplicating the asset.
+
+   Geometry is measured off the file itself: the horn tips sit at x 0.068/0.932
+   and the two arms merge at y 0.713, giving a 0.4161 width-to-height ratio.
+   Sized and placed so that merge point lands exactly on the animal's skull and
+   the tips leave the top of frame just as the real horns do. */
+.origin-mark {
+  /* ── Alignment, as tunable numbers ────────────────────────────────────
+     Everything below is derived from three measurements: the mark's own
+     geometry (tips at x 0.068/0.932, arms merging at y 0.713, ratio 0.4161)
+     and where the animal's horns converge in the plate (x 62%, y 30.7%).
+
+     To re-aim the mark after swapping the photograph, change `--horn-x` and
+     `--horn-y` and nothing else — the start position falls out of them. */
+  --horn-x: 62%;
+  --horn-y: 30.7%;
+  --merge: 0.713;   /* where the mark's two arms meet, as a fraction of height */
+  --mark-w: 16.5%;  /* of plate width; height follows from the aspect ratio */
+
+  /* Where it lands once detached, as a fraction of plate height, and how far
+     it shrinks getting there. */
+  --end-y: 40%;
+  --end-scale: 0.62;
+
+  position: absolute;
+  left: var(--horn-x);
+  /* Puts the arms' merge point exactly on the skull. 16.5% of plate width is
+     59.46% of plate height at this ratio, so the mark starts with its tips
+     above the frame — as the real horns do, because they are cropped too. */
+  top: calc(var(--horn-y) - 42.4%);
+  width: var(--mark-w);
+  aspect-ratio: 0.4161;
+
+  -webkit-mask: url('/mark.png') center / contain no-repeat;
+  mask: url('/mark.png') center / contain no-repeat;
+
+  opacity: 0;
+  will-change: transform, opacity;
+
+  /* The detach, as one expression of `--t`.
+     `--dx`, `--dy` and `--end-scale` are measured and written by the component
+     rather than hard-coded here. Landing the mark dead centre at a readable
+     size needs the ratio of two lengths — the mark's rendered height against
+     the viewport's — and `calc()` cannot divide a length by a length. Measuring
+     once in JS is exact at any window size; the alternative was a stack of
+     magic percentages that only held at one aspect ratio.
+
+     Order matters: scale is written last so it applies first, about the
+     element's own centre, and the translate that follows moves that centre by
+     a clean screen-space offset. */
+  transform:
+    translateX(-50%)
+    translate(
+      calc(var(--t) * var(--dx, 0px)),
+      calc(var(--t) * var(--dy, 0px))
+    )
+    scale(calc(1 - var(--t) * (1 - var(--end-scale, 0.4))));
+  /* Sand while it is still part of the animal, near-white once it is the
+     logo — the mark stepping out of the photograph and into the brand. */
+  background: color-mix(in oklab, var(--sand), var(--oryx-white) calc(var(--t) * 62%));
+}
+
+/* ── Copy over the film ──────────────────────────────────────────────── */
 .hero-copy {
   position: relative;
-  z-index: 2;
-  padding-bottom: clamp(1.2rem, 4vh, 2.6rem);
-  color: var(--film-text);
+  z-index: 4;
+  align-self: end;
+  padding-bottom: clamp(1.5rem, 4vh, 3rem);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.85rem;
 }
 
-.hero-logo { width: clamp(34px, 3.4vw, 46px); height: auto; margin-bottom: 1.2rem; }
 .hero-mark {
-  font-size: var(--step-4);
-  font-family: var(--font-display);
-  font-weight: 500;
+  color: var(--oryx-white);
+  font-weight: 600;
+  margin-bottom: -0.15rem;
+}
+
+.hero-slogan {
+  font-family: var(--font);
+  font-size: var(--step-1);
+  font-weight: 300;
   letter-spacing: 0.02em;
-  line-height: 0.94;
-  color: var(--film-text);
+  color: var(--sand-text);
+  text-wrap: balance;
 }
-/* The film's own voice throughout — subtitle, skip and continue included.
-   Leaving these in Inter had the last line of every act speaking in a
-   different typeface from the line above it. */
-.hero-sub {
-  margin-top: 0.9rem;
-  max-width: 44ch;
-  font-family: var(--font-display);
-  font-size: var(--step-2);
-  font-weight: 500;
-  letter-spacing: 0.03em;
-  color: var(--film-dim);
-}
+
+.hero-descriptor { color: var(--text-2); }
+
 .hero-index {
   display: block;
-  font-family: var(--font-display);
-  font-size: 1.05rem;
-  font-weight: 500;
-  letter-spacing: 0.22em;
-  text-transform: none;
-  color: var(--film-dim);
-  margin-bottom: 0.9rem;
+  border-left: 2px solid var(--sand);
+  padding-left: 0.7rem;
+  line-height: 1.2;
 }
+
 .hero-service {
-  font-size: var(--step-3);
-  font-family: var(--font-display);
-  font-weight: 500;
-  letter-spacing: 0.02em;
-  line-height: 0.98;
-  color: var(--film-text);
+  font-size: var(--step-4);
+  color: var(--oryx-white);
 }
 .hero-service span { display: block; }
+
 .hero-outro {
   font-size: var(--step-3);
-  font-family: var(--font-display);
-  font-weight: 500;
-  letter-spacing: 0.02em;
-  color: var(--film-text);
+  color: var(--oryx-white);
 }
 
-/* ── O.I.F.M.G, as five aligned columns ───────────────────────────────── */
-.initials {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: clamp(0.5rem, 1.4vw, 1.3rem);
-  align-items: start;
-}
-.ir-col { display: block; min-width: 0; }
-/* The mask is what lets each initial rise from its own baseline. */
-.ir-mask { display: block; overflow: hidden; padding-bottom: 0.06em; }
-.ir-initial {
-  display: block;
-  font-size: clamp(1.9rem, 4.6vw, 3.4rem);
-  font-family: var(--font-display);
-  font-weight: 500;
-  letter-spacing: 0.02em;
-  line-height: 1;
-  color: var(--film-text);
-}
-.ir-rule {
-  display: block;
-  height: 2px;
-  margin: 0.55rem 0 0.5rem;
-  background: var(--film-text);
-  transform-origin: left;
-}
-.ir-word {
-  display: block;
-  font-size: var(--step--2);
-  font-weight: 600;
-  font-variation-settings: 'opsz' 14;
-  letter-spacing: var(--track-label);
-  text-transform: uppercase;
-  line-height: 1.25;
-  color: var(--film-dim);
-  /* The words are different lengths and must not be hyphenated apart. */
-  overflow-wrap: normal;
+.hero-sub {
+  font-size: var(--step-1);
+  font-weight: 300;
+  color: var(--text-2);
+  max-width: 46ch;
+  text-wrap: pretty;
 }
 
-/* ── Foot: the clock, and the way out ─────────────────────────────────── */
-/* Sits on the film too — a white bar here would be the same box by another
-   name, just stretched across the bottom of the screen. */
+/* The mark, printed rather than composited — the closing shot needs it as a
+   glyph on the page, not as a layer over the animal. */
+.hero-mark-glyph {
+  display: block;
+  width: clamp(46px, 5vw, 68px);
+  aspect-ratio: 0.4161;
+  background: var(--sand);
+  -webkit-mask: url('/mark.png') center / contain no-repeat;
+  mask: url('/mark.png') center / contain no-repeat;
+  margin-bottom: 0.4rem;
+}
+
+/* ── Foot: progress and the way out ──────────────────────────────────── */
 .hero-foot {
   position: relative;
-  z-index: 2;
+  z-index: 4;
+  width: 100%;
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 0 var(--gutter) clamp(1.2rem, 3vh, 2rem);
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1.5rem;
-  padding: 0 var(--gutter) clamp(1.2rem, 3.5vh, 2.2rem);
 }
 
-.acts { display: flex; gap: 0.4rem; }
-.act-tick {
-  position: relative;
-  width: clamp(20px, 3.4vw, 40px);
-  height: 2px;
-  background: rgba(255, 255, 255, 0.28);
-  overflow: hidden;
+/* ── The slogan, taken apart ─────────────────────────────────────────────
+   Four columns: the letter, a rule, and the word it stands for. Columns rather
+   than one growing line, so each pair is held in place by alignment and the
+   letters never slide while the words arrive. */
+.initials {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(0.6rem, 2vw, 2rem);
+  align-items: start;
+  /* `.hero-copy` is a column flex with `align-items: flex-start`, which makes
+     every child shrink-to-fit. Combined with `minmax(0, 1fr)` tracks — whose
+     floor is zero — that collapsed all four columns to about thirteen pixels
+     and stacked the words one letter per line. Stretching opts this one child
+     out of that, and the max-width still holds the measure. */
+  align-self: stretch;
+  width: 100%;
+  max-width: 46rem;
 }
-.act-tick::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: var(--film-text);
-  transform: scaleX(0);
+.ir-col { display: block; min-width: 0; }
+/* The mask is what lets each letter rise from its own baseline. */
+.ir-mask { display: block; overflow: hidden; padding-bottom: 0.08em; }
+.ir-initial {
+  display: block;
+  font-family: var(--font-display);
+  font-size: clamp(2.2rem, 6vw, 4.6rem);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  color: var(--oryx-white);
+}
+.ir-rule {
+  display: block;
+  height: 1px;
+  margin: 0.7rem 0 0.6rem;
+  background: var(--sand);
   transform-origin: left;
 }
-.act-tick.is-past::after { transform: scaleX(1); }
-/* Fills over the act's own hold — a clock, not an ornament. */
-.act-tick.is-live::after { animation: tickFill var(--hold) linear forwards; }
-@keyframes tickFill {
-  from { transform: scaleX(0); }
-  to { transform: scaleX(1); }
+.ir-word {
+  display: block;
+  font-family: var(--font);
+  font-size: var(--step--2);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  line-height: 1.25;
+  color: var(--sand-text);
+  /* The words are different lengths and must not be hyphenated apart. */
+  overflow-wrap: normal;
 }
 
-.hero-skip,
 .hero-cue {
   display: inline-flex;
   align-items: center;
   gap: 0.55rem;
-  font-family: var(--font-display);
-  font-size: 1.02rem;
-  font-weight: 500;
-  letter-spacing: 0.1em;
-  color: var(--film-dim);
-  transition: color 0.25s var(--ease-out);
-}
-.hero-skip:hover,
-.hero-cue:hover { color: var(--film-text); }
-.hero-cue i {
-  width: 1px;
-  height: 18px;
-  background: var(--film-text);
-  animation: cueDrop 2.2s var(--ease-inout) infinite;
-  transform-origin: top;
-}
-@keyframes cueDrop {
-  0% { transform: scaleY(0); opacity: 0; }
-  40% { transform: scaleY(1); opacity: 1; }
-  100% { transform: scaleY(1) translateY(8px); opacity: 0; }
+  font-size: var(--step--2);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--text-2);
+  transition: color 0.3s var(--ease-out);
 }
 
-@media (max-width: 720px) {
-  .initials { gap: 0.4rem; }
-  .ir-word { font-size: 0.6rem; letter-spacing: 0.04em; }
+.hero-cue:hover { color: var(--oryx-white); }
+
+.hero-cue i {
+  width: 22px;
+  height: 1px;
+  background: var(--sand);
+  animation: cue 1.8s var(--ease-inout) infinite;
+}
+
+@keyframes cue {
+  0%, 100% { transform: translateX(0); opacity: 1; }
+  50% { transform: translateX(6px); opacity: 0.5; }
+}
+
+@media (max-width: 640px) {
+  .origin-mark { width: 20%; }
+  .hero-copy { gap: 0.7rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stage-clip img,
+  .stage-clip video { animation: none; transform: scale(1.04); }
+  .hero-cue i { animation: none; }
 }
