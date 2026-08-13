@@ -1,0 +1,257 @@
+/* ══ Three identities, one system ═══════════════════════════════════════
+   Each service page gets its own typography, its own ranking of the palette
+   and its own layout logic. What it does not get is its own colours: all three
+   are built from the board's five and nothing else, re-ordered so that a
+   different one dominates each time.
+
+   This works by overriding tokens on `.world--<id>`. Every component below
+   already reads `--font-display`, `--text`, `--line` and the rest, so a page
+   changes identity by redeclaring them here rather than by rewriting any of
+   the markup underneath.
+
+   What holds the three together: the ORYX mark, the chevron, the bar chrome,
+   and the fact that no fourth colour ever appears. */
+
+/* ═══ 01 · Transport — "Dispatch" ═══════════════════════════════════════
+   Cool black, Oryx White dominant, sand rationed to live states only. The
+   voice is a transit grotesque and a mono, because everything this service
+   sells is a time, a place or a reference number. */
+.world--transport {
+  --font-display: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+  --font: 'Barlow', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', monospace;
+
+  /* Condensed capitals want tracking pulled in, not opened out — the opposite
+     of what Cinzel needs. Reusing the group's display tracking here would have
+     undone the reason to set it condensed at all. */
+  --track-display: 0.015em;
+  --track-display-lg: 0.05em;
+  --track-label: 0.2em;
+
+  --tone: #0f1214;
+  --ground: #0f1214;
+  --sunk: #0a0c0e;
+  --raise: #161a1d;
+  --raise-2: #1e2327;
+
+  --text: #f4f1e8;
+  --text-2: #b3b6b2;
+  --text-3: #82867f;
+  --sand-text: #d4b98d;
+
+  --line: rgba(244, 241, 232, 0.14);
+  --line-soft: rgba(244, 241, 232, 0.07);
+  --line-sand: rgba(200, 169, 120, 0.34);
+}
+
+/* Barlow Condensed is a sans: it has a lowercase, and setting the whole page
+   in capitals would throw away its best quality. Only the smallest labels stay
+   upper-case, because at label size they are signage. */
+.world--transport h1,
+.world--transport h2,
+.world--transport h3 {
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: var(--track-display);
+  line-height: 0.98;
+}
+
+/* Every number on this page is a mono. Timetables are read down a column, and
+   proportional figures make a column that cannot be scanned. */
+.world--transport .t-stop-t,
+.world--transport .t-manifest dd,
+.world--transport .t-fig-n,
+.world--transport .t-inside-n,
+.world--transport .t-pod-meta,
+.world--transport .t-map-s,
+.world--transport .world-index,
+.world--transport .world-eyebrow {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0;
+}
+
+/* The layout move: density. An instrument panel packs information in and lets
+   the rules do the separating, where the editorial page opens up and lets the
+   whitespace do it. Same components, opposite instinct. */
+.world--transport .t-stop-k { font-size: var(--step-3); }
+.world--transport .t-stop-d { max-width: 52ch; }
+.world--transport .world-lede { font-size: var(--step-1); max-width: 40ch; }
+
+/* Signage: the small labels are the only capitals, and they are tracked hard
+   so they read as stencilled rather than as small headings. */
+.world--transport .world-kicker,
+.world--transport .t-manifest dt {
+  font-family: var(--font-mono);
+  font-size: var(--step--2);
+  letter-spacing: 0.22em;
+}
+
+/* ═══ 02 · Workforce — "Roster" ═════════════════════════════════════════
+   The light one. Same five colours, inverted: Oryx White is the ground and
+   Oryx Black is the type, with Deep Brown carrying the accents that sand is
+   too pale to carry on a light surface.
+
+   This is the people page, and it is the only one that reads like something
+   written rather than something operated. */
+.world--workforce {
+  --font-display: 'Fraunces Variable', 'Fraunces', Georgia, serif;
+  --font: 'Work Sans Variable', 'Work Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font);
+
+  --track-display: -0.012em;
+  --track-display-lg: -0.02em;
+  --track-label: 0.14em;
+
+  --tone: #f4f1e8;
+  --ground: #f4f1e8;
+  --sunk: #eae5d6;
+  --raise: #efebdd;
+  --raise-2: #e4dece;
+
+  --text: #1c1c1a;
+  --text-2: #55534c;
+  --text-3: #7d7a72;
+  /* Sand at #c8a978 is 2.1:1 on this ground — fine as a fill, unreadable as
+     type. Deep Brown is the accent that survives the inversion. */
+  --sand-text: #6b4f2a;
+
+  --fill-strong: var(--deep-brown);
+  --fill-soft: var(--sand);
+
+  --line: rgba(28, 28, 26, 0.16);
+  --line-soft: rgba(28, 28, 26, 0.08);
+  --line-sand: rgba(74, 56, 40, 0.3);
+}
+
+/* Fraunces is an optical-size serif with a soft, high-contrast display cut.
+   Set in capitals it would look like a wedding invitation; set in sentence
+   case at a large optical size it looks like an editorial feature, which is
+   what this page is. */
+.world--workforce h1,
+.world--workforce h2,
+.world--workforce h3 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-variation-settings: 'opsz' 96, 'SOFT' 30;
+  text-transform: none;
+  letter-spacing: var(--track-display);
+  line-height: 1.06;
+}
+
+/* The same applies to the display spans, which are not headings but are set in
+   the display face. They were authored in tracked capitals for Cinzel, and
+   capitals are the one setting Fraunces should never be in. */
+.world--workforce .w-block-k,
+.world--workforce .w-badge-r,
+.world--workforce .w-dial-c {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-variation-settings: 'opsz' 72, 'SOFT' 40;
+  text-transform: none;
+  letter-spacing: var(--track-display);
+}
+
+/* At reading size the optical axis goes the other way: lower `opsz` thickens
+   the hairlines so small settings do not disintegrate. */
+.world--workforce .w-block-d,
+.world--workforce .world-line,
+.world--workforce .world-lede,
+.world--workforce p {
+  font-family: var(--font);
+}
+
+/* The editorial move: an asymmetric measure. Where Transport fills its width
+   with a dense read-out, this page holds its text to a comfortable column and
+   lets the margin carry the page — which is what makes it read as something
+   written rather than something operated. */
+.world--workforce .w-shift { grid-template-columns: 0.85fr 1.15fr; }
+.world--workforce .world-lede { font-size: var(--step-2); line-height: 1.4; max-width: 22ch; }
+.world--workforce .w-block-d { max-width: 46ch; line-height: 1.6; }
+
+/* ═══ 03 · Renovation — "Programme" ═════════════════════════════════════
+   Deep Brown dominant, sand as line-work rather than as highlight. The voice
+   is a drafting face and a mono, and the page is laid out like a drawing
+   sheet — which is the document this trade actually works from. */
+.world--renovation {
+  --font-display: 'Space Grotesk Variable', 'Space Grotesk', ui-sans-serif, sans-serif;
+  --font: 'Space Grotesk Variable', 'Space Grotesk', ui-sans-serif, sans-serif;
+  --font-mono: 'Space Mono', ui-monospace, 'SFMono-Regular', monospace;
+
+  --track-display: -0.005em;
+  --track-display-lg: 0.01em;
+  --track-label: 0.16em;
+
+  --tone: #191310;
+  --ground: #191310;
+  --sunk: #120d0a;
+  --raise: #241a13;
+  --raise-2: #2e2118;
+
+  --text: #f4f1e8;
+  --text-2: #b6ada2;
+  --text-3: #8a7f72;
+  --sand-text: #d4b98d;
+
+  --line: rgba(244, 241, 232, 0.13);
+  --line-soft: rgba(244, 241, 232, 0.06);
+  --line-sand: rgba(200, 169, 120, 0.34);
+}
+
+.world--renovation h1,
+.world--renovation h2,
+.world--renovation h3 {
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: var(--track-display-lg);
+  line-height: 1.02;
+}
+
+/* Anything that is a measurement, a week number or a reference is a mono —
+   the annotation voice of a drawing. */
+.world--renovation .r-layer-n,
+.world--renovation .r-define-n,
+.world--renovation .r-inside-n,
+.world--renovation .r-fig-n,
+.world--renovation .r-gantt-scale,
+.world--renovation .r-plan-room,
+.world--renovation .r-plan-dim text,
+.world--renovation .world-index,
+.world--renovation .world-eyebrow,
+.world--renovation .r-swatch-k {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* The layout move: this page is a drawing sheet.
+   A faint orthogonal grid runs behind every section — the graph paper the
+   whole trade works on — and the sections sit inside a ruled border rather
+   than floating on a ground. Neither of the other two worlds has a background
+   texture at all, which is most of why this one reads differently before a
+   single word is looked at. */
+.world--renovation .world-scroll {
+  background-image:
+    linear-gradient(to right, rgba(200, 169, 120, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(200, 169, 120, 0.05) 1px, transparent 1px);
+  background-size: 44px 44px;
+}
+
+/* Sections that carry drawings sit on the sheet, boxed, the way a detail is
+   boxed on a real drawing. */
+.world--renovation .r-plan,
+.world--renovation .r-gantt,
+.world--renovation .r-scrub {
+  border: 1px solid var(--line-sand);
+  padding: clamp(1rem, 2.4vw, 2rem);
+  background: color-mix(in srgb, var(--sunk) 72%, transparent);
+}
+
+/* Drafting annotation: tracked mono, small, never a heading. */
+.world--renovation .world-kicker,
+.world--renovation .r-gantt-k,
+.world--renovation .r-swatch-k {
+  font-family: var(--font-mono);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-size: var(--step--2);
+}

@@ -3,6 +3,173 @@
    Where Transport runs a line down the left, this runs a clock down it, and
    the second half of the page is a grid that populates person by person. */
 
+/* ── Its own navigation ───────────────────────────────────────────────
+   A masthead, not a toolbar. Tall, centred, on the cream ground, with the
+   sections set under a rule the way a magazine sets its contents — and it
+   scrolls away rather than sticking, because a bar that follows you down a
+   long read belongs to a tool, not to something you are reading. */
+.w-nav {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 1.1rem var(--gutter) 0;
+}
+.w-nav-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: clamp(2rem, 6vh, 3.5rem);
+}
+.w-nav-back {
+  font-family: var(--font);
+  font-size: var(--step--2);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--text-3);
+  transition: color 0.2s var(--ease-out);
+}
+.w-nav-back:hover { color: var(--text); }
+.w-nav-cta {
+  padding: 0.6rem 1.2rem;
+  border: 1px solid var(--text);
+  border-radius: 999px;
+  font-family: var(--font);
+  font-size: var(--step--2);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--text);
+  transition: background 0.2s var(--ease-out), color 0.2s var(--ease-out);
+}
+.w-nav-cta:hover { background: var(--text); color: var(--tone); }
+
+.w-nav-mast {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.9rem;
+  text-align: center;
+}
+.w-nav-mark {
+  width: 20px;
+  aspect-ratio: 0.4161;
+  background: var(--deep-brown);
+  -webkit-mask: url('/mark.png') center / contain no-repeat;
+  mask: url('/mark.png') center / contain no-repeat;
+}
+.w-nav-word {
+  font-family: var(--font-display);
+  font-variation-settings: 'opsz' 144, 'SOFT' 20;
+  font-size: clamp(2.2rem, 6vw, 4rem);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+.w-nav-strap {
+  margin-top: 0.5rem;
+  text-align: center;
+  font-size: var(--step--2);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--sand-text);
+}
+.w-nav-links {
+  margin-top: clamp(1.6rem, 4vh, 2.4rem);
+  padding: 0.9rem 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  justify-content: center;
+  gap: clamp(1.2rem, 5vw, 3.5rem);
+}
+.w-nav-links a {
+  font-family: var(--font-display);
+  font-variation-settings: 'opsz' 24;
+  font-size: var(--step-0);
+  color: var(--text-2);
+  transition: color 0.2s var(--ease-out);
+}
+.w-nav-links a:hover { color: var(--text); }
+
+/* ── Its own footer ───────────────────────────────────────────────────
+   Editorial: one large serif sign-off carrying the page and a quiet column of
+   links beside it. Mostly air, where Transport's is mostly directory. */
+.w-foot { border-top: 1px solid var(--line); background: var(--sunk); }
+.w-foot-main {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: clamp(3.5rem, 10vh, 6rem) var(--gutter);
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: clamp(2.5rem, 7vw, 6rem);
+  align-items: start;
+}
+.w-foot-say h3 {
+  font-size: var(--step-3);
+  color: var(--text);
+  max-width: 16ch;
+}
+.w-foot-say p {
+  margin-top: 1rem;
+  font-size: var(--step-0);
+  color: var(--text-2);
+  max-width: 40ch;
+}
+.w-foot-cta {
+  margin-top: 1.8rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.9rem 1.6rem;
+  border-radius: 999px;
+  background: var(--deep-brown);
+  color: var(--oryx-white);
+  font-family: var(--font);
+  font-size: var(--step--1);
+  font-weight: 600;
+  transition: background 0.2s var(--ease-out);
+}
+.w-foot-cta:hover { background: var(--text); }
+.w-foot-cta i { font-style: normal; transition: transform 0.2s var(--ease-out); }
+.w-foot-cta:hover i { transform: translateX(4px); }
+
+.w-foot-cols {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 2rem;
+}
+.w-foot-cols h4 {
+  font-family: var(--font);
+  font-size: var(--step--2);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--sand-text);
+  margin-bottom: 0.9rem;
+}
+.w-foot-cols li { font-size: var(--step--1); color: var(--text-2); padding: 0.22rem 0; }
+.w-foot-cols a { border-bottom: 1px solid var(--line-sand); }
+
+.w-foot-base {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 1.2rem var(--gutter) 2.2rem;
+  border-top: 1px solid var(--line);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.6rem 1.5rem;
+  font-size: var(--step--2);
+  color: var(--text-3);
+}
+.w-foot-back { font: inherit; color: var(--text-3); border-bottom: 1px solid var(--line-sand); }
+.w-foot-back:hover { color: var(--text); }
+
+@media (max-width: 860px) {
+  .w-foot-main { grid-template-columns: 1fr; }
+}
+
 /* ── The shift ────────────────────────────────────────────────────────── */
 .w-shift {
   max-width: var(--maxw);
@@ -48,7 +215,7 @@
   font-size: var(--step-2);
   text-transform: uppercase;
   letter-spacing: var(--track-display);
-  color: var(--oryx-white);
+  color: var(--text);
   line-height: 1.1;
 }
 .w-block-d { font-size: var(--step-0); color: var(--text-2); max-width: 42ch; }
@@ -105,14 +272,14 @@
   top: 0;
   bottom: 0;
   width: 3px;
-  background: var(--sand);
+  background: var(--fill-strong);
 }
 .w-badge-r {
   font-family: var(--font-display);
   font-size: var(--step-1);
   text-transform: uppercase;
   letter-spacing: var(--track-display);
-  color: var(--oryx-white);
+  color: var(--text);
   line-height: 1.15;
 }
 .w-badge-n { font-size: var(--step--2); color: var(--text-2); letter-spacing: 0.02em; }
@@ -180,7 +347,7 @@
 .w-dial-arc {
   --h: 0;
   fill: none;
-  stroke: var(--sand);
+  stroke: var(--fill-strong);
   stroke-width: 12;
   stroke-linecap: butt;
   /* One hour per unit: the visible run, then the rest of the day as gap. */
@@ -205,7 +372,7 @@
   font-variant-numeric: tabular-nums;
 }
 .w-dial-c {
-  fill: var(--oryx-white);
+  fill: var(--text);
   font-family: var(--font-display);
   font-size: 44px;
   text-anchor: middle;
@@ -231,10 +398,10 @@
 .w-dial-swatch {
   width: 14px;
   height: 14px;
-  background: var(--sand);
+  background: var(--fill-strong);
   opacity: calc(0.55 + var(--i) * 0.11);
 }
-.w-dial-k { font-size: var(--step--1); color: var(--oryx-white); }
+.w-dial-k { font-size: var(--step--1); color: var(--text); }
 .w-dial-t {
   font-size: var(--step--2);
   color: var(--text-3);
@@ -293,8 +460,8 @@
   transition: opacity 0.5s var(--ease-out), transform 0.5s var(--ease-out);
   transition-delay: calc(var(--i, 0) * 45ms);
 }
-.w-cell--2 { background: var(--sand); }
-.w-cell--1 { background: rgba(200, 169, 120, 0.34); }
+.w-cell--2 { background: var(--fill-strong); }
+.w-cell--1 { background: var(--fill-soft); }
 .w-cell--0 {
   background: transparent;
   border-color: var(--line);
@@ -343,7 +510,7 @@
    four headings that happen to have text beside them. */
 .w-define-row h3 {
   font-size: var(--step-1);
-  color: var(--oryx-white);
+  color: var(--text);
 }
 .w-define-row p { font-size: var(--step-0); color: var(--text-2); max-width: 46ch; }
 
@@ -410,7 +577,7 @@
   padding: 0.9rem 0;
   border-top: 1px solid var(--line);
 }
-.w-sectors dt { font-size: var(--step-0); font-weight: 600; color: var(--oryx-white); }
+.w-sectors dt { font-size: var(--step-0); font-weight: 600; color: var(--text); }
 .w-sectors dd { font-size: var(--step--1); color: var(--text-2); }
 
 /* ── Inside ───────────────────────────────────────────────────────────── */
@@ -439,7 +606,7 @@
   font-variant-numeric: tabular-nums;
 }
 .w-inside-body { display: grid; gap: 0.3rem; }
-.w-inside-k { font-size: var(--step-1); font-weight: 500; color: var(--oryx-white); }
+.w-inside-k { font-size: var(--step-1); font-weight: 500; color: var(--text); }
 .w-inside-d { font-size: var(--step--1); color: var(--text-2); }
 .w-inside-shot { position: sticky; top: 2rem; }
 .w-inside-shot img { width: 100%; aspect-ratio: 3 / 4; object-fit: cover; }

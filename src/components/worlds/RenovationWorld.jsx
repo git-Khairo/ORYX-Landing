@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import WorldShell, { Media, WorldClose } from './WorldShell'
-import { film, portal, gallery, closing } from '../../content/media'
+import WorldShell, { Media } from './WorldShell'
+import { film, portal, gallery } from '../../content/media'
 
 /**
  * Renovation — "The Build-Up."
@@ -22,6 +22,34 @@ export default function RenovationWorld({ service, onClose, onRequest }) {
 
   return (
     <WorldShell service={service} onClose={onClose}>
+      {/* ── Its own navigation ────────────────────────────────────────
+          A drawing sheet's header strip, not a website nav: sheet reference on
+          the left, sections through the middle, revision and scale on the
+          right, all boxed in ruled cells. Anyone who has held a construction
+          drawing recognises this before they read it. */}
+      <header className="r-nav">
+        <button type="button" className="r-nav-cell r-nav-mark" onClick={onClose}>
+          <i aria-hidden="true" />
+          <span>
+            <b>ORYX Projects</b>
+            <em>Return to group</em>
+          </span>
+        </button>
+
+        <nav className="r-nav-cell r-nav-links" aria-label="Renovation sections">
+          <a href="#r-drawing">Drawing</a>
+          <a href="#r-programme">Programme</a>
+          <a href="#r-build">Build-up</a>
+          <a href="#r-spec">Specification</a>
+        </nav>
+
+        <dl className="r-nav-cell r-nav-meta">
+          <div><dt>Sheet</dt><dd>03</dd></div>
+          <div><dt>Rev</dt><dd>C</dd></div>
+          <div><dt>Scale</dt><dd>1:50</dd></div>
+        </dl>
+      </header>
+
       {/* ── Opening ───────────────────────────────────────────────────── */}
       <header className="r-open">
         <Media clip={film.renovation} />
@@ -45,7 +73,7 @@ export default function RenovationWorld({ service, onClose, onRequest }) {
           A floor plan that draws itself. Transport gets a map and Workforce a
           rota; this is the document this trade actually works from, and no
           other page on the site could carry it. */}
-      <section className="r-plan-block">
+      <section className="r-plan-block" id="r-drawing">
         <div className="r-plan-head">
           <p className="world-kicker" data-reveal>Drawn before it is built</p>
           <p className="world-line" data-reveal>
@@ -86,7 +114,7 @@ export default function RenovationWorld({ service, onClose, onRequest }) {
           Twelve weeks, five phases, and visible overlap. The overlap is the
           product: trades running into each other is what one accountable
           programme buys, and what a queue of separate contractors cannot. */}
-      <section className="r-programme">
+      <section className="r-programme" id="r-programme">
         <div className="r-prog-head">
           <p className="world-kicker" data-reveal>One programme, one date</p>
           <p className="world-line" data-reveal>
@@ -129,7 +157,7 @@ export default function RenovationWorld({ service, onClose, onRequest }) {
       {/* ── The specification ─────────────────────────────────────────
           Real finish names against real colour, so the strip is a
           specification rather than a row of decorative squares. */}
-      <section className="r-materials">
+      <section className="r-materials" id="r-spec">
         <p className="world-kicker" data-reveal>Specified, not improvised</p>
         <ul className="r-swatches">
           {world.materials.map((m, i) => (
@@ -196,12 +224,7 @@ export default function RenovationWorld({ service, onClose, onRequest }) {
         </ol>
       </section>
 
-      <WorldClose
-        service={service}
-        clip={closing.renovation}
-        onClose={onClose}
-        onRequest={onRequest}
-      />
+      <RenovationFooter service={service} onClose={onClose} onRequest={onRequest} />
     </WorldShell>
   )
 }
@@ -324,7 +347,7 @@ function Layers({ layers }) {
   }, [layers.length])
 
   return (
-    <section className="r-layers" ref={section}>
+    <section className="r-layers" id="r-build" ref={section}>
       <div className="r-layers-sticky">
         <p className="world-kicker">In the order it is built</p>
 
@@ -345,5 +368,81 @@ function Layers({ layers }) {
         </ol>
       </div>
     </section>
+  )
+}
+
+/**
+ * This site's own footer — a title block.
+ *
+ * The bottom-right corner of every construction drawing carries one: client,
+ * project, scale, drawn by, checked, date, sheet number. Reproducing it here
+ * makes the footer the single most recognisable thing on the page, and it is
+ * an object neither of the other two services could borrow.
+ */
+function RenovationFooter({ service, onClose, onRequest }) {
+  const year = new Date().getFullYear()
+  return (
+    <footer className="r-foot">
+      <div className="r-foot-ask">
+        <h3>{service.world.prompt}</h3>
+        <p>
+          A survey, then a written programme: scope, phasing, and the date the
+          building comes back into service.
+        </p>
+        <button type="button" className="r-foot-cta" onClick={onRequest}>
+          Request a survey <i aria-hidden="true">→</i>
+        </button>
+      </div>
+
+      {/* The title block itself. */}
+      <div className="r-titleblock">
+        <div className="r-tb-row">
+          <div className="r-tb-cell r-tb-wide">
+            <dt>Client</dt>
+            <dd>Commercial landlords, occupiers and facility teams</dd>
+          </div>
+          <div className="r-tb-cell">
+            <dt>Discipline</dt>
+            <dd>Strip-out · Fit-out · Services</dd>
+          </div>
+        </div>
+        <div className="r-tb-row">
+          <div className="r-tb-cell">
+            <dt>Drawn</dt>
+            <dd>ORYX Projects</dd>
+          </div>
+          <div className="r-tb-cell">
+            <dt>Checked</dt>
+            <dd>Contracts</dd>
+          </div>
+          <div className="r-tb-cell">
+            <dt>Date</dt>
+            <dd>{year}</dd>
+          </div>
+          <div className="r-tb-cell">
+            <dt>Sheet</dt>
+            <dd>03 / 03</dd>
+          </div>
+          <div className="r-tb-cell">
+            <dt>Rev</dt>
+            <dd>C</dd>
+          </div>
+        </div>
+        <div className="r-tb-row">
+          <div className="r-tb-cell r-tb-wide">
+            <dt>Project</dt>
+            <dd>ORYX Projects — a service of ORYX GROUP</dd>
+          </div>
+          <div className="r-tb-cell">
+            <dt>Contact</dt>
+            <dd><a href="mailto:projects@oryx.example">projects@oryx.example</a></dd>
+          </div>
+        </div>
+      </div>
+
+      <button type="button" className="r-foot-back" onClick={onClose}>
+        ← All ORYX services
+      </button>
+    </footer>
   )
 }

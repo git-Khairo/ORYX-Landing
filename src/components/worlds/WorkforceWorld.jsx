@@ -1,5 +1,5 @@
-import WorldShell, { Media, WorldClose } from './WorldShell'
-import { film, portal, gallery, closing } from '../../content/media'
+import WorldShell, { Media } from './WorldShell'
+import { film, portal, gallery } from '../../content/media'
 
 /**
  * Workforce — "The Roster."
@@ -19,6 +19,36 @@ export default function WorkforceWorld({ service, onClose, onRequest }) {
 
   return (
     <WorldShell service={service} onClose={onClose}>
+      {/* ── Its own navigation ────────────────────────────────────────
+          An editorial masthead, not an operations bar: tall, light, centred,
+          with the links sitting under a rule the way a magazine sets its
+          sections. It even scrolls away rather than sticking — this is a page
+          to be read, and a bar that follows you down a long read is a tool,
+          not a publication. */}
+      <header className="w-nav">
+        <div className="w-nav-top">
+          <button type="button" className="w-nav-back" onClick={onClose}>
+            ← ORYX GROUP
+          </button>
+          <button type="button" className="w-nav-cta" onClick={onRequest}>
+            Request crew
+          </button>
+        </div>
+
+        <p className="w-nav-mast">
+          <span className="w-nav-mark" aria-hidden="true" />
+          <span className="w-nav-word">ORYX People</span>
+        </p>
+        <p className="w-nav-strap">Event crew · Cleaning · Facilities · Front of house</p>
+
+        <nav className="w-nav-links" aria-label="Workforce sections">
+          <a href="#w-shift">The shift</a>
+          <a href="#w-day">The day</a>
+          <a href="#w-week">The week</a>
+          <a href="#w-crew">The crew</a>
+        </nav>
+      </header>
+
       {/* ── Opening ───────────────────────────────────────────────────── */}
       <header className="w-open">
         <Media clip={film.workforce} />
@@ -33,7 +63,7 @@ export default function WorkforceWorld({ service, onClose, onRequest }) {
           The timetable is the layout, not an illustration of one. Times sit in
           their own gutter and the blocks hang off them, so the page is read the
           way a rota is read. */}
-      <section className="w-shift">
+      <section className="w-shift" id="w-shift">
         <div className="w-shift-intro">
           <p className="world-kicker" data-reveal>A shift, end to end</p>
           <p className="world-lede" data-reveal>{world.lede}</p>
@@ -57,7 +87,7 @@ export default function WorkforceWorld({ service, onClose, onRequest }) {
           actually hands over, and it carries a role and a name for what the
           role covers without needing a paragraph. They stagger in as the grid
           is reached, so the crew assembles while you read it. */}
-      <section className="w-crew">
+      <section className="w-crew" id="w-crew">
         <div className="w-crew-head">
           <p className="world-kicker" data-reveal>Who turns up</p>
           <p className="world-line" data-reveal>
@@ -87,7 +117,7 @@ export default function WorkforceWorld({ service, onClose, onRequest }) {
           fourth way of saying the same thing. A clock is the one shape that
           reads as "hours covered" on sight, and it is the only circular thing
           on the site, so the page cannot be confused with any other. */}
-      <section className="w-day-block">
+      <section className="w-day-block" id="w-day">
         <div className="w-day-head">
           <p className="world-kicker" data-reveal>A day, covered</p>
           <p className="world-line" data-reveal>
@@ -164,7 +194,7 @@ export default function WorkforceWorld({ service, onClose, onRequest }) {
           to say "staffing" without saying it. The uneven shape is the honest
           part — cover is not flat across a week, and showing that is more
           convincing than claiming full coverage everywhere. */}
-      <section className="w-roster">
+      <section className="w-roster" id="w-week">
         <div className="w-roster-head">
           <p className="world-kicker" data-reveal>A week of cover</p>
           <p className="world-line" data-reveal>
@@ -282,12 +312,70 @@ export default function WorkforceWorld({ service, onClose, onRequest }) {
         </figure>
       </section>
 
-      <WorldClose
-        service={service}
-        clip={closing.workforce}
-        onClose={onClose}
-        onRequest={onRequest}
-      />
+      <WorkforceFooter service={service} onClose={onClose} onRequest={onRequest} />
     </WorldShell>
+  )
+}
+
+/**
+ * This site's own footer.
+ *
+ * Editorial: one large serif sign-off holding the page, a short column of
+ * links beside it, and a quiet legal line. Where Transport's footer is a
+ * dense operational directory, this one is mostly air — the same difference
+ * that runs through both pages from the top.
+ */
+function WorkforceFooter({ service, onClose, onRequest }) {
+  const year = new Date().getFullYear()
+  return (
+    <footer className="w-foot">
+      <div className="w-foot-main">
+        <div className="w-foot-say">
+          <h3>{service.world.prompt}</h3>
+          <p>
+            Tell us the site, the standard and the shifts. We will come back
+            with names, numbers and a start date.
+          </p>
+          <button type="button" className="w-foot-cta" onClick={onRequest}>
+            Request crew <i aria-hidden="true">→</i>
+          </button>
+        </div>
+
+        <div className="w-foot-cols">
+          <div>
+            <h4>People</h4>
+            <ul>
+              <li>Event crew</li>
+              <li>Cleaning teams</li>
+              <li>Facility staff</li>
+              <li>Front of house</li>
+            </ul>
+          </div>
+          <div>
+            <h4>Standards</h4>
+            <ul>
+              <li>Vetted and inducted</li>
+              <li>Insured</li>
+              <li>Named supervisor</li>
+              <li>Same-day cover</li>
+            </ul>
+          </div>
+          <div>
+            <h4>Talk to us</h4>
+            <ul>
+              <li><a href="mailto:people@oryx.example">people@oryx.example</a></li>
+              <li>Mon–Fri · 08:00–18:00</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div className="w-foot-base">
+        <span>© {year} ORYX People — a service of ORYX GROUP</span>
+        <button type="button" className="w-foot-back" onClick={onClose}>
+          All ORYX services
+        </button>
+      </div>
+    </footer>
   )
 }

@@ -32,6 +32,12 @@
   --invert-text-2: #55534c;
   --invert-line: rgba(28, 28, 26, 0.14);
 
+  /* Filled states — a rota cell, a dial arc, a progress bar. Sand carries
+     these on a dark ground, but it is only 2.1:1 on Oryx White, so the light
+     world swaps in Deep Brown and demotes sand to the half-strength fill. */
+  --fill-strong: var(--sand);
+  --fill-soft: rgba(200, 169, 120, 0.34);
+
   --line: rgba(244, 241, 232, 0.13);
   --line-soft: rgba(244, 241, 232, 0.07);
   --line-sand: rgba(200, 169, 120, 0.32);
@@ -45,6 +51,11 @@
      Montserrat is the board's own secondary and needs no substitute. It does
      every job below display size. */
   --font-display: 'Cinzel', 'Trajan Pro', 'Trajan', Georgia, serif;
+  /* The group's own voice, held separately from `--font-display` because the
+     service pages override that one. Anything that speaks as ORYX rather than
+     as a service — the wordmark in every bar — reads from this instead, so the
+     three identities cannot drift the brand along with them. */
+  --font-group: 'Cinzel', 'Trajan Pro', 'Trajan', Georgia, serif;
   --font: 'Montserrat Variable', 'Montserrat', ui-sans-serif, system-ui, -apple-system, sans-serif;
 
   --step--2: clamp(0.69rem, 0.67rem + 0.08vw, 0.75rem);

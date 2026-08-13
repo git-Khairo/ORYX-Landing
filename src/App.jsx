@@ -14,6 +14,9 @@ import './styles/world-shell.css'
 import './styles/world-transport.css'
 import './styles/world-workforce.css'
 import './styles/world-renovation.css'
+/* Last, so the per-service identities win any tie with the shared world
+   styles they are overriding. */
+import './styles/world-identity.css'
 import './styles/footer.css'
 
 /**

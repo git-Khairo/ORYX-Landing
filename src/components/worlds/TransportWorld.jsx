@@ -1,7 +1,7 @@
 /* `Route` still runs its own effect — it measures the stops list rather than
    the section, so it does not share the loading scene's driver. */
 import { useEffect, useRef, useState } from 'react'
-import WorldShell, { Media, WorldClose } from './WorldShell'
+import WorldShell, { Media } from './WorldShell'
 import { film, portal, gallery, closing } from '../../content/media'
 import { useSmoothProgress } from '../../lib/useReveal'
 
@@ -24,6 +24,33 @@ export default function TransportWorld({ service, onClose, onRequest }) {
 
   return (
     <WorldShell service={service} onClose={onClose}>
+      {/* ── Its own navigation ────────────────────────────────────────
+          A dispatch portal's bar: dense, full width, condensed uppercase, with
+          a live status chip. Nothing about it is shared with the other two
+          services beyond the wordmark. */}
+      <header className="t-nav">
+        <div className="t-nav-inner">
+          <button type="button" className="t-nav-mark" onClick={onClose}>
+            <i aria-hidden="true" />
+            <span className="t-nav-word">ORYX</span>
+            <span className="t-nav-unit">Dispatch</span>
+          </button>
+
+          <nav className="t-nav-links" aria-label="Transport sections">
+            <a href="#t-network">Network</a>
+            <a href="#t-route">Schedule</a>
+            <a href="#t-load">Services</a>
+            <a href="#t-coverage">Coverage</a>
+          </nav>
+
+          <span className="t-nav-status">
+            <i aria-hidden="true" />
+            Live · 24/7
+          </span>
+        </div>
+        <span className="t-nav-progress" aria-hidden="true" />
+      </header>
+
       {/* ── Opening: film, with the consignment strip across the foot ─── */}
       <header className="t-open">
         <Media clip={film.transport} />
@@ -70,7 +97,7 @@ export default function TransportWorld({ service, onClose, onRequest }) {
           Figures set as a departure board, which is the one place on this site
           where a row of numerals is the native form rather than a stylistic
           choice. */}
-      <section className="t-board">
+      <section className="t-board" id="t-coverage">
         <ul className="t-figs">
           {world.figures.map((f) => (
             <li key={f.l} data-reveal>
@@ -116,13 +143,79 @@ export default function TransportWorld({ service, onClose, onRequest }) {
         <Pod shot={shots[2]} />
       </section>
 
-      <WorldClose
-        service={service}
-        clip={closing.transport}
-        onClose={onClose}
-        onRequest={onRequest}
-      />
+      <TransportFooter service={service} onClose={onClose} onRequest={onRequest} />
     </WorldShell>
+  )
+}
+
+/**
+ * This site's own footer.
+ *
+ * A logistics operator's: a dispatch strip across the top with the number you
+ * actually ring, then dense columns of coverage and depots, then a legal line.
+ * It has nothing structurally in common with the other two services' footers —
+ * that is the point.
+ */
+function TransportFooter({ service, onClose, onRequest }) {
+  return (
+    <footer className="t-foot">
+      <div className="t-foot-call">
+        <Media clip={closing.transport} />
+        <div className="t-foot-call-inner">
+          <p className="t-foot-prompt">{service.world.prompt}</p>
+          <div className="t-foot-actions">
+            <button type="button" className="t-foot-cta" onClick={onRequest}>
+              Book a collection <i aria-hidden="true">→</i>
+            </button>
+            <a className="t-foot-tel" href="tel:+310000000000">+31 (0)00 000 0000</a>
+          </div>
+        </div>
+      </div>
+
+      <div className="t-foot-cols">
+        <div>
+          <h4>Services</h4>
+          <ul>
+            <li>Scheduled routes</li>
+            <li>On demand</li>
+            <li>Between sites</li>
+            <li>Specialist handling</li>
+          </ul>
+        </div>
+        <div>
+          <h4>Coverage</h4>
+          <ul>
+            <li>Randstad</li>
+            <li>Nationwide</li>
+            <li>Cross-border</li>
+          </ul>
+        </div>
+        <div>
+          <h4>Depots</h4>
+          <ul className="t-foot-mono">
+            <li>Rotterdam · Port</li>
+            <li>Den Haag · Cross-dock</li>
+            <li>Amsterdam · Hub</li>
+            <li>Eindhoven · Drop</li>
+          </ul>
+        </div>
+        <div>
+          <h4>Dispatch</h4>
+          <ul className="t-foot-mono">
+            <li>Mon–Sun · 24 hours</li>
+            <li>Exception cover · always</li>
+            <li>dispatch@oryx.example</li>
+          </ul>
+        </div>
+      </div>
+
+      <div className="t-foot-base">
+        <span>ORYX Dispatch — a service of ORYX GROUP</span>
+        <button type="button" className="t-foot-back" onClick={onClose}>
+          ← All ORYX services
+        </button>
+      </div>
+    </footer>
   )
 }
 
@@ -150,7 +243,7 @@ function Load({ items }) {
   })
 
   return (
-    <section className="t-load" ref={section}>
+    <section className="t-load" id="t-load" ref={section}>
       <div className="t-load-sticky">
         <p className="world-kicker">What it is</p>
 
@@ -230,7 +323,7 @@ function Load({ items }) {
 function NetworkMap({ map }) {
   if (!map) return null
   return (
-    <section className="t-map-block">
+    <section className="t-map-block" id="t-network">
       <div className="t-map-head">
         <p className="world-kicker" data-reveal>The network</p>
         <p className="world-line" data-reveal>
@@ -322,7 +415,7 @@ function Route({ stops, lede, shot }) {
   }, [stops.length])
 
   return (
-    <section className="t-route" ref={section}>
+    <section className="t-route" id="t-route" ref={section}>
       <div className="t-route-intro">
         <p className="world-kicker" data-reveal>What it is</p>
         <p className="world-lede" data-reveal>{lede}</p>
