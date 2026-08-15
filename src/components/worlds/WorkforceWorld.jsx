@@ -1,4 +1,6 @@
+import { useRef } from 'react'
 import WorldShell, { Media } from './WorldShell'
+import { useSmoothProgress } from '../../lib/useReveal'
 import { film, portal, gallery } from '../../content/media'
 
 /**
@@ -82,6 +84,14 @@ export default function WorkforceWorld({ service, onClose, onRequest }) {
         </ol>
       </section>
 
+      {/* ── The building, staffed ─────────────────────────────────────
+          Workforce's answer to Transport's lorry. Where that scene loads
+          objects onto a vehicle and sends it away, this one sends people into
+          a building and lights it up — the same scroll-driven mechanism doing
+          the opposite thing, which is exactly the difference between the two
+          services. */}
+      <Staffing crew={world.crew} />
+
       {/* ── The crew ──────────────────────────────────────────────────
           Badges rather than cards: an ID badge is the object this service
           actually hands over, and it carries a role and a name for what the
@@ -109,6 +119,49 @@ export default function WorkforceWorld({ service, onClose, onRequest }) {
         <figure className="w-crew-shot" data-reveal>
           <img src={shots[0]?.src} alt={shots[0]?.alt || ''} loading="lazy" />
         </figure>
+      </section>
+
+      {/* ── The quote ─────────────────────────────────────────────────
+          The one piece of social proof on the site, and the device an
+          editorial layout most obviously wants. Attributed to a role and a
+          sector rather than a person: that is what a facilities buyer finds
+          credible, and it survives not having a name cleared for use. */}
+      <figure className="w-quote">
+        <blockquote data-reveal>
+          <p>{world.quote.line}</p>
+        </blockquote>
+        <figcaption data-reveal>
+          <span className="w-quote-who">{world.quote.who}</span>
+          <span className="w-quote-where">{world.quote.where}</span>
+        </figcaption>
+      </figure>
+
+      {/* ── Vetting ───────────────────────────────────────────────────
+          The page claims "100% vetted, trained and insured" in a figure and
+          then never returns to it. Staffing is bought on risk, so the checks
+          are set out in the order they actually happen, each one ticking in as
+          it is reached. */}
+      <section className="w-vetting" id="w-vetting">
+        <div className="w-vetting-head">
+          <p className="world-kicker" data-reveal>Before anyone starts</p>
+          <h3 data-reveal>Every check, every placement</h3>
+          <p className="world-line" data-reveal>
+            Not a policy document — the list a site manager would ask for, in
+            the order it happens.
+          </p>
+        </div>
+
+        <ol className="w-checks">
+          {world.vetting.map((v, i) => (
+            <li key={v.k} data-reveal style={{ '--i': i }}>
+              <span className="w-check-tick" aria-hidden="true" />
+              <span className="w-check-body">
+                <span className="w-check-k">{v.k}</span>
+                <span className="w-check-d">{v.d}</span>
+              </span>
+            </li>
+          ))}
+        </ol>
       </section>
 
       {/* ── The day ───────────────────────────────────────────────────
@@ -286,9 +339,10 @@ export default function WorkforceWorld({ service, onClose, onRequest }) {
       {/* ── What's inside ─────────────────────────────────────────────── */}
       <section className="w-inside-block">
         <div className="w-inside-copy">
-          <p className="world-kicker" data-reveal>What&rsquo;s inside</p>
+          <p className="world-kicker" data-reveal>The services</p>
+          <h3 className="w-inside-head" data-reveal>Five things we staff</h3>
           <p className="world-line" data-reveal>
-            Everything below sits under one agreement, with one point of contact.
+            Every one of them under one agreement, with one named contact.
           </p>
           <ol className="w-inside">
             {world.inside.map((it, i) => (
@@ -314,6 +368,121 @@ export default function WorkforceWorld({ service, onClose, onRequest }) {
 
       <WorkforceFooter service={service} onClose={onClose} onRequest={onRequest} />
     </WorldShell>
+  )
+}
+
+/**
+ * The building, being staffed.
+ *
+ * Transport draws a lorry because what it moves is objects; this draws a
+ * building because what this service moves is people, and the place they go is
+ * the whole product. One floor per crew: as the scroll advances, each role's
+ * badge slides in from the side, docks against its floor, and that floor's
+ * windows come on. By the end the building is lit from top to bottom — which
+ * is the claim, made without a single stick figure.
+ *
+ * Drawn flat in the page's own two colours rather than sourced, for the same
+ * reason as the lorry: nothing in a stock library is this building with these
+ * six crews in it.
+ */
+function Staffing({ crew }) {
+  const section = useRef(null)
+  useSmoothProgress(section)
+
+  const floors = crew.slice(0, 6)
+  /* Geometry, top floor first so index 0 is the roof and the building fills
+     downward as the scroll advances. */
+  const top = 70
+  const floorH = 68
+  const left = 250
+  const width = 400
+
+  return (
+    <section className="w-staff" ref={section}>
+      <div className="w-staff-sticky">
+        <div className="w-staff-head">
+          <p className="world-kicker">One building, fully covered</p>
+          <p className="world-line">
+            Every floor has a named crew and a named supervisor. Nobody arrives
+            to find out who is doing what.
+          </p>
+        </div>
+
+        <div className="w-staff-scene" aria-hidden="true">
+          <svg viewBox="0 0 900 560">
+            {/* Ground */}
+            <path className="w-staff-ground" d="M60 500 H840" />
+
+            {/* Shell */}
+            <path
+              className="w-staff-shell"
+              d={`M${left} ${top} H${left + width} V500 H${left} Z`}
+            />
+            {/* A roof line, so it reads as a building rather than a bar chart. */}
+            <path className="w-staff-roof" d={`M${left - 18} ${top} H${left + width + 18}`} />
+
+            {floors.map((c, i) => {
+              const y = top + i * floorH
+              return (
+                <g className="w-staff-floor" key={c.r} style={{ '--i': i }}>
+                  {/* Floor slab */}
+                  <path
+                    className="w-staff-slab"
+                    d={`M${left} ${y + floorH} H${left + width}`}
+                  />
+
+                  {/* Five windows, lit together as the crew lands. */}
+                  {[0, 1, 2, 3, 4].map((w) => (
+                    <rect
+                      className="w-staff-win"
+                      key={w}
+                      x={left + 26 + w * 72}
+                      y={y + 16}
+                      width={46}
+                      height={34}
+                      style={{ '--w': w }}
+                    />
+                  ))}
+
+                  {/* The crew badge, docking from alternating sides. */}
+                  <g className={`w-staff-badge ${i % 2 ? 'is-right' : 'is-left'}`}>
+                    <rect
+                      x={i % 2 ? left + width + 26 : left - 226}
+                      y={y + 14}
+                      width={200}
+                      height={38}
+                      rx={4}
+                    />
+                    <text
+                      x={i % 2 ? left + width + 42 : left - 210}
+                      y={y + 38}
+                    >
+                      {c.r}
+                    </text>
+                  </g>
+
+                  {/* Leader line from badge to floor. */}
+                  <path
+                    className="w-staff-lead"
+                    d={
+                      i % 2
+                        ? `M${left + width} ${y + 33} H${left + width + 26}`
+                        : `M${left - 26} ${y + 33} H${left}`
+                    }
+                  />
+                </g>
+              )
+            })}
+
+            {/* Entrance, so the ground floor reads as a way in. */}
+            <path
+              className="w-staff-door"
+              d={`M${left + width / 2 - 26} 500 V462 H${left + width / 2 + 26} V500`}
+            />
+          </svg>
+        </div>
+      </div>
+    </section>
   )
 }
 

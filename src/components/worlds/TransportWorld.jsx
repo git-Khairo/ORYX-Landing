@@ -121,11 +121,12 @@ export default function TransportWorld({ service, onClose, onRequest }) {
       </section>
 
       {/* ── What's inside, against the proof-of-delivery card ──────────── */}
-      <section className="t-inside-block">
+      <section className="t-inside-block" id="t-included">
         <div className="t-inside-copy">
-          <p className="world-kicker" data-reveal>What&rsquo;s inside</p>
+          <p className="world-kicker" data-reveal>The services</p>
+          <h3 className="t-inside-head" data-reveal>Five things we run for you</h3>
           <p className="world-line" data-reveal>
-            Everything below sits under one agreement, with one point of contact.
+            Every one of them sits under one agreement, with one point of contact.
           </p>
           <ol className="t-inside">
             {world.inside.map((it, i) => (

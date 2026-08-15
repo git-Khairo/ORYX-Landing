@@ -211,12 +211,17 @@ export default function RenovationWorld({ service, onClose, onRequest }) {
       </section>
 
       {/* ── What's inside ─────────────────────────────────────────────── */}
-      <section className="r-inside-block">
-        <p className="world-kicker" data-reveal>What&rsquo;s inside</p>
+      <section className="r-inside-block" id="r-scope">
+        <div className="r-inside-head">
+          <p className="world-kicker" data-reveal>Scope of works</p>
+          <h3 data-reveal>Five packages, one contract</h3>
+        </div>
         <ol className="r-inside">
           {world.inside.map((it, i) => (
             <li key={it.k} data-reveal>
-              <span className="r-inside-n">{String(i + 1).padStart(2, '0')}</span>
+              {/* Clause numbering, as a specification would carry it — the
+                  packages are things you sign for, not bullet points. */}
+              <span className="r-inside-n">{`0${i + 1}.${(i + 1) * 10}`}</span>
               <span className="r-inside-k">{it.k}</span>
               <span className="r-inside-d">{it.d}</span>
             </li>

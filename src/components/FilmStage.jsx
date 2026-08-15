@@ -36,7 +36,7 @@ const wipePath = (p, down) => {
  * stall would land exactly on the cut. Off-screen clips are paused so only one
  * is ever decoding.
  */
-export default function FilmStage({ activeId, enter, reduced }) {
+export default function FilmStage({ activeId, enter, cam, hold, reduced }) {
   const videos = useRef({})
   const wipe = useRef(null)
   const [ready, setReady] = useState({})
@@ -87,6 +87,11 @@ export default function FilmStage({ activeId, enter, reduced }) {
     /* No previous shot means this is the opening frame, which has nothing to
        wipe over and should simply be there. */
     if (reduced || !el || !prevId || prevId === activeId) return
+    /* A hard cut. Most edits in a film are instantaneous, and running the same
+       decorated transition on every one of them is what makes a sequence read
+       as slides no matter how the pictures move. The wipe is kept for the two
+       edits that mark a change of act. */
+    if (enter === 'cut') return
 
     const down = enter === 'down'
     el.style.clipPath = wipePath(0, down)
@@ -119,6 +124,13 @@ export default function FilmStage({ activeId, enter, reduced }) {
             className={`stage-clip ${live ? 'is-live' : ''} ${prev ? 'is-prev' : ''} ${
               ready[id] ? 'is-ready' : ''
             }`}
+            /* The live shot carries its own camera move and runs it over its
+               own hold. Every shot pushing in at the same rate is what made
+               six clips read as a slideshow; a film changes setup on the cut,
+               and it is the grade and the cut language that carry continuity,
+               not identical motion. */
+            data-cam={live ? cam : undefined}
+            style={live ? { '--hold': `${hold}s` } : undefined}
             ref={live ? wipe : null}
           >
             {/* The origin shot is a composite, not a clip — the animal and the

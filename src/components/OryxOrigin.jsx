@@ -75,7 +75,7 @@ export default function OryxOrigin({ play, reduced }) {
        so the end state still tells it. */
     if (reduced) {
       gsap.set('.origin-mark', { '--t': 1, opacity: 1 })
-      gsap.set('.origin-photo', { opacity: 0.22 })
+      gsap.set('.origin-photo', { opacity: 0.08 })
       return
     }
 
@@ -104,7 +104,7 @@ export default function OryxOrigin({ play, reduced }) {
          into the dark, which keeps it present underneath the mark. */
       tl.to(
         '.origin-photo',
-        { opacity: 0.22, scale: 1.07, duration: 2.5, ease: 'expo.inOut' },
+        { opacity: 0.08, scale: 1.07, duration: 2.5, ease: 'expo.inOut' },
         1.95,
       )
     }, root)

@@ -220,6 +220,92 @@
 }
 .w-block-d { font-size: var(--step-0); color: var(--text-2); max-width: 42ch; }
 
+/* ── The building, staffed ────────────────────────────────────────────
+   Workforce's counterpart to Transport's lorry, driven the same way: a tall
+   section, a sticky stage, and one `--p` from `useSmoothProgress`. Each floor
+   slices its own window out of `--p` with clamp(), so the crews land in
+   sequence with no per-element JavaScript.
+
+   Deep Brown line-work on cream — the light page's own two colours. */
+.w-staff {
+  height: 300svh;
+  background: var(--sunk);
+  border-block: 1px solid var(--line);
+}
+.w-staff-sticky {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: var(--gutter);
+  display: grid;
+  grid-template-rows: auto 1fr;
+  align-content: center;
+  gap: clamp(1rem, 3vh, 2rem);
+}
+.w-staff-head { display: grid; gap: 0.9rem; max-width: 46ch; }
+.w-staff-scene { display: grid; place-items: center; min-height: 0; }
+.w-staff-scene svg { width: 100%; height: 100%; max-height: 62svh; overflow: visible; }
+
+.w-staff-ground { stroke: var(--line); stroke-width: 2; fill: none; }
+.w-staff-shell {
+  fill: none;
+  stroke: var(--deep-brown);
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+}
+.w-staff-roof { stroke: var(--deep-brown); stroke-width: 4; fill: none; }
+.w-staff-slab { stroke: var(--line); stroke-width: 1.5; fill: none; }
+.w-staff-door { fill: none; stroke: var(--deep-brown); stroke-width: 2.5; }
+
+/* Each floor takes its turn. The windows of a floor light together but with a
+   small per-window stagger, so a floor coming on reads as lights being
+   switched rather than a block changing colour. */
+.w-staff-floor {
+  --l: clamp(0, (var(--p, 0) - var(--i) * 0.115) / 0.16, 1);
+}
+
+.w-staff-win {
+  fill: var(--sand);
+  stroke: var(--deep-brown);
+  stroke-width: 1;
+  opacity: calc(clamp(0, (var(--l) - var(--w) * 0.06) / 0.5, 1) * 0.9 + 0.08);
+}
+
+/* The badge slides in from its side and docks against the floor. */
+.w-staff-badge rect {
+  fill: var(--deep-brown);
+  opacity: var(--l);
+}
+.w-staff-badge text {
+  fill: var(--oryx-white);
+  font-family: var(--font);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  opacity: var(--l);
+}
+.w-staff-badge.is-left { transform: translateX(calc((1 - var(--l)) * -140px)); }
+.w-staff-badge.is-right { transform: translateX(calc((1 - var(--l)) * 140px)); }
+
+.w-staff-lead {
+  stroke: var(--line-sand);
+  stroke-width: 1.5;
+  fill: none;
+  opacity: var(--l);
+}
+
+@media (max-width: 760px) {
+  .w-staff { height: 240svh; }
+  .w-staff-badge text { font-size: 22px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .w-staff-badge.is-left,
+  .w-staff-badge.is-right { transform: none; }
+}
+
 /* ── The crew ─────────────────────────────────────────────────────────
    Badges, not cards. An ID badge is the object this service actually hands
    over: a coloured strip, a role, and what that role covers. */
@@ -301,6 +387,126 @@
   overflow: hidden;
 }
 .w-crew-shot img { width: 100%; aspect-ratio: 21 / 9; object-fit: cover; }
+
+/* ── The quote ────────────────────────────────────────────────────────
+   Set at display size with no quotation marks drawn around it — the measure,
+   the indent and the attribution do that work. A pull quote in a box would be
+   a testimonial widget; this is a page turning to speak. */
+.w-quote {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: clamp(4rem, 12vh, 8rem) var(--gutter);
+  display: grid;
+  gap: clamp(1.4rem, 3vh, 2rem);
+  justify-items: start;
+}
+.w-quote blockquote p {
+  font-family: var(--font-display);
+  font-variation-settings: 'opsz' 144, 'SOFT' 20;
+  font-size: clamp(1.8rem, 4.6vw, 3.6rem);
+  font-weight: 400;
+  line-height: 1.12;
+  letter-spacing: -0.018em;
+  color: var(--text);
+  max-width: 20ch;
+  text-wrap: balance;
+}
+/* Hanging quote mark in the margin, so the first line still starts on the
+   text axis — a quote mark in the flow pushes the whole opening word out of
+   alignment with everything above it. */
+.w-quote blockquote { position: relative; }
+.w-quote blockquote::before {
+  content: '\201C';
+  position: absolute;
+  left: -0.5em;
+  top: -0.12em;
+  font-family: var(--font-display);
+  font-size: clamp(2.6rem, 7vw, 5.5rem);
+  line-height: 1;
+  color: var(--line-sand);
+}
+.w-quote figcaption {
+  display: grid;
+  gap: 0.2rem;
+  padding-left: 1rem;
+  border-left: 2px solid var(--deep-brown);
+}
+.w-quote-who {
+  font-size: var(--step--1);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--text);
+}
+.w-quote-where { font-size: var(--step--2); color: var(--text-3); }
+
+/* ── Vetting ──────────────────────────────────────────────────────────
+   Two columns of checks, each ticking in as it is reached. Deliberately quiet:
+   this section's job is reassurance, and reassurance that shouts reads as
+   defensiveness. */
+.w-vetting {
+  background: var(--sunk);
+  border-block: 1px solid var(--line);
+  padding: clamp(3.5rem, 9vh, 6rem) var(--gutter);
+}
+.w-vetting-head {
+  max-width: var(--maxw);
+  margin: 0 auto clamp(2rem, 5vh, 3rem);
+  display: grid;
+  gap: 0.9rem;
+}
+.w-vetting-head h3 { font-size: var(--step-3); color: var(--text); max-width: 16ch; }
+
+.w-checks {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0;
+}
+.w-checks li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 1rem;
+  align-items: start;
+  padding: clamp(1.1rem, 2.8vh, 1.6rem) clamp(1rem, 2vw, 2rem) clamp(1.1rem, 2.8vh, 1.6rem) 0;
+  border-top: 1px solid var(--line);
+  transition-delay: calc(var(--i, 0) * 60ms);
+}
+
+/* The tick draws itself rather than fading in — a check being made, not a
+   glyph appearing. Two borders on a rotated box is the whole mark. */
+.w-check-tick {
+  width: 20px;
+  height: 20px;
+  margin-top: 0.15rem;
+  border: 1px solid var(--line-sand);
+  display: grid;
+  place-items: center;
+  flex: none;
+  position: relative;
+}
+.w-check-tick::after {
+  content: '';
+  width: 5px;
+  height: 10px;
+  border-right: 2px solid var(--deep-brown);
+  border-bottom: 2px solid var(--deep-brown);
+  rotate: 45deg;
+  translate: 0 -1px;
+  transform-origin: center;
+  scale: 0;
+  transition: scale 0.35s var(--ease-out);
+  transition-delay: calc(0.15s + var(--i, 0) * 60ms);
+}
+.w-checks li.is-in .w-check-tick::after { scale: 1; }
+
+.w-check-body { display: grid; gap: 0.3rem; }
+.w-check-k { font-size: var(--step-0); font-weight: 600; color: var(--text); }
+.w-check-d { font-size: var(--step--1); line-height: 1.55; color: var(--text-2); }
+
+@media (max-width: 760px) {
+  .w-checks { grid-template-columns: 1fr; }
+}
 
 /* ── The day, as a dial ───────────────────────────────────────────────
    Concentric arcs on a 24-hour clock. Each ring is one crew; overlaps at
@@ -591,23 +797,54 @@
   align-items: start;
 }
 .w-inside-copy { display: grid; gap: 1.2rem; }
+.w-inside-head { font-size: var(--step-3); color: var(--text); max-width: 14ch; }
+
+/* Editorial entries rather than list rows: the name gets display size and its
+   own line, and the number sits above it as a folio. Buried in a 3rem gutter
+   these read as footnotes; this is what the client is buying. */
 .w-inside { margin-top: 0.6rem; display: grid; }
 .w-inside li {
+  position: relative;
   display: grid;
-  grid-template-columns: 3rem 1fr;
-  gap: 1rem;
-  padding: 1.1rem 0;
+  gap: 0.4rem;
+  padding: clamp(1.8rem, 4.5vh, 2.6rem) 0 clamp(1.6rem, 4vh, 2.2rem) clamp(1.4rem, 3vw, 2.6rem);
   border-top: 1px solid var(--line);
+  transition: padding-left 0.4s var(--ease-out);
 }
+/* A brown rule in the margin that lengthens as the entry is pointed at —
+   the editorial equivalent of Transport's sand bar, doing the same job of
+   making these read as the offer rather than as a list. */
+.w-inside li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: clamp(1.8rem, 4.5vh, 2.6rem);
+  width: 2px;
+  height: 1.6em;
+  background: var(--deep-brown);
+  opacity: 0.35;
+  transition: opacity 0.4s var(--ease-out), height 0.4s var(--ease-out);
+}
+.w-inside li:hover::before { opacity: 1; height: 2.6em; }
+.w-inside li:last-child { border-bottom: 1px solid var(--line); }
 .w-inside-n {
   font-size: var(--step--2);
   font-weight: 600;
+  letter-spacing: var(--track-label);
   color: var(--sand-text);
   font-variant-numeric: tabular-nums;
 }
-.w-inside-body { display: grid; gap: 0.3rem; }
-.w-inside-k { font-size: var(--step-1); font-weight: 500; color: var(--text); }
-.w-inside-d { font-size: var(--step--1); color: var(--text-2); }
+.w-inside-body { display: grid; gap: 0.4rem; }
+.w-inside-k {
+  font-family: var(--font-display);
+  font-variation-settings: 'opsz' 72, 'SOFT' 40;
+  font-size: var(--step-3);
+  font-weight: 500;
+  letter-spacing: var(--track-display);
+  line-height: 1.02;
+  color: var(--text);
+}
+.w-inside-d { font-size: var(--step-0); line-height: 1.6; color: var(--text-2); max-width: 48ch; }
 .w-inside-shot { position: sticky; top: 2rem; }
 .w-inside-shot img { width: 100%; aspect-ratio: 3 / 4; object-fit: cover; }
 

@@ -31,52 +31,45 @@ export const brand = {
 /**
  * The opening film, as six shots of one sequence.
  *
- * Not a carousel: the shots share a camera. Every one is a slow push at the
- * same rate, every cut is the same chevron wipe taken off the mark, and the
- * film opens and closes on the same object. `hold` is seconds on screen.
+ * Three things keep this from being a slideshow, and none of them is the
+ * transition:
  *
- * `enter` names the direction the wipe travels, alternating so the film has a
- * rhythm rather than a tic.
+ * `enter` is `cut` for most shots. A film is overwhelmingly hard cuts; a
+ * decorated transition on every single edit is the surest sign of a slideshow,
+ * however good the decoration. The chevron wipe survives at exactly two
+ * points — into the long shot, and into the finale — where it marks a change
+ * of act rather than merely the next picture.
+ *
+ * `hold` is uneven. Four seconds, then three fast ones, then a long one, then
+ * the finale. Equal-length shots are slides by definition.
+ *
+ * `cam` is different for every shot. One shared slow push across six clips
+ * reads as a screensaver.
  */
 export const acts = [
   {
-    /* The origin shot. The animal, with the mark standing in for its horns —
-       then the horns detach and rise into the logo, which is the whole idea of
-       the identity stated in three seconds and never explained again. */
-    id: 'oryx',
-    kind: 'origin',
-    film: 'oryx',
-    /* Cut on the resolve. The detach lands at 4.15s (it starts at 1.95 and runs
-       2.2), and the shot used to sit there for another second afterwards with
-       the mark finished and the animal still fading in the background — a dead
-       beat that read as the film hesitating. The hold now ends just as the mark
-       arrives, so the next shot takes over on the resolve. */
-    hold: 4.35,
-    enter: 'up',
-    line: 'ORYX',
-    /* The board's own three words for the animal. The slogan used to sit here
-       and now belongs to the shot after this one, where it is taken apart
-       letter by letter — printing it twice would spend the reveal early. */
-    sub: 'Strength · Focus · Resilience',
-  },
-  {
-    /* The slogan, taken apart. This is the shot that earns the name: the film
-       has just made the mark out of the animal, and now it makes the promise
-       out of the mark's four letters. */
-    id: 'group',
-    kind: 'initials',
+    /* Establishing shot. The film opens on the work, not on the brand — the
+       animal has moved to the end, where it is a payoff rather than a preface. */
+    id: 'open',
+    kind: 'brand',
     film: 'facilities',
-    hold: 5.4,
-    enter: 'down',
+    hold: 4.2,
+    enter: 'up',
+    cam: 'riseIn',
     line: 'ORYX GROUP',
-    sub: 'ORYX GROUP · Building · People · Services · Solutions',
+    sub: 'Building · People · Services · Solutions',
   },
+  /* The middle is a montage: three short shots, cut faster than anything
+     around them, each moving a different way. Equal-length shots that all
+     pushed in at the same rate is exactly what made the sequence read as a
+     slideshow rather than as film. */
   {
     id: 'transport',
     kind: 'service',
     film: 'transport',
-    hold: 2.9,
-    enter: 'up',
+    hold: 1.9,
+    enter: 'cut',
+    cam: 'panR',
     index: '01',
     line: 'Transport\n& Logistics',
     sub: 'Goods moved on a schedule you can plan around.',
@@ -85,8 +78,9 @@ export const acts = [
     id: 'workforce',
     kind: 'service',
     film: 'workforce',
-    hold: 2.9,
-    enter: 'down',
+    hold: 1.9,
+    enter: 'cut',
+    cam: 'panL',
     index: '02',
     line: 'Workforce',
     sub: 'The right people, placed where the work is.',
@@ -95,22 +89,38 @@ export const acts = [
     id: 'renovation',
     kind: 'service',
     film: 'renovation',
-    hold: 2.9,
-    enter: 'up',
+    hold: 1.9,
+    enter: 'cut',
+    cam: 'closeIn',
     index: '03',
     line: 'Renovation',
     sub: 'Buildings brought back into service.',
   },
   {
-    /* Closes on the mark alone — the same object the film opened with, now
-       without the animal, because by here it does not need it. */
-    id: 'outro',
-    kind: 'outro',
+    /* The film breathes out here: a long, slow shot after three quick ones.
+       The slogan comes apart into the four letters it is built from. */
+    id: 'promise',
+    kind: 'initials',
     film: 'outro',
-    hold: 3.6,
+    hold: 5.6,
     enter: 'down',
-    line: 'One group. Every operation.',
+    cam: 'drift',
+    line: 'ORYX GROUP',
     sub: 'ORYX GROUP · Netherlands',
+  },
+  {
+    /* The finale. The animal, with the mark standing in for its horns, and the
+       mark then rising out of the head into the logo — the identity's own
+       origin, held back until the end so the film resolves on it instead of
+       spending it in the first four seconds. Its camera is its own. */
+    id: 'oryx',
+    kind: 'origin',
+    film: 'oryx',
+    hold: 6.4,
+    enter: 'up',
+    cam: 'none',
+    line: 'ORYX',
+    sub: 'Our Reliability, Your Excellence',
   },
 ]
 
@@ -234,6 +244,26 @@ export const services = [
         { k: 'Facility staff', d: 'Caretaking, front-of-house, post and stock handling.' },
         { k: 'Cover and escalation', d: 'Sickness and no-shows absorbed inside one shift.' },
         { k: 'Vetting and training', d: 'Checked, inducted and insured before they reach your door.' },
+      ],
+      /* Social proof, and the only quote on the site. Placeholder wording
+         until a real one is supplied — the attribution is deliberately a role
+         and a sector rather than a person, which is both what a facilities
+         buyer finds credible and what survives not having a name to use. */
+      quote: {
+        line: 'The shift ran, and nobody called me. That is the whole job.',
+        who: 'Facilities Manager',
+        where: 'Multi-site retail group, Randstad',
+      },
+      /* The checks, in the order they actually happen. Staffing is bought on
+         risk, and "vetted, trained and insured" is four words carrying the
+         single largest objection this service has to answer. */
+      vetting: [
+        { k: 'Identity and right to work', d: 'Documents seen, copied and held before a shift is offered.' },
+        { k: 'References taken', d: 'Two, checked by us, for the work they are actually being placed into.' },
+        { k: 'Screening where required', d: 'DBS and sector checks arranged before access is granted.' },
+        { k: 'Insured', d: "Employer's and public liability, ours not yours." },
+        { k: 'Site induction', d: 'Building, scope and standard, before the first shift rather than during it.' },
+        { k: 'Uniform and PPE', d: 'Issued and replaced by us, to your site rules.' },
       ],
       /* The day, as a clock rather than a table. `f` and `t` are hours on a
          24-hour dial; night cover deliberately wraps past midnight, which is

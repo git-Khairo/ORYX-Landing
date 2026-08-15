@@ -46,40 +46,74 @@
   object-fit: cover;
 }
 
-/* ── One camera, one grade ───────────────────────────────────────────────
-   The two things that decide whether six clips read as a film or as a stack
-   of slides, and neither of them is the transition.
+/* ── The camera, and the grade ───────────────────────────────────────────
+   The grade is the constant: one filter over all six clips, pulling stock
+   footage from six different shoots toward the board's warm near-black. That,
+   plus the chevron cut, is what makes them one film.
 
-   The camera: the push runs on every clip from mount, on one clock, whether or
-   not the clip is on screen. Attached to `.is-live` it restarted from scale 1
-   on each cut, so every shot opened by announcing itself as a new shot — which
-   is exactly what a carousel does. Sharing the clock means a shot appearing
-   twelve seconds in is already where the camera would have got to, so the move
-   carries straight through the edit.
-
-   The grade: stock footage from six different shoots has six different white
-   balances, and no transition can disguise that. One filter over all of them
-   pulls the lot toward the board's warm near-black, which is what actually
-   makes them feel shot for the same film. */
+   The camera is the variable. Every shot used to push in at the same rate from
+   the same start, and a uniform slow zoom on every frame is precisely what
+   reads as a slideshow — a film changes setup on the cut. Each shot now runs
+   its own move over its own hold: pans, a rise, a close-in, a slow drift. */
 .stage-clip img,
 .stage-clip video {
-  animation: push 24s linear both;
   filter: saturate(0.7) contrast(1.06) brightness(0.82) sepia(0.14);
+  transform: scale(1.06);
 }
 
-/* The origin shot keeps its own camera — the mark detaching — so it is exempt
-   from the shared push. It is graded harder than any other shot instead: the
-   mark is sand and sits directly on the horns, so the horns have to go down to
-   a ghost or the two simply merge. A blend-mode wash alone could not get there
-   predictably; a filter on the photograph can. */
+.stage-clip.is-live img,
+.stage-clip.is-live video {
+  /* Linear, always. An eased camera move accelerates and settles, which reads
+     as an animation; a real dolly or pan runs at a constant rate. */
+  animation-duration: var(--hold, 3s);
+  animation-timing-function: linear;
+  animation-fill-mode: both;
+}
+
+.stage-clip.is-live[data-cam='riseIn'] img,
+.stage-clip.is-live[data-cam='riseIn'] video { animation-name: cam-rise-in; }
+.stage-clip.is-live[data-cam='panR'] img,
+.stage-clip.is-live[data-cam='panR'] video { animation-name: cam-pan-right; }
+.stage-clip.is-live[data-cam='panL'] img,
+.stage-clip.is-live[data-cam='panL'] video { animation-name: cam-pan-left; }
+.stage-clip.is-live[data-cam='closeIn'] img,
+.stage-clip.is-live[data-cam='closeIn'] video { animation-name: cam-close-in; }
+.stage-clip.is-live[data-cam='drift'] img,
+.stage-clip.is-live[data-cam='drift'] video { animation-name: cam-drift; }
+
+/* A crane settling: rising slightly while easing in. */
+@keyframes cam-rise-in {
+  from { transform: scale(1.14) translate3d(0, 2.2%, 0); }
+  to   { transform: scale(1.05) translate3d(0, -0.6%, 0); }
+}
+/* Lateral, with a touch of push so it does not read as a flat slide. */
+@keyframes cam-pan-right {
+  from { transform: scale(1.13) translate3d(-3.2%, 0, 0); }
+  to   { transform: scale(1.17) translate3d(2.6%, 0, 0); }
+}
+@keyframes cam-pan-left {
+  from { transform: scale(1.13) translate3d(3.2%, 0, 0); }
+  to   { transform: scale(1.17) translate3d(-2.6%, 0, 0); }
+}
+/* The hardest push of the three service shots — it lands on the cut to the
+   long shot that follows, so the montage tightens before it breathes out. */
+@keyframes cam-close-in {
+  from { transform: scale(1.04); }
+  to   { transform: scale(1.24); }
+}
+/* Barely moving. The long shot needs to feel held, not travelling. */
+@keyframes cam-drift {
+  from { transform: scale(1.08) translate3d(1.4%, 0.6%, 0); }
+  to   { transform: scale(1.14) translate3d(-1.4%, -0.6%, 0); }
+}
+
+/* The finale keeps its own camera — the mark detaching — and is graded harder
+   than any other shot: the mark is sand and sits directly on the horns, so the
+   horns have to go down to a ghost or the two simply merge. */
 .origin img {
   animation: none;
+  transform: none;
   filter: brightness(0.44) saturate(0.5) contrast(1.1) sepia(0.16);
-}
-
-@keyframes push {
-  from { transform: scale(1.03); }
-  to { transform: scale(1.16); }
 }
 
 .stage-scrim {
@@ -252,6 +286,17 @@
   color: var(--oryx-white);
   font-weight: 600;
   margin-bottom: -0.15rem;
+}
+
+/* The last line of the film, under the resolved mark. Centred, because by the
+   finale the mark is centred and a slogan ranged left under a centred logo
+   reads as a caption that lost its picture. */
+.hero-slogan--end {
+  align-self: center;
+  text-align: center;
+  width: 100%;
+  font-size: var(--step-2);
+  color: var(--oryx-white);
 }
 
 .hero-slogan {

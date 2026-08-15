@@ -646,44 +646,98 @@
 .t-chips span { font-size: var(--step-0); font-weight: 600; color: var(--oryx-white); }
 .t-chips small { font-size: var(--step--2); color: var(--text-2); line-height: 1.5; }
 
-/* ── Inside, against the proof of delivery ────────────────────────────── */
+/* ── The services ─────────────────────────────────────────────────────
+   Promoted from a numbered list in a side column to the page's own catalogue:
+   full width, five bordered cells, each with a mono reference and a condensed
+   name. These are what the client is actually buying, and buried beside a
+   photograph they read as footnotes. */
 .t-inside-block {
   max-width: var(--maxw);
   margin: 0 auto;
   padding: clamp(3rem, 8vh, 5rem) var(--gutter) clamp(4rem, 10vh, 7rem);
   display: grid;
-  grid-template-columns: 1.2fr 0.9fr;
-  gap: clamp(2.5rem, 6vw, 5rem);
-  align-items: start;
+  gap: clamp(1.8rem, 4vh, 2.6rem);
 }
-.t-inside-copy { display: grid; gap: 1.2rem; }
-.t-inside { margin-top: 0.6rem; display: grid; }
-.t-inside li {
-  display: grid;
-  grid-template-columns: 3rem 1fr;
-  gap: 1rem;
-  padding: 1.1rem 0;
-  border-top: 1px solid var(--line);
-}
-.t-inside-n {
-  font-size: var(--step--2);
+.t-inside-copy { display: grid; gap: 1rem; }
+.t-inside-head {
+  font-family: var(--font-display);
+  font-size: var(--step-3);
   font-weight: 600;
-  color: var(--sand-text);
+  text-transform: uppercase;
+  letter-spacing: var(--track-display);
+  line-height: 1;
+  color: var(--text);
+}
+
+.t-inside {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+}
+.t-inside li {
+  position: relative;
+  background: var(--tone);
+  padding: clamp(2rem, 5vh, 2.8rem) clamp(1.2rem, 2vw, 1.7rem) clamp(1.6rem, 4vh, 2.2rem);
+  display: grid;
+  gap: 0.9rem;
+  align-content: start;
+  min-height: clamp(220px, 30vh, 280px);
+  transition: background 0.25s var(--ease-out);
+}
+.t-inside li:hover { background: var(--raise); }
+
+/* A sand rule across the head of each panel, running out to full width as the
+   panel is pointed at. It is the one accent on the section and it is what
+   makes five cells read as five offers rather than a table. */
+.t-inside li::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 34%;
+  background: var(--sand);
+  transition: width 0.45s var(--ease-out);
+}
+.t-inside li:hover::before { width: 100%; }
+
+.t-inside-n {
+  font-family: var(--font-mono);
+  font-size: var(--step-1);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--sand);
   font-variant-numeric: tabular-nums;
 }
-.t-inside-body { display: grid; gap: 0.3rem; }
-.t-inside-k { font-size: var(--step-1); font-weight: 500; color: var(--oryx-white); }
-.t-inside-d { font-size: var(--step--1); color: var(--text-2); }
+.t-inside-body { display: grid; gap: 0.45rem; }
+/* Sized to the column, not to the scale.
+   `--step-3` tops out at 3.7rem, and in condensed capitals "EXCEPTION" at that
+   size is wider than a 231px panel — the longest names ran straight through
+   their own cell borders into the next column. This clamp is the largest that
+   still fits the narrowest panel the grid produces, and `break-word` catches
+   any name longer than the ones here. */
+.t-inside-k {
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 2.8vw, 2.6rem);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: var(--track-display);
+  line-height: 1.02;
+  color: var(--text);
+  overflow-wrap: break-word;
+}
+.t-inside-d { font-size: var(--step-0); line-height: 1.55; color: var(--text-2); }
 
-/* The stamp. Rotated and set on the picture, because a proof of delivery is a
-   thing that gets stamped — a neat caption underneath would have been a
-   description of the artefact rather than the artefact. */
-.t-pod { position: relative; position: sticky; top: 2rem; }
-.t-pod img { width: 100%; aspect-ratio: 3 / 4; object-fit: cover; }
+/* The proof of delivery drops below the catalogue as a wide band — it was
+   competing with the services for the same column. */
+.t-pod { position: relative; overflow: hidden; }
+.t-pod img { width: 100%; aspect-ratio: 21 / 9; object-fit: cover; }
 .t-pod-stamp {
   position: absolute;
-  right: 6%;
-  bottom: 8%;
+  right: 5%;
+  bottom: 12%;
   display: grid;
   gap: 0.2rem;
   padding: 0.7rem 1rem;
@@ -696,15 +750,12 @@
 .t-pod-mark {
   font-family: var(--font-display);
   font-size: var(--step-1);
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: var(--track-display);
   color: var(--sand);
 }
-.t-pod-meta {
-  font-size: var(--step--2);
-  color: var(--text-2);
-  font-variant-numeric: tabular-nums;
-}
+.t-pod-meta { font-size: var(--step--2); color: var(--text-2); }
 
 @media (max-width: 900px) {
   .t-manifest { grid-template-columns: repeat(2, 1fr); }
