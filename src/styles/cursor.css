@@ -1,0 +1,86 @@
+/* ══ The cursor ═════════════════════════════════════════════════════════
+   A dot that tracks exactly and a ring that chases it. Everything here is
+   gated behind `.has-cursor`, which the component only adds once it knows it
+   is running on a device with a fine pointer and motion is allowed — so the
+   native cursor is never hidden by a replacement that is not there. */
+
+.cursor-dot,
+.cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0;
+  /* Composited only: these move on every frame, and anything that triggers
+     layout here is felt immediately. */
+  will-change: transform;
+}
+.has-cursor .cursor-dot,
+.has-cursor .cursor-ring { opacity: 1; }
+
+/* Off the screen entirely — not faded — when the pointer leaves the window. */
+.cursor-out .cursor-dot,
+.cursor-out .cursor-ring { opacity: 0; }
+
+.cursor-dot {
+  width: 6px;
+  height: 6px;
+  margin: -3px 0 0 -3px;
+  border-radius: 50%;
+  background: var(--sand);
+  transition: opacity 0.25s var(--ease-out);
+}
+
+.cursor-ring {
+  width: 34px;
+  height: 34px;
+  margin: -17px 0 0 -17px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line-sand);
+  border-radius: 50%;
+  transition: width 0.32s var(--ease-out), height 0.32s var(--ease-out),
+    margin 0.32s var(--ease-out), border-color 0.32s var(--ease-out),
+    background 0.32s var(--ease-out), opacity 0.25s var(--ease-out);
+}
+
+/* The mark, inside the ring. Hidden at rest and opened out over anything
+   clickable, so the brand's own shape is what says "this can be pressed". */
+.cursor-ring i {
+  width: 9px;
+  aspect-ratio: 0.4161;
+  background: var(--sand);
+  -webkit-mask: url('/mark.png') center / contain no-repeat;
+  mask: url('/mark.png') center / contain no-repeat;
+  opacity: 0;
+  scale: 0.4;
+  transition: opacity 0.28s var(--ease-out), scale 0.32s var(--ease-out);
+}
+
+/* ── Over something clickable ─────────────────────────────────────────
+   The ring opens, the mark arrives inside it, and the dot gets out of the way
+   so the two are never stacked on top of each other. */
+.cursor-live .cursor-ring {
+  width: 56px;
+  height: 56px;
+  margin: -28px 0 0 -28px;
+  border-color: var(--sand);
+  background: rgba(200, 169, 120, 0.08);
+}
+.cursor-live .cursor-ring i { opacity: 1; scale: 1; }
+.cursor-live .cursor-dot { opacity: 0; }
+
+/* ── Pressed ──────────────────────────────────────────────────────────── */
+.cursor-down .cursor-ring { scale: 0.82; }
+
+/* ── Hiding the native one ────────────────────────────────────────────
+   Last, and only under `.has-cursor`. Text inputs keep their own caret — a
+   custom cursor over a field you are typing into helps nobody. */
+.has-cursor,
+.has-cursor a,
+.has-cursor button,
+.has-cursor [role='button'] { cursor: none; }
+.has-cursor input,
+.has-cursor textarea,
+.has-cursor select { cursor: auto; }

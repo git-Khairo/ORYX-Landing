@@ -4,6 +4,7 @@ import FilmStage from '../components/FilmStage'
 import InitialsReveal from '../components/InitialsReveal'
 import { acts } from '../content/copy'
 import { usePrefersReduced } from '../lib/usePrefersReduced'
+import { useScrollLock, useEscape } from '../lib/useOverlay'
 
 /**
  * The opening film: one screen, six shots, about twenty-four seconds.
@@ -15,35 +16,64 @@ import { usePrefersReduced } from '../lib/usePrefersReduced'
  * one clock, so the film can overlap its own cuts and stay in step with the
  * chevron wipe underneath it.
  *
- * It loops. That makes the hero a running promo rather than a one-time
- * introduction, so two things follow from it: the film never hands the page
- * over by itself — an auto-scroll firing on every repeat would drag a reader
- * out of whatever they were looking at — and the way down is a control that is
- * always present rather than one that appears at the end.
+ * It is an intro, not a section. The film sits over a locked page and leaves
+ * for good when it is dismissed — there is no scrolling back up to it, because
+ * it is unmounted rather than hidden. A hero you can return to is a section,
+ * and a visitor who scrolls back to the top mid-read should not be handed
+ * twenty seconds of titles they did not ask for.
+ *
+ * It plays once and then hands over. Looping would make it a gate the visitor
+ * has to think their way out of; ending makes it an introduction that finishes
+ * the way a title sequence finishes, and the page is simply there afterwards.
+ * The skip control is present from the first frame for anyone who does not
+ * want the twenty-four seconds.
  */
 export default function Hero({ onFinish }) {
   const reduced = usePrefersReduced()
   const [index, setIndex] = useState(0)
+  const [leaving, setLeaving] = useState(false)
   const root = useRef(null)
+  const master = useRef(null)
+  /* A ref, not the `leaving` state: the timeline's `onComplete` closes over the
+     state as it was when the effect ran, so a visitor who skips and then has
+     the film finish underneath them would hand over twice. A ref is read live
+     and makes this idempotent however it is reached. */
+  const dismissed = useRef(false)
 
   const act = acts[index]
 
+  /* The page underneath must not move while the film is up, and Escape should
+     get you out of it the way it gets you out of anything else full-screen. */
+  useScrollLock(!reduced)
+  useEscape(!reduced, () => dismiss())
+
+  /* Leave on the chevron wipe, not a fade. The gateway is already mounted
+     underneath, so this reads as a cut from the last frame of the film
+     straight into the next section — the page is not arriving, it is being
+     uncovered. The timeout matches the animation so the unmount lands exactly
+     as the wipe clears. */
+  const dismiss = () => {
+    if (dismissed.current) return
+    dismissed.current = true
+    master.current?.kill()
+    setLeaving(true)
+    setTimeout(() => onFinish?.(), 620)
+  }
+
   useEffect(() => {
     if (reduced) {
-      /* Reduced motion gets one resolved frame and nothing that repeats. A
-         looping film is precisely what this setting is asking not to see. */
-      setIndex(acts.length - 1)
+      /* Reduced motion gets no film at all. A looping twenty-four second
+         sequence is precisely what this setting is asking not to be shown, and
+         a static title card standing between the visitor and the site would be
+         a gate with nothing behind it. */
       onFinish?.()
       return
     }
 
-    /* The film loops. It therefore never "finishes", so it also never takes the
-       page over on its own — an auto-scroll that fired every twenty-one seconds
-       would yank a reader out of whatever they had scrolled to. Going down is
-       the visitor's decision now, and the control in the corner is always
-       there to make it. */
-    const tl = gsap.timeline({ repeat: -1 })
-    onFinish?.()
+    /* One pass, then out. `onComplete` runs the same dismissal the skip button
+       does, so the film ending and the visitor cutting it short land in exactly
+       the same place — there is only one way this component leaves. */
+    const tl = gsap.timeline({ onComplete: () => dismiss() })
 
     /* Each shot is a label on one timeline. `.call()` flips the React state
        that swaps the copy and tells the stage which clip is live; the stage
@@ -55,6 +85,7 @@ export default function Hero({ onFinish }) {
     })
     tl.to({}, { duration: at })
 
+    master.current = tl
     return () => tl.kill()
   }, [reduced, onFinish])
 
@@ -116,7 +147,11 @@ export default function Hero({ onFinish }) {
   }, [index, reduced, act.hold])
 
   return (
-    <section className="hero" id="hero" aria-label="Introduction">
+    <section
+      className={`hero ${leaving ? 'is-leaving' : ''}`}
+      id="hero"
+      aria-label="Introduction"
+    >
       <FilmStage
         activeId={act.film}
         enter={act.enter}
@@ -178,14 +213,14 @@ export default function Hero({ onFinish }) {
           and even a single playhead invites the viewer to watch the clock
           rather than the film — the only control here is the way out. */}
       <div className="hero-foot">
-        {/* One control, always present. With the film looping there is no
-            "skip to the end" left to offer — there is only the way down, and
-            it should not appear and disappear depending on where the loop
-            happens to be. */}
-        <a className="hero-cue" href="#work">
-          <span>Continue</span>
+        {/* The only way out, and present from the first frame. It is a button
+            rather than a link to `#work`: there is nothing to scroll to while
+            the film is up, and an anchor would promise a journey down the page
+            that the locked scroll underneath cannot deliver. */}
+        <button type="button" className="hero-cue" onClick={dismiss}>
+          <span>Skip intro</span>
           <i aria-hidden="true" />
-        </a>
+        </button>
       </div>
     </section>
   )

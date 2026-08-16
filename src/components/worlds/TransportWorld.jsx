@@ -55,8 +55,16 @@ export default function TransportWorld({ service, onClose, onRequest }) {
       <header className="t-open">
         <Media clip={film.transport} />
         <div className="t-open-copy">
-          <p className="world-eyebrow" data-reveal>{service.index} · Service</p>
-          <h2 data-reveal>{service.title}</h2>
+          <p className="world-eyebrow" data-reveal>
+            {service.index} · {service.title}
+          </p>
+          {/* The headline carries the opening, not the service name — the name
+              is already in the eyebrow above it and in the navigation. */}
+          <h2 data-reveal>
+            {world.headline.split('\n').map((l) => (
+              <span key={l}>{l}</span>
+            ))}
+          </h2>
           <p className="world-promise" data-reveal>{service.promise}</p>
         </div>
 
@@ -86,6 +94,25 @@ export default function TransportWorld({ service, onClose, onRequest }) {
           that then drives out of frame. A four-up card grid said "reference
           table"; this says what the service actually does with them. */}
       <Load items={world.definition} />
+
+      {/* ── How it runs ───────────────────────────────────────────────
+          The page shows what happens on the day but never says how a job
+          starts. Four steps, in dispatch language, numbered like a manifest. */}
+      <section className="t-process" id="t-process">
+        <div className="t-process-head">
+          <p className="world-kicker" data-reveal>How it runs</p>
+          <h3 data-reveal>From brief to proof</h3>
+        </div>
+        <ol className="t-steps">
+          {world.process.map((st, i) => (
+            <li key={st.k} data-reveal style={{ '--i': i }}>
+              <span className="t-step-n">{String(i + 1).padStart(2, '0')}</span>
+              <span className="t-step-k">{st.k}</span>
+              <span className="t-step-d">{st.d}</span>
+            </li>
+          ))}
+        </ol>
+      </section>
 
       {/* ── Interlude ─────────────────────────────────────────────────── */}
       <section className="t-interlude">

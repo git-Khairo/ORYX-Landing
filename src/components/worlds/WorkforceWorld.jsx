@@ -55,8 +55,16 @@ export default function WorkforceWorld({ service, onClose, onRequest }) {
       <header className="w-open">
         <Media clip={film.workforce} />
         <div className="w-open-copy">
-          <p className="world-eyebrow" data-reveal>{service.index} · Service</p>
-          <h2 data-reveal>{service.title}</h2>
+          <p className="world-eyebrow" data-reveal>
+            {service.index} · {service.title}
+          </p>
+          {/* The headline carries the opening, not the service name — the name
+              is already in the eyebrow above it and in the navigation. */}
+          <h2 data-reveal>
+            {world.headline.split('\n').map((l) => (
+              <span key={l}>{l}</span>
+            ))}
+          </h2>
           <p className="world-promise" data-reveal>{service.promise}</p>
         </div>
       </header>
@@ -119,6 +127,49 @@ export default function WorkforceWorld({ service, onClose, onRequest }) {
         <figure className="w-crew-shot" data-reveal>
           <img src={shots[0]?.src} alt={shots[0]?.alt || ''} loading="lazy" />
         </figure>
+      </section>
+
+      {/* ── How we place people ───────────────────────────────────────
+          Editorial numbering rather than a rail: this page reads, it does not
+          operate. Same four-step idea as Transport, in this page's language
+          and this page's typography. */}
+      <section className="w-process" id="w-process">
+        <div className="w-process-head">
+          <p className="world-kicker" data-reveal>How we place people</p>
+          <h3 data-reveal>From brief to first shift</h3>
+        </div>
+        <ol className="w-steps">
+          {world.process.map((st, i) => (
+            <li key={st.k} data-reveal style={{ '--i': i }}>
+              <span className="w-step-n">{String(i + 1).padStart(2, '0')}</span>
+              <span className="w-step-body">
+                <span className="w-step-k">{st.k}</span>
+                <span className="w-step-d">{st.d}</span>
+              </span>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      {/* ── The kit ───────────────────────────────────────────────────
+          The most concrete thing this service can offer: what a site manager
+          physically sees when the crew walks in. Everything else on the page
+          is a promise about these people; this is the evidence. */}
+      <section className="w-kit" id="w-kit">
+        <div className="w-kit-copy">
+          <p className="world-kicker" data-reveal>The mark, on site</p>
+          <h3 data-reveal>{world.kit.head}</h3>
+          <p className="world-line" data-reveal>{world.kit.line}</p>
+        </div>
+        <ul className="w-kit-list">
+          {world.kit.items.map((it, i) => (
+            <li key={it.k} data-reveal style={{ '--i': i }}>
+              <span className="w-kit-mark" aria-hidden="true" />
+              <span className="w-kit-k">{it.k}</span>
+              <span className="w-kit-d">{it.d}</span>
+            </li>
+          ))}
+        </ul>
       </section>
 
       {/* ── The quote ─────────────────────────────────────────────────

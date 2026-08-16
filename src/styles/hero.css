@@ -8,14 +8,42 @@
   inherits: false;
 }
 
+/* An intro, not a section: fixed over the page rather than the first screen of
+   it. Nothing below scrolls while it is up, and when it is dismissed it is
+   unmounted — which is what makes it unreachable rather than merely passed. */
 .hero {
-  position: relative;
-  min-height: 100svh;
+  position: fixed;
+  inset: 0;
+  z-index: 90;
   display: grid;
   grid-template-rows: 1fr auto;
   overflow: hidden;
   background: var(--sunk);
   isolation: isolate;
+  animation: intro-in 0.5s var(--ease-out) both;
+}
+.hero.is-leaving { animation: intro-out 0.62s var(--ease-inout) both; }
+
+@keyframes intro-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+/* The intro does not dissolve — it is wiped away, by the same chevron the film
+   cuts on and the same one a service opens with. The page beneath is already
+   mounted and already the gateway, so this is a cut straight into the next
+   section rather than a fade to nothing and a page arriving afterwards.
+
+   Both polygons carry five points in matching units, which is the only way a
+   clip-path animates rather than snapping. */
+@keyframes intro-out {
+  from {
+    opacity: 1;
+    clip-path: polygon(0% 0%, 50% 0%, 100% 0%, 100% 100%, 0% 100%);
+  }
+  to {
+    opacity: 1;
+    clip-path: polygon(0% 0%, 50% 0%, 100% 0%, 100% -14%, 0% 0%);
+  }
 }
 
 /* ── The film layer ──────────────────────────────────────────────────── */
@@ -412,16 +440,25 @@
   overflow-wrap: normal;
 }
 
+/* The only way out of the intro, so it carries a little more weight than a
+   text link — a bordered target that reads as a control at a glance. */
 .hero-cue {
   display: inline-flex;
   align-items: center;
-  gap: 0.55rem;
+  gap: 0.7rem;
+  padding: 0.72rem 1.3rem;
+  border: 1px solid var(--line-sand);
   font-size: var(--step--2);
   font-weight: 600;
   letter-spacing: var(--track-label);
   text-transform: uppercase;
   color: var(--text-2);
-  transition: color 0.3s var(--ease-out);
+  transition: color 0.3s var(--ease-out), border-color 0.3s var(--ease-out),
+    background 0.3s var(--ease-out);
+}
+.hero-cue:hover {
+  border-color: var(--sand);
+  background: rgba(200, 169, 120, 0.08);
 }
 
 .hero-cue:hover { color: var(--oryx-white); }

@@ -582,6 +582,74 @@
   .t-road-dash { stroke-dashoffset: 0; }
 }
 
+/* ── How it runs ──────────────────────────────────────────────────────
+   Four steps as a rail with a hairline running through them — the same
+   left-to-right logic the rest of this page uses. */
+.t-process {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: clamp(3.5rem, 9vh, 6rem) var(--gutter);
+  display: grid;
+  gap: clamp(1.8rem, 4vh, 2.6rem);
+}
+.t-process-head { display: grid; gap: 0.9rem; }
+.t-process-head h3 {
+  font-family: var(--font-display);
+  font-size: var(--step-3);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: var(--track-display);
+  line-height: 1;
+  color: var(--text);
+}
+
+.t-steps {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(1rem, 2vw, 2rem);
+}
+.t-steps li {
+  position: relative;
+  padding-top: 1.6rem;
+  border-top: 1px solid var(--line-sand);
+  display: grid;
+  gap: 0.5rem;
+  align-content: start;
+  transition-delay: calc(var(--i, 0) * 80ms);
+}
+/* A dot on the rule at each step — the route line's logic, reused. */
+.t-steps li::before {
+  content: '';
+  position: absolute;
+  top: -4px;
+  left: 0;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--sand);
+}
+.t-step-n {
+  font-family: var(--font-mono);
+  font-size: var(--step--2);
+  letter-spacing: 0.14em;
+  color: var(--sand-text);
+  font-variant-numeric: tabular-nums;
+}
+.t-step-k {
+  font-family: var(--font-display);
+  font-size: var(--step-2);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: var(--track-display);
+  line-height: 1;
+  color: var(--text);
+}
+.t-step-d { font-size: var(--step--1); line-height: 1.55; color: var(--text-2); }
+
+@media (max-width: 820px) {
+  .t-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
 /* ── Interlude ────────────────────────────────────────────────────────── */
 .t-interlude {
   position: relative;

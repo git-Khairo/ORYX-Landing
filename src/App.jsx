@@ -1,11 +1,13 @@
 import { useState } from 'react'
 import Nav from './components/Nav'
+import Cursor from './components/Cursor'
 import ServiceWorld from './components/ServiceWorld'
 import Hero from './sections/Hero'
 import Work from './sections/Work'
 import Footer from './sections/Footer'
 import { services } from './content/copy'
 import './styles/nav.css'
+import './styles/cursor.css'
 import './styles/hero.css'
 import './styles/work.css'
 /* One shell, three worlds. `service.css` is gone with the single-template
@@ -20,11 +22,20 @@ import './styles/world-identity.css'
 import './styles/footer.css'
 
 /**
- * Three surfaces — the opening film, the working screen, the close — plus the
- * service world that opens over all of them.
+ * The site is two surfaces and an intro.
+ *
+ * The film is no longer the first section of a scrollable page — it is an
+ * overlay that plays over a locked page and then leaves for good. That is a
+ * deliberate difference: a hero you can scroll back up to is a section, and a
+ * visitor who returns to the top mid-read gets twenty seconds of titles they
+ * did not ask for. Held as an intro, the film is a thing that happens once,
+ * can be dismissed at any point, and cannot be stumbled back into.
  */
 export default function App() {
   const [openId, setOpenId] = useState(null)
+  /* Once this is true the film is unmounted, not hidden — there is no path
+     back to it short of reloading, which is exactly the intent. */
+  const [introDone, setIntroDone] = useState(false)
   const service = services.find((s) => s.id === openId) || null
 
   /**
@@ -53,11 +64,19 @@ export default function App() {
 
   return (
     <>
-      <a className="skip-link" href="#work">Skip the intro</a>
+      {/* Only once the film has gone. While the intro is up the page beneath
+          is locked, so a link promising to jump into it would be a dead end —
+          the intro's own control is the way through, and it is reachable by
+          keyboard from the first frame. */}
+      {introDone && <a className="skip-link" href="#work">Skip to services</a>}
+      {/* The chrome stays mounted underneath the film so the page is already
+          there the instant the intro clears — nothing has to load in behind it. */}
+      <Cursor />
       <Nav />
-      <Hero />
       <Work onOpenService={open} />
       <Footer onOpenService={open} />
+
+      {!introDone && <Hero onFinish={() => setIntroDone(true)} />}
 
       {service && (
         <ServiceWorld

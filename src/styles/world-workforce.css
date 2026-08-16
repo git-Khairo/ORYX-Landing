@@ -388,6 +388,107 @@
 }
 .w-crew-shot img { width: 100%; aspect-ratio: 21 / 9; object-fit: cover; }
 
+/* ── How we place people ─────────────────────────────────────────────
+   Numbered entries down a single column, generously spaced. Transport lays
+   its four steps out as a rail because a rail is how a route reads; this page
+   reads top to bottom, so its steps do too. */
+.w-process {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: clamp(3.5rem, 9vh, 6rem) var(--gutter);
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: clamp(2rem, 5vw, 4rem);
+  align-items: start;
+}
+.w-process-head { position: sticky; top: 2rem; display: grid; gap: 0.9rem; }
+.w-process-head h3 { font-size: var(--step-3); color: var(--text); max-width: 14ch; }
+
+.w-steps { display: grid; }
+.w-steps li {
+  display: grid;
+  grid-template-columns: 3.2rem minmax(0, 1fr);
+  gap: 1.2rem;
+  padding: clamp(1.3rem, 3.2vh, 1.9rem) 0;
+  border-top: 1px solid var(--line);
+  transition-delay: calc(var(--i, 0) * 70ms);
+}
+.w-steps li:last-child { border-bottom: 1px solid var(--line); }
+.w-step-n {
+  font-size: var(--step--2);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  color: var(--sand-text);
+  font-variant-numeric: tabular-nums;
+  padding-top: 0.4rem;
+}
+.w-step-body { display: grid; gap: 0.35rem; }
+.w-step-k {
+  font-family: var(--font-display);
+  font-variation-settings: 'opsz' 72, 'SOFT' 40;
+  font-size: var(--step-2);
+  font-weight: 500;
+  line-height: 1.05;
+  color: var(--text);
+}
+.w-step-d { font-size: var(--step-0); line-height: 1.6; color: var(--text-2); max-width: 46ch; }
+
+/* ── The kit ──────────────────────────────────────────────────────────
+   What a site manager physically sees. Set on the darker cream band so it
+   reads as evidence set apart from the argument around it. */
+.w-kit {
+  background: var(--raise-2);
+  border-block: 1px solid var(--line);
+  padding: clamp(3.5rem, 9vh, 6rem) var(--gutter);
+  display: grid;
+  gap: clamp(2rem, 5vh, 3rem);
+}
+.w-kit-copy {
+  max-width: var(--maxw);
+  width: 100%;
+  margin: 0 auto;
+  display: grid;
+  gap: 0.9rem;
+}
+.w-kit-copy h3 { font-size: var(--step-3); color: var(--text); max-width: 18ch; }
+
+.w-kit-list {
+  max-width: var(--maxw);
+  width: 100%;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+}
+.w-kit-list li {
+  background: var(--tone);
+  padding: clamp(1.4rem, 3.5vh, 2rem) clamp(1.1rem, 1.8vw, 1.5rem);
+  display: grid;
+  gap: 0.5rem;
+  align-content: start;
+  transition-delay: calc(var(--i, 0) * 70ms);
+}
+/* The mark on every item — this section is literally about the mark being
+   visible on site, so it appears on each piece of kit. */
+.w-kit-mark {
+  width: 12px;
+  aspect-ratio: 0.4161;
+  background: var(--deep-brown);
+  -webkit-mask: url('/mark.png') center / contain no-repeat;
+  mask: url('/mark.png') center / contain no-repeat;
+  margin-bottom: 0.4rem;
+}
+.w-kit-k { font-size: var(--step-1); font-weight: 600; color: var(--text); line-height: 1.15; }
+.w-kit-d { font-size: var(--step--1); line-height: 1.5; color: var(--text-2); }
+
+@media (max-width: 900px) {
+  .w-process { grid-template-columns: 1fr; }
+  .w-process-head { position: static; }
+  .w-kit-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
 /* ── The quote ────────────────────────────────────────────────────────
    Set at display size with no quotation marks drawn around it — the measure,
    the indent and the attribution do that work. A pull quote in a box would be

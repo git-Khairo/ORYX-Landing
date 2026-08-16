@@ -11,16 +11,30 @@
   /* Each world sits in its own light — three near-blacks a degree apart. */
   background: var(--tone, var(--ground));
   color: var(--text-2);
-  /* `both` so the overlay holds the animation's end state, and an animation
-     rather than a JS-toggled class so it cannot stall half-transparent while
-     still trapping focus — see WorldShell. Reduced motion collapses the
-     duration globally, which leaves the end state intact. */
-  animation: world-in 0.45s var(--ease-out) both;
+  /* Opening a service uses the film's own cut: a chevron taken off the mark,
+     rising over the page. It is deliberately identical for all three — the
+     worlds behind it could not look more different from each other, and one
+     shared way in is what says they are three parts of one company rather
+     than three unrelated sites.
+
+     An animation rather than a JS-toggled class, so it cannot stall part-way
+     while still trapping focus, and `both` so the overlay holds the end state.
+     Reduced motion collapses the duration globally and leaves that end state
+     intact. */
+  animation: world-in 0.72s var(--ease-inout) both;
 }
 
+/* The same shape the film cuts on: a panel whose leading edge is the mark's V,
+   with the notch closing as it lands so the world finishes on a flat edge. */
 @keyframes world-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 1;
+    clip-path: polygon(0% 100%, 50% 114%, 100% 100%, 100% 100%, 0% 100%);
+  }
+  to {
+    opacity: 1;
+    clip-path: polygon(0% 0%, 50% 0%, 100% 0%, 100% 100%, 0% 100%);
+  }
 }
 
 .world-shell { position: relative; height: 100%; display: flex; flex-direction: column; }
@@ -131,3 +145,8 @@
 .t-open-copy h2,
 .w-open-copy h2,
 .r-open-copy h2 { font-size: var(--step-4); color: var(--oryx-white); }
+/* The headline is authored as two lines and set as two lines — a break that
+   the copy chose rather than one the measure happened to produce. */
+.t-open-copy h2 span,
+.w-open-copy h2 span,
+.r-open-copy h2 span { display: block; }

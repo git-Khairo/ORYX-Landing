@@ -54,8 +54,16 @@ export default function RenovationWorld({ service, onClose, onRequest }) {
       <header className="r-open">
         <Media clip={film.renovation} />
         <div className="r-open-copy">
-          <p className="world-eyebrow" data-reveal>{service.index} · Service</p>
-          <h2 data-reveal>{service.title}</h2>
+          <p className="world-eyebrow" data-reveal>
+            {service.index} · {service.title}
+          </p>
+          {/* The headline carries the opening, not the service name — the name
+              is already in the eyebrow above it and in the navigation. */}
+          <h2 data-reveal>
+            {world.headline.split('\n').map((l) => (
+              <span key={l}>{l}</span>
+            ))}
+          </h2>
           <p className="world-promise" data-reveal>{service.promise}</p>
         </div>
       </header>
@@ -149,6 +157,25 @@ export default function RenovationWorld({ service, onClose, onRequest }) {
             </div>
           ))}
         </div>
+      </section>
+
+      {/* ── How a job runs ────────────────────────────────────────────
+          Four notes on the sheet: survey, programme, build, hand back. Same
+          question the other two services answer, asked in drawing language. */}
+      <section className="r-process" id="r-process">
+        <div className="r-process-head">
+          <p className="world-kicker" data-reveal>How a job runs</p>
+          <h3 data-reveal>Survey to handover</h3>
+        </div>
+        <ol className="r-steps">
+          {world.process.map((st, i) => (
+            <li key={st.k} data-reveal style={{ '--i': i }}>
+              <span className="r-step-n">{`N${i + 1}`}</span>
+              <span className="r-step-k">{st.k}</span>
+              <span className="r-step-d">{st.d}</span>
+            </li>
+          ))}
+        </ol>
       </section>
 
       {/* ── The layers ────────────────────────────────────────────────── */}

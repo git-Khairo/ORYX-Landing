@@ -1,57 +1,51 @@
 /* ══ Nav ════════════════════════════════════════════════════════════════
-   A compact glass pill, centred.
+   A bar, not a pill.
 
-   Rebuilt down from a much fussier version carrying an edge-refraction layer,
-   a chromatic fringe and a raking sheen. All three were attempts to simulate
-   glass, and together they read as a second object floating inside the first.
-   What actually sells it is unglamorous: one blur, one flat translucent fill,
-   one hairline border, one soft cast shadow. Nothing else. */
+   The glass pill spoke a language nothing else on the site speaks any more —
+   soft, floating, rounded — against a gateway and a footer that are flat,
+   ruled and typographic. This is built the same way they are: the wordmark in
+   Cinzel at left, a slash-separated pair of links at right, sand on hover.
+
+   It carries no background. The gateway is locked to exactly one screen and
+   the doors run its full height, so an opaque bar would eat into that
+   composition; a soft scrim at the top of the frame does the legibility work
+   and costs no layout. */
 .nav {
   position: fixed;
-  top: clamp(0.8rem, 2vh, 1.4rem);
-  left: 50%;
-  transform: translateX(-50%);
+  top: 0;
+  left: 0;
+  right: 0;
   z-index: 60;
-  width: max-content;
-  max-width: calc(100vw - 2 * var(--gutter));
-
   display: flex;
   align-items: center;
-  gap: clamp(3.5rem, 14vw, 11rem);
-  padding: 0.42rem 1.4rem;
-  border-radius: 999px;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: clamp(1rem, 2.6vh, 1.6rem) var(--gutter);
+  pointer-events: none;
+}
+/* Only the controls take the pointer — the bar itself must not sit over the
+   doors and swallow their hovers. */
+.nav > * { pointer-events: auto; }
 
-  /* You have to be able to SEE THROUGH it. Glass does not remove what is
-     behind it, it displaces it — so the blur stays low enough for shapes to
-     survive and the fill is nearly nothing. The frosted quality comes from the
-     blur, never from opacity.
-
-     The rim is sand rather than white now. On a dark site a white rim was the
-     brightest thing on the page and pulled focus from the film; sand at low
-     alpha reads as a lit edge and belongs to the palette. */
-  backdrop-filter: blur(14px) saturate(140%) brightness(0.92);
-  -webkit-backdrop-filter: blur(14px) saturate(140%) brightness(0.92);
-  background: rgba(19, 19, 17, 0.32);
-  border: 1px solid var(--line-sand);
-  box-shadow:
-    inset 0 1px 0 0 rgba(200, 169, 120, 0.22),
-    0 10px 30px -16px rgba(0, 0, 0, 0.7);
-  color: var(--oryx-white);
+.nav::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    rgba(13, 13, 12, 0.72) 0%,
+    rgba(13, 13, 12, 0.36) 55%,
+    transparent 100%
+  );
 }
 
 /* ── Mark ─────────────────────────────────────────────────────────────── */
-.nav-mark {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.6rem;
-  flex: none;
-}
-
-/* The mark as a mask rather than an image, so it is painted sand instead of
-   being an inverted black PNG pretending to be white. */
+.nav-mark { display: inline-flex; align-items: center; gap: 0.7rem; }
 .nav-mark i {
   display: block;
-  width: 15px;
+  width: 14px;
   aspect-ratio: 0.4161;
   background: var(--sand);
   -webkit-mask: url('/mark.png') center / contain no-repeat;
@@ -61,33 +55,34 @@
 .nav-mark:hover i { background: var(--oryx-white); }
 
 .nav-mark span {
-  color: var(--oryx-white);
-  font-family: var(--font-display);
-  font-size: 1.02rem;
+  font-family: var(--font-group);
+  font-size: clamp(0.78rem, 0.95vw, 0.95rem);
   font-weight: 600;
-  letter-spacing: 0.24em;
-  margin-right: -0.24em;
+  letter-spacing: 0.3em;
+  margin-right: -0.3em;
+  text-transform: uppercase;
+  color: var(--oryx-white);
 }
 
-/* ── Action ───────────────────────────────────────────────────────────── */
-/* Plain text. A filled pill inside a pill read as two nested ovals and broke
-   the single-object illusion the glass depends on. */
-.nav-cta {
-  flex: none;
+/* ── Links ────────────────────────────────────────────────────────────
+   Slash-separated, the way the descriptor line and the legal line are. */
+.nav-links {
   display: inline-flex;
   align-items: center;
-  gap: 0.45rem;
-  color: var(--text-2);
-  font-family: var(--font);
-  font-size: var(--step--1);
-  font-weight: 500;
-  letter-spacing: 0.02em;
-  transition: color 0.3s var(--ease-out);
+  gap: 0.9rem;
+  font-size: var(--step--2);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
 }
-.nav-cta:hover { color: var(--oryx-white); }
-.nav-cta i { font-style: normal; transition: transform 0.3s var(--ease-out); }
-.nav-cta:hover i { transform: translateX(4px); }
+.nav-links a {
+  color: var(--text-2);
+  transition: color 0.25s var(--ease-out);
+}
+.nav-links a:hover { color: var(--sand); }
+.nav-links span { color: var(--line-sand); }
 
-@media (max-width: 860px) {
-  .nav { gap: 1.6rem; padding-inline: 1.1rem; }
+@media (max-width: 560px) {
+  .nav-mark span { letter-spacing: 0.2em; margin-right: -0.2em; }
+  .nav-links { gap: 0.7rem; }
 }

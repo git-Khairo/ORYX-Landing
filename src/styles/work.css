@@ -1,105 +1,94 @@
-/* ══ Work — service rows and the group ══════════════════════════════════
-   The split is the board's own: film on the left, a cream panel on the right.
-   That is exactly how the identity sheet is laid out — a black field carrying
-   the imagery with one Oryx White column of reading beside it — so the page
-   inherits the composition rather than inventing a new one. It also gives the
-   dark run its first intermission at the point where the text gets longest. */
-.work { min-height: 100svh; display: flex; background: var(--ground); }
-.work-grid {
-  flex: 1;
-  min-height: 100svh;
+/* ══ The gateway ════════════════════════════════════════════════════════
+   Three vertical doors and the board's purpose panel, side by side. The split
+   is the identity sheet's own: a black field carrying the imagery with one
+   Oryx White column of reading beside it. */
+.gate {
+  /* Exactly one screen, not "at least" one. With `min-height` the panel's
+     content could push the section taller than the viewport, which took the
+     doors' titles below the fold and cut them off. Fixed height plus
+     `overflow: hidden` makes the constraint real, and everything inside is
+     sized to fit it. */
+  height: 100svh;
+  overflow: hidden;
   display: grid;
-  grid-template-columns: 2fr 1fr;
+  grid-template-columns: 1.7fr 1fr;
+  background: var(--ground);
 }
 
-/* ── The three services, as rows ──────────────────────────────────────── */
-/* No top inset and no rules on the outside — the section meets the hero edge
-   to edge, and the only lines inside it are the ones between its own rows. */
-.rows {
-  background: var(--sunk);
+/* ── The doors ────────────────────────────────────────────────────────
+   Vertical, because that is what a door is. The one you are pointed at opens
+   and takes most of the width; the other two stay shut and carry their names
+   up their own edge. */
+.doors {
   display: flex;
-  flex-direction: column;
   min-width: 0;
+  background: var(--sunk);
 }
 
-.row {
+.door {
   position: relative;
   flex: 1 1 0;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+  min-width: 0;
   overflow: hidden;
   text-align: left;
-  padding: clamp(1rem, 2.4vh, 1.9rem) clamp(1.2rem, 2.4vw, 2.6rem);
-  border-bottom: 1px solid var(--line);
-  transition: flex-grow 0.8s var(--ease-out);
+  border-right: 1px solid var(--line);
+  /* The open door takes roughly half the row and the two closed ones share
+     what is left. Transitioned on flex-grow rather than width so the three
+     always add up to the space available, whatever it is. */
+  transition: flex-grow 0.75s var(--ease-out);
 }
-.row:last-child { border-bottom: 0; }
-/* No reserved height: the pill floats above the layout, so the first row runs
-   straight up to the hero edge and only keeps the breathing room that the rows
-   below get from the row above them. */
-.rows > .row:first-child { padding-top: clamp(1.4rem, 4vh, 2.8rem); }
-.row.is-on { flex-grow: 1.9; }
+.door:last-child { border-right: 0; }
+.door.is-on { flex-grow: 3.4; }
 
-/* A sand hairline marks the open row. One accent, doing one job — saying which
-   of the three you are pointed at, which nothing else on this panel says. */
-.row::before {
+/* A sand rule down the leading edge of the open door — the one accent, saying
+   which of the three you are in front of. */
+.door::before {
   content: '';
   position: absolute;
   left: 0;
   top: 0;
   bottom: 0;
   width: 2px;
+  z-index: 3;
   background: var(--sand);
   transform: scaleY(0);
   transform-origin: top;
-  transition: transform 0.6s var(--ease-out);
-  z-index: 2;
+  transition: transform 0.7s var(--ease-out);
 }
-.row.is-on::before { transform: scaleY(1); }
+.door.is-on::before { transform: scaleY(1); }
 
-/* The film runs the whole time. Only its brightness responds to attention —
-   the open row's clip comes up, the other two sit back. */
-.row-film {
-  position: absolute;
-  inset: 0;
-  transition: opacity 0.7s var(--ease-out);
-  opacity: 0.42;
-}
-.row.is-on .row-film { opacity: 1; }
-.row-film video {
+.door-film { position: absolute; inset: 0; transition: opacity 0.7s var(--ease-out); opacity: 0.34; }
+.door.is-on .door-film { opacity: 1; }
+.door-film video {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transform: scale(1.06);
-  transition: transform 2.6s var(--ease-out);
+  transform: scale(1.08);
+  transition: transform 3s var(--ease-out);
 }
-.row.is-on .row-film video { transform: scale(1); }
-/* A dark wash from the left, so white type reads without the picture being
-   flattened. Dark, not white — a white wipe bleached the footage to fog. */
-.row-film::after {
+.door.is-on .door-film video { transform: scale(1); }
+/* Weighted to the foot, where the type sits, and heavier on a closed door so
+   the two you are not looking at read as background. */
+.door-film::after {
   content: '';
   position: absolute;
   inset: 0;
   background: linear-gradient(
-    90deg,
-    rgba(13, 13, 12, 0.92) 0%,
+    to top,
+    rgba(13, 13, 12, 0.95) 0%,
     rgba(13, 13, 12, 0.7) 34%,
-    rgba(13, 13, 12, 0.34) 66%,
-    rgba(13, 13, 12, 0.18) 100%
+    rgba(13, 13, 12, 0.4) 70%,
+    rgba(13, 13, 12, 0.3) 100%
   );
 }
 
-.row-line {
-  position: relative;
-  z-index: 1;
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: baseline;
-  gap: clamp(0.9rem, 2vw, 1.8rem);
-}
-.row-index {
+.door-index {
+  position: absolute;
+  top: clamp(1.2rem, 3vh, 2rem);
+  left: 0;
+  right: 0;
+  z-index: 2;
+  text-align: center;
   font-size: var(--step--2);
   font-weight: 600;
   letter-spacing: var(--track-label);
@@ -107,257 +96,299 @@
   font-variant-numeric: tabular-nums;
   transition: color 0.4s var(--ease-out);
 }
-.row.is-on .row-index { color: var(--sand-text); }
-.row-title {
-  font-size: var(--step-3);
+.door.is-on .door-index { color: var(--sand-text); }
+
+/* The closed door's name, running up its edge. A long title has as much room
+   as the door is tall, which is what makes a narrow column survivable. */
+.door-spine {
+  position: absolute;
+  left: 50%;
+  bottom: clamp(1.6rem, 4vh, 2.6rem);
+  z-index: 2;
+  translate: -50% 0;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
   font-family: var(--font-display);
-  font-weight: 400;
+  font-size: clamp(1.1rem, 1.6vw, 1.5rem);
+  text-transform: uppercase;
+  letter-spacing: var(--track-display-lg);
+  color: var(--oryx-white);
+  white-space: nowrap;
+  transition: opacity 0.35s var(--ease-out);
+}
+.door.is-on .door-spine { opacity: 0; }
+
+/* The open door's copy, set flat. Both settings are rendered and one is
+   hidden, so the swap is instant — re-rendering the text would flicker. */
+.door-open {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  display: grid;
+  gap: 0.7rem;
+  padding: clamp(1.4rem, 4vh, 2.6rem);
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 0.5s var(--ease-out) 0.12s,
+    transform 0.6s var(--ease-out) 0.12s;
+  pointer-events: none;
+}
+.door.is-on .door-open { opacity: 1; transform: translateY(0); }
+
+.door-title {
+  font-family: var(--font-display);
+  font-size: var(--step-3);
   text-transform: uppercase;
   letter-spacing: var(--track-display);
-  line-height: 1.1;
+  line-height: 1.05;
   color: var(--oryx-white);
 }
-.row-go {
-  font-size: var(--step-1);
-  color: var(--text-3);
-  transform: translateX(-6px);
-  opacity: 0;
-  transition: transform 0.5s var(--ease-out), opacity 0.4s var(--ease-out),
-    color 0.4s var(--ease-out);
-}
-.row.is-on .row-go { opacity: 1; transform: translateX(0); color: var(--sand); }
-
-.row-detail {
-  position: relative;
-  z-index: 1;
-  display: grid;
-  grid-template-rows: 0fr;
-  opacity: 0;
-  transition: grid-template-rows 0.7s var(--ease-out), opacity 0.5s var(--ease-out);
-}
-.row-detail > span { overflow: hidden; display: block; }
-.row.is-on .row-detail { grid-template-rows: 1fr; opacity: 1; }
-.row-promise {
-  display: block;
-  padding-top: 1rem;
+.door-promise {
   font-size: var(--step-1);
   font-weight: 500;
-  color: var(--oryx-white);
-  max-width: 34ch;
+  color: var(--sand-text);
+  max-width: 30ch;
 }
-.row-body {
-  display: block;
-  margin-top: 0.5rem;
+.door-body {
   font-size: var(--step-0);
   line-height: 1.55;
   color: var(--text-2);
-  max-width: 46ch;
+  max-width: 44ch;
 }
-
-/* ── Vision / mission / values ────────────────────────────────────────
-   The cream panel. One item is always open, so the column reads as an answer
-   rather than three closed doors. No fill and no accent inside it — the only
-   things that change on open are height and the sign. */
-.pillars {
-  padding-top: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  min-width: 0;
-
-  /* The inverted band, declared through the same tokens the rest of the site
-     uses, so everything nested inside flips with it. */
-  background: var(--invert-bg);
-  color: var(--invert-text-2);
-  --text: var(--invert-text);
-  --text-2: var(--invert-text-2);
-  --text-3: #7d7a72;
-  --sand-text: #8a6a3b;
-  --line: var(--invert-line);
-  --line-soft: rgba(28, 28, 26, 0.07);
-}
-
-.pillar {
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-  flex: 0 0 auto;
-  border-bottom: 1px solid var(--line-soft);
-  /* Slower and softer than the rest of the page. An accordion that snaps draws
-     attention to the mechanism; this one should just settle. */
-  transition: flex 0.9s cubic-bezier(0.32, 0.72, 0, 1);
-}
-.pillar:last-child { border-bottom: 0; }
-.pillar.is-open { flex: 1 1 auto; }
-
-.pillar-head {
-  display: grid;
-  grid-template-columns: 2.4rem 1fr auto;
-  align-items: baseline;
-  gap: 0 1rem;
-  width: 100%;
-  /* Roomy. The head row is the resting state of this column and carries it. */
-  padding: clamp(1.5rem, 3.4vh, 2.4rem) clamp(1.4rem, 2.2vw, 2.4rem);
-  text-align: left;
-  transition: opacity 0.4s var(--ease-out);
-}
-.pillar-head:hover { opacity: 0.62; }
-
-.pillar-n {
+.door-go {
+  margin-top: 0.4rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
   font-size: var(--step--2);
   font-weight: 600;
   letter-spacing: var(--track-label);
-  color: var(--text-3);
-  font-variant-numeric: tabular-nums;
-}
-.pillar-label {
-  font-family: var(--font-display);
-  font-size: var(--step-2);
-  font-weight: 400;
   text-transform: uppercase;
-  letter-spacing: var(--track-display);
-  line-height: 1;
-  color: var(--invert-text);
+  color: var(--sand);
+}
+.door-go i { font-style: normal; transition: transform 0.3s var(--ease-out); }
+.door:hover .door-go i { transform: translateX(5px); }
+
+/* ── The brand panel ─────────────────────────────────────────────────
+   Two columns: the reading, and the group's name rotated down the outer edge.
+
+   That edge is the whole idea. The doors on the left carry their names running
+   up their own edges, so the panel answers with the wordmark running down its
+   own — the two bracket the screen and it reads as one composition rather than
+   a column of words beside a column of pictures. It also gets the lockup off
+   the content column, which is what frees the full width for the statement. */
+.purpose {
+  position: relative;
+  background: var(--oryx-black);
+  border-left: 1px solid var(--line);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  min-width: 0;
+  overflow: hidden;
 }
 
-/* A plus that loses its stem. No colour change — the shape carries the state. */
-.pillar-arrow {
-  position: relative;
-  flex: none;
-  width: 12px;
-  height: 12px;
-  align-self: center;
+.purpose-body {
+  padding: clamp(1.6rem, 4vh, 2.8rem) clamp(1.4rem, 2.4vw, 2.4rem);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 0;
+  min-width: 0;
 }
-.pillar-arrow::before,
-.pillar-arrow::after {
+
+.purpose-mark {
+  width: clamp(34px, 3.2vw, 46px);
+  aspect-ratio: 0.4161;
+  background: var(--sand);
+  -webkit-mask: url('/mark.png') center / contain no-repeat;
+  mask: url('/mark.png') center / contain no-repeat;
+  margin-bottom: clamp(1rem, 2.6vh, 1.8rem);
+}
+
+/* The statement leads the panel and is set to. Montserrat, not Cinzel — Cinzel
+   is a Trajan revival whose lowercase are small capitals, so a sentence this
+   long comes out as an unbroken block of caps nobody reads. */
+.purpose-line {
+  font-size: clamp(1.05rem, 1.5vw, 1.45rem);
+  font-weight: 300;
+  line-height: 1.5;
+  letter-spacing: 0.002em;
+  color: var(--oryx-white);
+  text-wrap: pretty;
+}
+
+/* Slashes rather than bullets — the four words are a set of territories, and
+   a slash reads as a division where a bullet reads as a list item. */
+.purpose-tagline {
+  margin-top: clamp(0.9rem, 2.4vh, 1.4rem);
+  padding-bottom: clamp(1rem, 2.6vh, 1.6rem);
+  border-bottom: 1px solid var(--line);
+  width: 100%;
+  font-size: var(--step--2);
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--sand);
+}
+
+/* ── Vision, mission, values ──────────────────────────────────────────
+   A contents page: a number in the margin, the name, a sign, and a rule under
+   each. Horizontal rules and margin numerals, so it reads as an index rather
+   than as three bordered notes. */
+.mvv { width: 100%; display: flex; flex-direction: column; }
+
+.mvv-item { border-bottom: 1px solid var(--line); transition: border-color 0.5s var(--ease-out); }
+.mvv-item.is-open { border-bottom-color: var(--line-sand); }
+
+.mvv-key {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 2.6rem minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 0.9rem;
+  padding: clamp(0.7rem, 1.9vh, 1.05rem) 0;
+  text-align: left;
+  transition: opacity 0.3s var(--ease-out);
+}
+.mvv-key:hover { opacity: 0.75; }
+
+.mvv-n {
+  font-size: var(--step--2);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+  transition: color 0.4s var(--ease-out);
+}
+.mvv-item.is-open .mvv-n { color: var(--sand); }
+
+.mvv-label {
+  font-family: var(--font-display);
+  font-size: clamp(1.15rem, 1.7vw, 1.6rem);
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  line-height: 1;
+  color: var(--oryx-white);
+}
+
+/* A plus that loses its stem. The shape carries the state — quieter than a
+   spinning chevron and read just as fast. */
+.mvv-sign { position: relative; align-self: center; flex: none; width: 11px; height: 11px; }
+.mvv-sign::before,
+.mvv-sign::after {
   content: '';
   position: absolute;
   inset: 0;
   margin: auto;
-  background: var(--invert-text);
-  transition: transform 0.5s var(--ease-out);
+  background: var(--sand);
+  transition: transform 0.45s var(--ease-out);
 }
-.pillar-arrow::before { width: 12px; height: 1px; }
-.pillar-arrow::after { width: 1px; height: 12px; }
-.pillar.is-open .pillar-arrow::after { transform: scaleY(0); }
+.mvv-sign::before { width: 11px; height: 1px; }
+.mvv-sign::after { width: 1px; height: 11px; }
+.mvv-item.is-open .mvv-sign::after { transform: scaleY(0); }
 
-.pillar-panel {
+.mvv-panel {
   display: grid;
   grid-template-rows: 0fr;
   opacity: 0;
-  transition: grid-template-rows 0.9s cubic-bezier(0.32, 0.72, 0, 1),
-    opacity 0.5s var(--ease-out);
+  transition: grid-template-rows 0.55s var(--ease-out), opacity 0.35s var(--ease-out);
 }
-/* The fade trails the height so contents arrive into a space already opening,
-   rather than being revealed by the edge of a clip as it passes over them. */
-.pillar.is-open .pillar-panel {
+.mvv-item.is-open .mvv-panel {
   grid-template-rows: 1fr;
   opacity: 1;
-  transition: grid-template-rows 0.9s cubic-bezier(0.32, 0.72, 0, 1),
-    opacity 0.6s var(--ease-out) 0.16s;
+  /* The fade trails the height so the words arrive into a space already
+     opening, rather than being wiped in by the edge of a clip. */
+  transition: grid-template-rows 0.55s var(--ease-out),
+    opacity 0.4s var(--ease-out) 0.12s;
 }
+.mvv-inner { overflow: hidden; }
+
 /* Indented to the number column, so the panel hangs off the same axis as the
-   label above it rather than starting at the section edge. */
-.pillar-inner {
-  overflow: hidden;
-  padding-left: calc(clamp(1.4rem, 2.2vw, 2.4rem) + 3.4rem);
-  padding-right: clamp(1.4rem, 2.2vw, 2.4rem);
-}
-.pillar.is-open .pillar-inner { padding-bottom: clamp(1.6rem, 3.4vh, 2.4rem); }
-
-/* Quieter than the label above it. The panel is supporting detail, so it reads
-   at body size and body weight — set larger it competed with the very heading
-   that opened it. */
-.pillar-headline {
+   name above it instead of starting at the panel edge. */
+.mvv-item p {
+  padding: 0 0 clamp(0.7rem, 1.9vh, 1.05rem) 3.5rem;
   font-size: var(--step-0);
-  font-weight: 500;
-  line-height: 1.5;
-  color: var(--invert-text);
-  max-width: 32ch;
+  font-weight: 300;
+  line-height: 1.6;
+  color: var(--text-2);
 }
 
-/* Four named values, term and gloss on one line each. */
-.pillar-points {
-  margin-top: 1.3rem;
-  display: grid;
-  gap: 0.7rem;
+.mvv-vals {
+  padding: 0 0 clamp(0.7rem, 1.9vh, 1.05rem) 3.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
 }
-.pillar-points div {
-  display: grid;
-  grid-template-columns: 8.5rem 1fr;
-  gap: 0.2rem 1rem;
-  padding-top: 0.7rem;
-  border-top: 1px solid var(--line-soft);
+.mvv-vals li {
+  padding: 6px 11px;
+  border: 1px solid var(--line-sand);
+  font-size: var(--step--2);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-2);
+  transition: border-color 0.3s var(--ease-out), color 0.3s var(--ease-out);
 }
-.pillar-points dt {
+.mvv-vals li:hover { border-color: var(--sand); color: var(--sand); }
+
+.purpose-foot {
+  margin-top: clamp(1rem, 2.6vh, 1.6rem);
   font-size: var(--step--2);
   font-weight: 600;
-  color: var(--invert-text);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--sand);
 }
-.pillar-points dd {
-  font-size: var(--step--2);
-  line-height: 1.55;
-  color: var(--invert-text-2);
+
+/* ── The spine ────────────────────────────────────────────────────────
+   The group's name down the outer edge, answering the door spines opposite.
+
+   `vertical-rl`, not `sideways-rl`. Both read top-to-bottom here and look
+   identical, but `sideways-rl` is unsupported in Safari, where it falls back
+   to horizontal text — which would put the whole wordmark across a 49px
+   column and break the panel outright. The doors run the same property with a
+   180° flip, so the two spines rotate toward each other rather than both
+   leaning the same way. */
+.purpose-spine {
+  writing-mode: vertical-rl;
+  display: grid;
+  place-items: center;
+  padding: clamp(1.2rem, 3vh, 2rem) clamp(0.5rem, 1vw, 0.9rem);
+  border-left: 1px solid var(--line);
+  font-family: var(--font-group);
+  font-size: clamp(0.8rem, 1.05vw, 1.05rem);
+  font-weight: 600;
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+  color: var(--oryx-white);
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 /* ══ Small screens ══════════════════════════════════════════════════════
-   The desktop layout is built on two things that do not exist on a phone: a
-   viewport wide enough to hold two columns, and a pointer to reveal with. Both
-   assumptions are dropped here rather than scaled down.
-
-   - The screen stops being one viewport tall. Squeezing six blocks into 100svh
-     gave every one of them about a sixth of a phone screen.
-   - Rows no longer compete for height with flex-grow — each is a fixed, honest
-     block, and none of them is "active".
-   - Nothing hides behind hover. Every row shows its promise outright, because
-     a tap that reveals text the visitor cannot see is not discoverable. */
+   Two assumptions do not survive a phone: a viewport wide enough for two
+   columns, and a pointer to open a door with. Both are dropped rather than
+   scaled down — every door shows its own copy outright, because a tap that
+   reveals text the visitor cannot see is not discoverable. */
 @media (max-width: 1000px) {
-  .work,
-  .work-grid {
-    min-height: 0;
-    display: block;
-  }
-  .rows { border-right: 0; }
+  .gate { grid-template-columns: 1fr; height: auto; overflow: visible; }
+  /* The spine is a wide-screen idea — on a phone the panel is not tall enough
+     for a rotated wordmark to be anything but a stripe, so it goes. */
+  .purpose { grid-template-columns: 1fr; overflow: visible; }
+  .purpose-spine { display: none; }
 
-  .row,
-  .row.is-on {
-    flex: none;
-    min-height: 0;
-    padding: clamp(1.6rem, 5vw, 2.2rem) var(--gutter);
-  }
-  .rows > .row:first-child { padding-top: clamp(1.6rem, 5vw, 2.2rem); }
+  .doors { flex-direction: column; }
+  .door,
+  .door.is-on { flex: none; min-height: 46svh; border-right: 0; border-bottom: 1px solid var(--line); }
+  .door::before { display: none; }
+  .door-film { opacity: 1; }
+  .door-spine { display: none; }
+  .door-open { opacity: 1; transform: none; position: static; padding-top: 30svh; }
+  .door-index { text-align: left; padding-inline: clamp(1.4rem, 4vh, 2.6rem); }
+  .door-body { display: none; }
 
-  /* With no hover there is no "chosen" row, so the sand rule would be lying. */
-  .row::before { display: none; }
-
-  /* Film stays visible on every row: with no hover there is no "chosen" one. */
-  .row-film { opacity: 1; }
-  .row-film::after {
-    background: linear-gradient(
-      to top,
-      rgba(13, 13, 12, 0.94) 0%,
-      rgba(13, 13, 12, 0.74) 55%,
-      rgba(13, 13, 12, 0.58) 100%
-    );
-  }
-
-  .row-line { grid-template-columns: auto 1fr auto; align-items: center; }
-  .row-title { font-size: var(--step-2); }
-  .row-go { opacity: 1; transform: none; color: var(--sand); }
-
-  /* The promise is always readable; only the long body stays folded away. */
-  .row-detail,
-  .row.is-on .row-detail { grid-template-rows: 1fr; opacity: 1; }
-  .row-promise { padding-top: 0.8rem; font-size: var(--step-0); }
-  .row-body { display: none; }
-
-  .pillars { padding-top: 0; }
-  .pillar,
-  .pillar.is-open { flex: none; }
-  .pillar-head { padding: 1.2rem var(--gutter); }
-  .pillar-inner {
-    padding-left: var(--gutter);
-    padding-right: var(--gutter);
-  }
-  .pillar-points div { grid-template-columns: 1fr; gap: 0.15rem; }
+  .vmv-points div { grid-template-columns: 1fr; gap: 0.1rem; }
 }

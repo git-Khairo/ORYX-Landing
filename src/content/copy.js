@@ -25,6 +25,21 @@ export const brand = {
   /* The board's four-part descriptor. Chrome and metadata only — it says what
      the company does, where the slogan says what it is like to work with. */
   descriptor: ['Building', 'People', 'Services', 'Solutions'],
+  /* The board sets its four descriptor words as a list with a line of
+     explanation against each. Kept in that form, because four abstract nouns
+     on their own say almost nothing — it is the gloss that makes them a
+     description of a company rather than a mood. */
+  descriptorNotes: [
+    { k: 'Building', d: 'Refurbishment and fit-out of commercial premises.' },
+    { k: 'People', d: 'Crew, cleaning teams and facility staff, placed and supervised.' },
+    { k: 'Services', d: 'The day-to-day work that keeps a site open and running.' },
+    { k: 'Solutions', d: 'Transport and logistics, with the reporting that proves them.' },
+  ],
+  /* The identity board's own purpose statement, used verbatim. It sits beside
+     the three services on the gateway, which is the only place on the site
+     that has to answer "who is this" before "what do they do". */
+  purpose:
+    'We build, support and deliver essential services and smart solutions that create value, empower people and build a better tomorrow.',
   region: 'Netherlands',
 }
 
@@ -143,6 +158,18 @@ export const services = [
     promise: 'Moved on time, tracked end to end.',
     body: 'Fixed routes for predictable volume and on-demand capacity for everything else, run for organisations that cannot afford to find out late.',
     world: {
+      /* The opening line of the world. Short and declarative, where the body
+         copy stays discursive — a headline and an essay are different jobs. */
+      headline: 'Moved on time.\nTracked to the door.',
+      /* Four steps, in this trade's own language. Every service answers "how
+         does this actually work", and each answers it in its own words rather
+         than a shared template with the nouns swapped. */
+      process: [
+        { k: 'Brief', d: 'What moves, from where, how often, and what it costs you if it is late.' },
+        { k: 'Plan', d: 'Route built, load sequenced by drop order, slot confirmed in writing.' },
+        { k: 'Run', d: 'Collected, sealed and tracked, with exceptions reported before you ask.' },
+        { k: 'Prove', d: 'Signed and timestamped at the door, proof returned the same day.' },
+      ],
       lede: 'Most delivery problems are not driving problems. They are information problems — you find out late, and by then the only choice left is which apology to make. We plan routes to be reported, not chased.',
       /* The route this page is built around. Each stop is a section; scroll
          position moves the marker down the line. */
@@ -206,6 +233,26 @@ export const services = [
     promise: 'The right people, placed where the work is.',
     body: 'Event crew, cleaning teams, facility staff — supplied to organisations and clients who need capable people at short notice and to a known standard.',
     world: {
+      headline: 'The right people.\nWhere they are needed.',
+      process: [
+        { k: 'Brief', d: 'The role, the site, the shift pattern and the skills that actually matter.' },
+        { k: 'Screen', d: 'Right to work, tickets and references checked before anyone is put forward.' },
+        { k: 'Deploy', d: 'Briefed on the building and the task before the first shift starts.' },
+        { k: 'Supervise', d: 'Attendance, conduct and replacement cover stay our problem, not yours.' },
+      ],
+      /* The most concrete thing this service can say. Uniform, badge and a
+         named supervisor are what a site manager actually sees on the day —
+         everything else on the page is a promise about them. */
+      kit: {
+        head: 'You will know our people on sight',
+        line: 'Every ORYX worker arrives badged, briefed and in branded workwear, so your supervisor always knows who is on the floor.',
+        items: [
+          { k: 'Branded workwear', d: 'Issued and replaced by us, to your site rules.' },
+          { k: 'Certified PPE', d: 'To the standard the site requires, checked before entry.' },
+          { k: 'Photo ID badge', d: 'Worn visibly, matched to the name on your rota.' },
+          { k: 'A named supervisor', d: 'One per shift, on site, reachable.' },
+        ],
+      },
       lede: 'Staffing is judged on the shifts nobody remembers. The right number of people arrived, they knew the site, they knew the standard, and the day ran. We supply people the way an operations team would want them supplied.',
       /* The shift this page is built around — the timetable is the layout. */
       shift: [
@@ -314,6 +361,13 @@ export const services = [
     promise: 'Buildings brought back into service.',
     body: 'Refurbishment and fit-out of commercial premises, coordinated as one accountable programme rather than a queue of separate trades.',
     world: {
+      headline: 'Back in service.\nOn the date you were given.',
+      process: [
+        { k: 'Survey', d: 'Measured and recorded, then priced against a written scope.' },
+        { k: 'Programme', d: 'Every trade sequenced into one contract with one completion date.' },
+        { k: 'Build', d: 'Phased around occupation, reported weekly against the programme.' },
+        { k: 'Hand back', d: 'Snagged, cleaned, documented and signed off against the scope.' },
+      ],
       lede: 'Renovation goes wrong in the gaps between trades — the week nobody booked, the decision nobody owned. Held as one programme those gaps stop existing, and the building comes back into service on the date you were given.',
       /* The layer stack this page is built around — assembled on scroll, in
          the order the building itself is assembled. */
