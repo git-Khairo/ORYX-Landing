@@ -3,6 +3,7 @@ import gsap from 'gsap'
 import FilmStage from '../components/FilmStage'
 import InitialsReveal from '../components/InitialsReveal'
 import { acts, brand } from '../content/copy'
+import { promo } from '../content/media'
 import { usePrefersReduced } from '../lib/usePrefersReduced'
 import { useScrollLock, useEscape } from '../lib/useOverlay'
 
@@ -19,8 +20,121 @@ import { useScrollLock, useEscape } from '../lib/useOverlay'
  * unmounted when dismissed, so there is no scrolling back up to it. The skip
  * control is present from the first frame for anyone who does not want the
  * twenty seconds.
+ *
+ * ── Two modes ────────────────────────────────────────────────────────────
+ * Setting `promo.src` in `media.js` replaces all of the above with one edited
+ * video followed by the same end card. The five-shot sequence stays in the
+ * file until that video exists, because deleting it first would leave the site
+ * with no intro at all in the meantime — it is scaffolding with a removal date,
+ * not a second supported path. Once the promo is in, `acts`, `FilmStage`,
+ * `InitialsReveal` and everything under `PlayedSequence` come out.
  */
 export default function Hero({ onFinish }) {
+  return promo.src ? <PromoFilm onFinish={onFinish} /> : <PlayedSequence onFinish={onFinish} />
+}
+
+/**
+ * The single-file intro: one video, then the card.
+ *
+ * The video's own `ended` event advances to the end card rather than a timer,
+ * so re-cutting the promo to a different length needs no code change. A timer
+ * would have to be kept in step with the export by hand, and would drift on any
+ * connection slow enough to stall playback mid-shot.
+ */
+function PromoFilm({ onFinish }) {
+  const reduced = usePrefersReduced()
+  const [done, setDone] = useState(false)
+  const [leaving, setLeaving] = useState(false)
+  const dismissed = useRef(false)
+  const video = useRef(null)
+
+  useScrollLock(!reduced)
+  useEscape(!reduced, () => dismiss())
+
+  const dismiss = () => {
+    if (dismissed.current) return
+    dismissed.current = true
+    video.current?.pause()
+    setLeaving(true)
+    setTimeout(() => onFinish?.(), 620)
+  }
+
+  useEffect(() => {
+    if (reduced) onFinish?.()
+  }, [reduced, onFinish])
+
+  useEffect(() => {
+    const v = video.current
+    if (!v || reduced) return
+
+    /* Muted video is normally allowed to autoplay, but "normally" is not
+       "always" — a data-saver setting or a backgrounded tab will still refuse
+       it. A refusal must not skip the film: the poster holds the frame and the
+       first gesture starts it, the same way the soundtrack is armed. Jumping
+       to the end card on refusal was throwing the promo away for anyone whose
+       browser happened to be strict. */
+    let off = () => {}
+    v.play?.().catch(() => {
+      const kick = () => { off(); v.play?.().catch(() => {}) }
+      const evs = ['pointerdown', 'keydown', 'touchstart', 'wheel']
+      evs.forEach((e) => window.addEventListener(e, kick, { once: true, passive: true }))
+      off = () => evs.forEach((e) => window.removeEventListener(e, kick))
+    })
+    return () => off()
+  }, [reduced])
+
+  if (reduced) return null
+
+  return (
+    <section
+      className={`hero ${leaving ? 'is-leaving' : ''} ${done ? 'is-end' : ''}`}
+      id="hero"
+      aria-label="Introduction"
+    >
+      <div className="hero-promo" aria-hidden="true">
+        {!done && (
+          <video
+            ref={video}
+            src={promo.src}
+            poster={promo.poster || undefined}
+            muted
+            playsInline
+            preload="auto"
+            tabIndex={-1}
+            onEnded={() => setDone(true)}
+            /* A missing or undecodable file must not strand the visitor behind
+               a black screen with a skip link as the only way out. */
+            onError={() => setDone(true)}
+          />
+        )}
+      </div>
+
+      <div className="hero-copy shell">
+        {done && (
+          <div className="hero-end">
+            <span className="hero-end-mark" aria-hidden="true" />
+            <p className="hero-end-word">{brand.full}</p>
+            <p className="hero-end-slogan">{brand.slogan}</p>
+            <button type="button" className="hero-enter" onClick={dismiss}>
+              Enter worlds <i aria-hidden="true">→</i>
+            </button>
+          </div>
+        )}
+      </div>
+
+      <div className="hero-foot">
+        {!done && (
+          <button type="button" className="hero-cue" onClick={dismiss}>
+            <span>Skip intro</span>
+            <i aria-hidden="true" />
+          </button>
+        )}
+      </div>
+    </section>
+  )
+}
+
+function PlayedSequence({ onFinish }) {
   const reduced = usePrefersReduced()
   const [index, setIndex] = useState(0)
   const [leaving, setLeaving] = useState(false)
@@ -32,6 +146,17 @@ export default function Hero({ onFinish }) {
   const dismissed = useRef(false)
 
   const act = acts[index]
+  /* The letters do not open the closing shot — the mark does. They arrive once
+     the clip has run out to its held sunset frame, which is why this is a timer
+     rather than simply rendering them with the act. */
+  const [letters, setLetters] = useState(false)
+
+  useEffect(() => {
+    setLetters(false)
+    if (act.kind !== 'origin' || reduced) return
+    const t = setTimeout(() => setLetters(true), 2600)
+    return () => clearTimeout(t)
+  }, [index, act.kind, reduced])
 
   useScrollLock(!reduced)
   useEscape(!reduced, () => dismiss())
@@ -142,14 +267,15 @@ export default function Hero({ onFinish }) {
           <p className="hero-line" data-act-in>{act.sub}</p>
         )}
 
-        {act.kind === 'initials' && (
-          <>
-            {/* Not wrapped in `data-act-in` — this runs its own entrance,
-                letter by letter, and the generic stagger would fade the whole
-                block in over the top of it. */}
+        {/* The closing shot carries the letters over its held frame. Not
+            wrapped in `data-act-in` — InitialsReveal runs its own entrance,
+            letter by letter, and the generic stagger would fade the whole block
+            in over the top of it. */}
+        {act.kind === 'origin' && letters && (
+          <div className="hero-letters">
             <InitialsReveal play reduced={reduced} />
-            <p className="hero-descriptor label" data-act-in>{act.sub}</p>
-          </>
+            <p className="hero-descriptor label">{act.sub}</p>
+          </div>
         )}
 
         {/* The end card. Centred, on the bare ground, and it stays. */}

@@ -143,7 +143,8 @@
    so they are exempt from the shared push. They are graded harder than any
    other shot: the mark is sand and sits directly on the horns, so the horns
    have to go down to a ghost or the two simply merge. */
-.origin img {
+.origin img,
+.origin video {
   animation: none;
   transform: none;
   filter: brightness(0.44) saturate(0.5) contrast(1.1) sepia(0.16);
@@ -151,9 +152,12 @@
 
 /* The sunset is the same photograph pushed warm and dark — the sun about to
    come up behind it does the lighting, so the plate itself drops back. */
-.origin--sunset img {
-  filter: brightness(0.3) saturate(0.75) contrast(1.16) sepia(0.42)
-    hue-rotate(-12deg);
+/* Lighter than the still version was graded. The sun is *in* the footage now
+   rather than drawn on top of it, and at brightness 0.3 the disc between the
+   horns — the entire point of the shot — went to a dull smudge. */
+.origin--sunset img,
+.origin--sunset video {
+  filter: brightness(0.62) saturate(0.9) contrast(1.1) sepia(0.16);
 }
 
 .stage-scrim {
@@ -177,11 +181,14 @@
    stay aligned at every window size. Positioning the mark against the viewport
    would let the two drift apart the moment the aspect ratio changed. */
 .origin {
-  /* Where the animal's horns converge in the source frame, as fractions. The
-     plate offset and the mark's placement are both derived from these two
-     numbers, so re-aiming after a photo swap means measuring them once. */
-  --horn-fx: 0.62;
-  --horn-fy: 0.307;
+  /* Where the animal's horns converge in the clip, as fractions. The plate
+     offset and the mark's placement both derive from these, so re-aiming after
+     a footage swap means measuring them once.
+
+     The generated clip frames the head centred and square to camera, where the
+     old still had it well right of centre — hence 0.5 rather than 0.62. */
+  --horn-fx: 0.5;
+  --horn-fy: 0.30;
 
   position: absolute;
   inset: 0;
@@ -199,7 +206,10 @@
    shot into a close-up on the head. Both numbers are chosen so the plate still
    covers the frame in every direction; nothing here may let an edge show. */
 .origin-plate {
-  --plate-w: max(150vw, 225svh);
+  /* The clip is already a close-up, so it does not need the 2× crop the old
+     wide still did — that magnification on 848-wide footage would be visible
+     mush. Just enough over 100% to cover any aspect ratio. */
+  --plate-w: max(112vw, 168svh);
   position: absolute;
   width: var(--plate-w);
   aspect-ratio: 3 / 2;
@@ -208,17 +218,17 @@
      the horns ran out of headroom at the top and the muzzle was sliced off at
      the bottom; held high, the whole face clears the frame and the horns keep
      the room they need to leave it. */
-  top: calc(38svh - var(--horn-fy) * var(--plate-w) / 1.4993);
+  top: calc(42svh - var(--horn-fy) * var(--plate-w) / 1.4993);
 }
 
 .origin-photo {
   position: absolute;
   inset: 0;
-  transform-origin: 62% 32%; /* the animal's head — the recede pulls away from
-                                the mark, not from the middle of the frame */
+  transform-origin: 50% 30%; /* the animal's head — centred in this clip */
 }
 
-.origin-photo img {
+.origin-photo img,
+.origin-photo video {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -240,8 +250,8 @@
     radial-gradient(
       64% 56% at var(--horn-fx) 32%,
       rgba(13, 13, 12, 0) 0%,
-      rgba(13, 13, 12, 0.45) 58%,
-      rgba(13, 13, 12, 0.82) 100%
+      rgba(13, 13, 12, 0.32) 62%,
+      rgba(13, 13, 12, 0.74) 100%
     );
 }
 
@@ -262,10 +272,14 @@
 
      To re-aim the mark after swapping the photograph, change `--horn-x` and
      `--horn-y` and nothing else — the start position falls out of them. */
-  --horn-x: 62%;
-  --horn-y: 30.7%;
+  --horn-x: 50%;
+  /* Tuned against the footage frame by frame, not derived. At the old 30%/16.5%
+     the mark floated *between* the horns as a separate graphic; the shot only
+     works when its two arms sit *on* them and the merge point lands on the
+     skull, which is what these values do. */
+  --horn-y: 33%;
   --merge: 0.713;   /* where the mark's two arms meet, as a fraction of height */
-  --mark-w: 16.5%;  /* of plate width; height follows from the aspect ratio */
+  --mark-w: 24%;    /* of plate width; height follows from the aspect ratio */
 
   position: absolute;
   left: var(--horn-x);
@@ -294,31 +308,6 @@
    rather than the mark being read against the disc. */
 .origin--sunset .origin-mark { background: #2a1c10; }
 
-/* ── The sun ──────────────────────────────────────────────────────────
-   Positioned from the same two fractions as the mark, so it rises inside the
-   V the horns make and cannot drift away from it at any window size. Drawn
-   rather than sourced: no photograph puts the sun exactly there. */
-.origin-sun {
-  position: absolute;
-  left: var(--horn-fx);
-  /* Just above the point where the two arms meet. */
-  top: calc(var(--horn-fy) - 6%);
-  width: 15%;
-  aspect-ratio: 1;
-  translate: -50% -50%;
-  border-radius: 50%;
-  background:
-    radial-gradient(
-      circle,
-      #ffe6b0 0%,
-      #f6c874 22%,
-      #f0a94e 42%,
-      rgba(226, 138, 54, 0.55) 62%,
-      rgba(200, 120, 48, 0) 78%
-    );
-  opacity: 0;
-  will-change: transform, opacity;
-}
 
 /* ── Copy over the film ──────────────────────────────────────────────── */
 .hero-copy {
@@ -475,6 +464,12 @@
    away the only thing this component exists to show. */
 .ir-word {
   display: block;
+  /* Explicitly none, not merely absent. `.initials` is an `h2` and the global
+     heading rule uppercases it, and `text-transform` inherits — so dropping the
+     declaration here left the words inheriting caps rather than escaping them,
+     and `eXcellence` went back to `EXCELLENCE`. The capital X is the whole
+     reason this component exists; it has to be overridden, not omitted. */
+  text-transform: none;
   font-family: var(--font);
   font-size: var(--step--1);
   font-weight: 600;
@@ -529,4 +524,66 @@
   .stage-clip img,
   .stage-clip video { animation: none; transform: scale(1.04); }
   .hero-cue i { animation: none; }
+}
+
+/* ── The promo, as one file ───────────────────────────────────────────────
+   Only rendered when `promo.src` is set. Full bleed and cover-cropped, the
+   same treatment the five-shot stage gets, so switching between the two modes
+   does not change how the intro sits on the screen.
+
+   No scrim here. The composited sequence needs one because live type is set
+   over it; a finished promo carries its own titles and a wash over the top
+   would be grading someone else's grade. */
+.hero-promo {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: var(--oryx-black);
+}
+.hero-promo video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* The letters, riding the closing shot's held frame. They come in after the
+   mark has settled on the horns, so they fade up as a block rather than
+   competing with it for the same two seconds. */
+.hero-letters {
+  position: relative;
+  display: grid;
+  gap: clamp(0.8rem, 2.4vh, 1.4rem);
+  animation: letters-in 0.9s var(--ease-out) both;
+}
+
+/* Title-safe backing. The letters land over the animal's head, and without
+   this the Y column falls on the dark of its face and simply disappears — the
+   one column that has to be legible, because it is the letter the name gives
+   up. Full-bleed and feathered upward so it reads as the shot getting darker
+   toward the bottom rather than as a panel behind the type. */
+.hero-letters::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  left: 50%;
+  translate: -50% 0;
+  width: 100vw;
+  top: -14%;
+  bottom: -60%;
+  background: linear-gradient(
+    to top,
+    rgba(13, 13, 12, 0.94) 0%,
+    rgba(13, 13, 12, 0.86) 46%,
+    rgba(13, 13, 12, 0.52) 78%,
+    rgba(13, 13, 12, 0) 100%
+  );
+  pointer-events: none;
+}
+@keyframes letters-in {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-letters { animation: none; }
 }

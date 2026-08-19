@@ -134,15 +134,10 @@ export default function FilmStage({ activeId, enter, cam, hold, variant, reduced
             style={live ? { '--hold': `${hold}s` } : undefined}
             ref={live ? wipe : null}
           >
-            {/* The two oryx shots are composites, not clips — the plate, the
-                mark and the sun are separate objects that have to move against
-                each other. They share one component and differ by variant. */}
-            {id === 'oryx' || id === 'oryxSun' ? (
-              <OryxOrigin
-                play={live}
-                reduced={reduced}
-                variant={id === 'oryxSun' ? 'sunset' : 'day'}
-              />
+            {/* The sunset shot is a composite, not a clip: the footage and the
+                mark are separate objects that have to sit in register. */}
+            {id === 'oryxSun' ? (
+              <OryxOrigin play={live} reduced={reduced} />
             ) : clip.kind === 'image' && clip.src ? (
               <img src={clip.src} alt="" />
             ) : clip.src ? (

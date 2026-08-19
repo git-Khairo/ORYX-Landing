@@ -10,53 +10,38 @@
  * downloaded into `public/film/`. Every URL verified in session: 200, video/mp4.
  */
 export const film = {
-  /* The film opens here: the animal small in a wide desert, walking. A gemsbok
-     like the close-up that follows, so the push from this frame into that one
-     reads as one continuous move on one animal rather than a cut between two.
+  /* ── The opening film, generated ─────────────────────────────────────
+     Three clips that chain: each one ends on the frame the next begins with,
+     because they were made as first/last-frame interpolations off a single
+     chain of keyframes. That is what lets them cut together without a
+     dissolve — the edit lands on an identical frame.
 
-     Held as its own entry so a commissioned or licensed clip can replace this
-     single line later without touching the sequence around it. */
+     Note the order is not the filename order they arrived in. Read by content:
+     the wide push came first, the mid-to-head push third, and the sunset
+     second. Renamed on the way in so the sequence is legible on disk.
+
+     ⚠ 848×480. That is the Wan "Fast" output, and full-bleed on a 1440p screen
+     it is roughly a 3× upscale — soft, and visibly so on the wide shot where
+     the dune edges are. The grade and the scrim hide a good deal of it, but
+     this wants regenerating at a higher resolution, or upscaling, before
+     launch. Everything else about them is right. */
   oryxWide: {
-    kind: 'image',
-    src: 'https://images.pexels.com/photos/34800154/pexels-photo-34800154.jpeg?auto=compress&cs=tinysrgb&w=2400',
-    credit: 'https://www.pexels.com/photo/oryx-antelope-in-namibian-desert-34800154/',
-    /* Where the animal stands, as a fraction of the plate. The push targets
-       this point, so swapping the plate means re-measuring these two numbers
-       and nothing else. */
+    src: '/film/01-wide.mp4',
+    /* Where the animal stands, as a fraction of the plate — the push targets
+       this point. */
     subject: { x: 0.34, y: 0.62 },
   },
-
-  /* The origin shot, and the only frame on the site where the animal appears.
-     A still rather than a clip, deliberately: the free libraries have no
-     front-facing oryx footage, and this shot needs the head square to camera
-     because the mark has to sit on it as the horns.
-
-     The previous plate (16573757) was replaced — both animals faced away, the
-     adult's head was cropped out of frame entirely, and there was nothing to
-     align the mark to. This is a gemsbok, head to camera, real horns rising
-     straight out of the top of frame with the same splay as the mark, on a
-     dark background that takes the brand grade without a fight. Gemsbok is
-     Oryx gazella and is the animal on the identity board itself. */
-  oryx: {
-    kind: 'image',
-    /* Requested large: the shot is framed as a close-up on the head, so the
-       plate is rendered about twice viewport width and a 1920 source would be
-       upscaled and soft exactly where the mark meets the horns. */
-    src: 'https://images.pexels.com/photos/37177683/pexels-photo-37177683.jpeg?auto=compress&cs=tinysrgb&w=2400',
-    credit: 'https://www.pexels.com/photo/close-up-of-a-gemsbok-37177683/',
-    /* Where the animal's horns converge, as a fraction of the plate. The
-       overlay mark is positioned from these, so if the plate is ever swapped
-       these three numbers are the only thing that needs re-measuring. */
-    horn: { x: 0.62, y: 0.32, spread: 0.144 },
+  oryxPush: {
+    src: '/film/02-push.mp4',
   },
-  /* The sunset shot points at the *same file* as the close-up above. That is
-     the whole trick: shot three is not a second animal photographed at dusk —
-     which would never match — it is the identical plate under a warm grade
-     with a sun rising inside the mark. A time-lapse jump on one frame. */
+  /* Ends on the shot the whole identity rests on: the head square to camera,
+     the horns rising in a narrow V, and the sun sitting exactly in the gap
+     between them. The mark goes here. */
   oryxSun: {
-    kind: 'image',
-    src: 'https://images.pexels.com/photos/37177683/pexels-photo-37177683.jpeg?auto=compress&cs=tinysrgb&w=2400',
-    credit: 'https://www.pexels.com/photo/close-up-of-a-gemsbok-37177683/',
+    src: '/film/03-sun.mp4',
+    /* Where the horns converge in this clip, as fractions of the frame. The
+       mark overlay is positioned from these two numbers and nothing else. */
+    horn: { x: 0.5, y: 0.30, spread: 0.15 },
   },
 
   facilities: {
@@ -105,6 +90,31 @@ export const film = {
     src: 'https://videos.pexels.com/video-files/28542398/12414662_1280_720_30fps.mp4',
     credit: 'https://www.pexels.com/video/sunset-28542398/',
   },
+}
+
+/**
+ * The hero promo — one finished film, when there is one.
+ *
+ * `src` is null until the edited video exists, and that is the switch: with it
+ * null the intro plays the five-shot composited sequence in `acts`, and the
+ * moment a path is set here the whole intro becomes that one file followed by
+ * the end card. Nothing else changes.
+ *
+ * To turn it on: put the export at `public/film/promo.mp4`, a first frame at
+ * `public/film/promo-poster.jpg`, and fill both fields in.
+ *
+ * Requirements the player imposes, not preferences:
+ *  - **Silent.** Autoplay is only permitted for muted video, and the site's own
+ *    soundtrack is carrying the audio anyway. A promo with its own mix would
+ *    play over `theme.mp3`, not instead of it.
+ *  - **H.264 MP4**, 1920×1080. Not HEVC, which Chrome on Windows will not
+ *    decode, and not a 4K master — this autoplays on first paint.
+ *  - **A poster.** Without one the first frame is black until enough of the
+ *    file has arrived, which on a slow connection is the whole opening beat.
+ */
+export const promo = {
+  src: null,
+  poster: null,
 }
 
 /** The closing frame under the footer — a different aerial from the outro act,

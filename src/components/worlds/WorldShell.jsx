@@ -1,4 +1,6 @@
 import { useEffect, useRef } from 'react'
+
+const noop = () => {}
 import { createPortal } from 'react-dom'
 import { usePrefersReduced } from '../../lib/usePrefersReduced'
 import {
@@ -38,23 +40,60 @@ export default function WorldShell({ service, onClose, children }) {
   useReveal(scroller, [service.id])
 
   /* Only the film currently on screen decodes. Several full-screen clips in one
-     scroller, all playing at once, is most of the cost of scrolling this. */
+     scroller, all playing at once, is most of the cost of scrolling this.
+     
+     The gesture fallback is not belt-and-braces, it is the difference between a
+     video and a still. These carry `preload="none"`, so nothing is fetched
+     until `play()` is called — and when `play()` is refused, the old
+     `.catch(() => {})` swallowed it, no request was ever made, and the section
+     sat on its poster forever with `readyState: 0`. That is precisely the
+     "video not showing" case: not a broken URL, a refusal nobody handled. */
   useEffect(() => {
     const el = scroller.current
     if (!el) return
+
+    let off = () => {}
+    const pending = new Set()
+
+    const arm = () => {
+      if (off !== noop) return
+      const kick = () => {
+        off()
+        pending.forEach((v) => v.play?.().catch(() => {}))
+        pending.clear()
+      }
+      const evs = ['pointerdown', 'keydown', 'touchstart', 'wheel']
+      evs.forEach((e) => window.addEventListener(e, kick, { once: true, passive: true }))
+      off = () => {
+        evs.forEach((e) => window.removeEventListener(e, kick))
+        off = noop
+      }
+    }
+
     const io = new IntersectionObserver(
       (entries) => {
         entries.forEach((e) => {
           const v = e.target.querySelector('video')
           if (!v) return
-          if (e.isIntersecting) v.play?.().catch(() => {})
-          else v.pause?.()
+          if (e.isIntersecting) {
+            v.play?.().catch(() => {
+              /* Queue it and start on the first gesture, whatever that is. */
+              pending.add(v)
+              arm()
+            })
+          } else {
+            pending.delete(v)
+            v.pause?.()
+          }
         })
       },
       { root: el, threshold: 0.01 },
     )
     el.querySelectorAll('[data-film]').forEach((n) => io.observe(n))
-    return () => io.disconnect()
+    return () => {
+      io.disconnect()
+      off()
+    }
   }, [service.id])
 
   return createPortal(

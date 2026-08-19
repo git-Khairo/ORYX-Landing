@@ -54,57 +54,52 @@ export const brand = {
  */
 export const acts = [
   {
-    /* Establishing. No copy at all — the film earns its title by showing the
-       animal first, and a caption over the opening frame would spend that. */
+    /* Establishing. The animal small in the dunes, camera creeping in. */
     id: 'wild',
     kind: 'plate',
     film: 'oryxWide',
-    hold: 4.4,
+    hold: 2.06,
     enter: 'up',
-    cam: 'stalk',
+    cam: 'none',
     line: 'ORYX',
     sub: 'An oryx in the Namib.',
   },
   {
-    /* The push lands. The mark fades up exactly on the horns and stays there —
-       it does not detach here. The point of this shot is the equivalence. */
-    id: 'mark',
-    kind: 'origin',
-    film: 'oryx',
-    variant: 'day',
-    hold: 5.0,
-    enter: 'cut',
-    cam: 'none',
-    line: 'ORYX',
-    sub: 'The horns are the mark.',
-  },
-  {
-    /* Same plate, hours later. The sun comes up inside the V it makes. */
-    id: 'sun',
-    kind: 'origin',
-    film: 'oryxSun',
-    variant: 'sunset',
-    hold: 5.4,
+    /* The push onto the head, carrying what the name stands for. Cuts on an
+       identical frame at both ends, so no dissolve is needed or wanted. */
+    id: 'push',
+    kind: 'plate',
+    film: 'oryxPush',
+    hold: 4.06,
     enter: 'cut',
     cam: 'none',
     line: 'ORYX',
     sub: 'Strength · Focus · Resilience',
   },
   {
-    /* The name comes apart into the promise it is built from. */
-    id: 'promise',
-    kind: 'initials',
-    film: 'outro',
-    hold: 5.6,
-    enter: 'down',
-    cam: 'drift',
+    /* The closing shot, and it carries three beats rather than one.
+       The clip runs day into sunset and the sun comes up inside the V the horns
+       make — filmed, not drawn. The mark fades up onto those horns. Then the
+       letters unfold into the promise, and the mark shrinks away as the
+       footage gives out to the bare ground the end card sits on.
+
+       `hold` is well past the clip's 3.56s on purpose: the video plays out and
+       holds its final frame while the letters run over it. That is why the
+       element does not loop — a loop would jump the sunset back to daylight
+       under the type. */
+    id: 'sun',
+    kind: 'origin',
+    film: 'oryxSun',
+    hold: 8.6,
+    enter: 'cut',
+    cam: 'none',
     line: 'ORYX GROUP',
     sub: 'ORYX GROUP · Netherlands',
   },
   {
     /* The end card. No film behind it — the mark on the ground, the slogan,
-       and the way in. This one has no `hold`: the timeline stops here and the
-       film waits to be dismissed rather than dismissing itself. */
+       and the way in. No `hold`: the timeline stops here and the film waits to
+       be dismissed rather than dismissing itself. */
     id: 'enter',
     kind: 'end',
     film: null,
