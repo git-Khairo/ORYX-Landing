@@ -1,13 +1,3 @@
-/* `--t` drives the origin shot's detach — position, scale and colour all read
-   from this one number. Registering it makes it a real animatable number rather
-   than a string GSAP happens to be rewriting, which is what lets `calc()` use
-   it and the browser interpolate it. */
-@property --t {
-  syntax: '<number>';
-  initial-value: 0;
-  inherits: false;
-}
-
 /* An intro, not a section: fixed over the page rather than the first screen of
    it. Nothing below scrolls while it is up, and when it is dismissed it is
    unmounted — which is what makes it unreachable rather than merely passed. */
@@ -98,6 +88,15 @@
   animation-fill-mode: both;
 }
 
+/* The establishing shot: a slow push in on the animal, drifting toward where
+   it stands rather than toward the middle of the frame — `transform-origin` is
+   set from the plate's own `subject` fractions. It travels a long way, because
+   the next shot is a close-up of the same head and the eye has to believe the
+   two are one move. */
+.stage-clip.is-live[data-cam='stalk'] img { transform-origin: 34% 62%; }
+.stage-clip.is-live[data-cam='stalk'] img,
+.stage-clip.is-live[data-cam='stalk'] video { animation-name: cam-stalk; }
+
 .stage-clip.is-live[data-cam='riseIn'] img,
 .stage-clip.is-live[data-cam='riseIn'] video { animation-name: cam-rise-in; }
 .stage-clip.is-live[data-cam='panR'] img,
@@ -108,6 +107,11 @@
 .stage-clip.is-live[data-cam='closeIn'] video { animation-name: cam-close-in; }
 .stage-clip.is-live[data-cam='drift'] img,
 .stage-clip.is-live[data-cam='drift'] video { animation-name: cam-drift; }
+
+@keyframes cam-stalk {
+  from { transform: scale(1.02); }
+  to   { transform: scale(1.9); }
+}
 
 /* A crane settling: rising slightly while easing in. */
 @keyframes cam-rise-in {
@@ -135,13 +139,21 @@
   to   { transform: scale(1.14) translate3d(-1.4%, -0.6%, 0); }
 }
 
-/* The finale keeps its own camera — the mark detaching — and is graded harder
-   than any other shot: the mark is sand and sits directly on the horns, so the
-   horns have to go down to a ghost or the two simply merge. */
+/* The two oryx shots run their own camera — the mark arriving, the sun rising —
+   so they are exempt from the shared push. They are graded harder than any
+   other shot: the mark is sand and sits directly on the horns, so the horns
+   have to go down to a ghost or the two simply merge. */
 .origin img {
   animation: none;
   transform: none;
   filter: brightness(0.44) saturate(0.5) contrast(1.1) sepia(0.16);
+}
+
+/* The sunset is the same photograph pushed warm and dark — the sun about to
+   come up behind it does the lighting, so the plate itself drops back. */
+.origin--sunset img {
+  filter: brightness(0.3) saturate(0.75) contrast(1.16) sepia(0.42)
+    hue-rotate(-12deg);
 }
 
 .stage-scrim {
@@ -255,11 +267,6 @@
   --merge: 0.713;   /* where the mark's two arms meet, as a fraction of height */
   --mark-w: 16.5%;  /* of plate width; height follows from the aspect ratio */
 
-  /* Where it lands once detached, as a fraction of plate height, and how far
-     it shrinks getting there. */
-  --end-y: 40%;
-  --end-scale: 0.62;
-
   position: absolute;
   left: var(--horn-x);
   /* Puts the arms' merge point exactly on the skull. 16.5% of plate width is
@@ -273,29 +280,44 @@
   mask: url('/mark.png') center / contain no-repeat;
 
   opacity: 0;
+  will-change: opacity;
+
+  /* It stays where the horns are. The mark used to detach and fly to the centre
+     of the frame, which spent the idea in the same second it made it — the shot
+     is about the two things being one thing, and that reads better held than
+     animated apart. All the measuring that move needed went with it. */
+  transform: translateX(-50%);
+  background: var(--sand);
+}
+
+/* Against the sun the mark goes dark, so the disc is read *through* the V
+   rather than the mark being read against the disc. */
+.origin--sunset .origin-mark { background: #2a1c10; }
+
+/* ── The sun ──────────────────────────────────────────────────────────
+   Positioned from the same two fractions as the mark, so it rises inside the
+   V the horns make and cannot drift away from it at any window size. Drawn
+   rather than sourced: no photograph puts the sun exactly there. */
+.origin-sun {
+  position: absolute;
+  left: var(--horn-fx);
+  /* Just above the point where the two arms meet. */
+  top: calc(var(--horn-fy) - 6%);
+  width: 15%;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background:
+    radial-gradient(
+      circle,
+      #ffe6b0 0%,
+      #f6c874 22%,
+      #f0a94e 42%,
+      rgba(226, 138, 54, 0.55) 62%,
+      rgba(200, 120, 48, 0) 78%
+    );
+  opacity: 0;
   will-change: transform, opacity;
-
-  /* The detach, as one expression of `--t`.
-     `--dx`, `--dy` and `--end-scale` are measured and written by the component
-     rather than hard-coded here. Landing the mark dead centre at a readable
-     size needs the ratio of two lengths — the mark's rendered height against
-     the viewport's — and `calc()` cannot divide a length by a length. Measuring
-     once in JS is exact at any window size; the alternative was a stack of
-     magic percentages that only held at one aspect ratio.
-
-     Order matters: scale is written last so it applies first, about the
-     element's own centre, and the translate that follows moves that centre by
-     a clean screen-space offset. */
-  transform:
-    translateX(-50%)
-    translate(
-      calc(var(--t) * var(--dx, 0px)),
-      calc(var(--t) * var(--dy, 0px))
-    )
-    scale(calc(1 - var(--t) * (1 - var(--end-scale, 0.4))));
-  /* Sand while it is still part of the animal, near-white once it is the
-     logo — the mark stepping out of the photograph and into the brand. */
-  background: color-mix(in oklab, var(--sand), var(--oryx-white) calc(var(--t) * 62%));
 }
 
 /* ── Copy over the film ──────────────────────────────────────────────── */
@@ -310,71 +332,90 @@
   gap: 0.85rem;
 }
 
-.hero-mark {
-  color: var(--oryx-white);
-  font-weight: 600;
-  margin-bottom: -0.15rem;
-}
-
-/* The last line of the film, under the resolved mark. Centred, because by the
-   finale the mark is centred and a slogan ranged left under a centred logo
-   reads as a caption that lost its picture. */
-.hero-slogan--end {
-  align-self: center;
-  text-align: center;
-  width: 100%;
-  font-size: var(--step-2);
-  color: var(--oryx-white);
-}
-
-.hero-slogan {
+/* One line, one setting, across the establishing shot and both oryx shots.
+   They are a single continuous idea and should not change voice halfway. */
+.hero-line {
   font-family: var(--font);
   font-size: var(--step-1);
   font-weight: 300;
   letter-spacing: 0.02em;
-  color: var(--sand-text);
+  color: var(--oryx-white);
+  max-width: 34ch;
   text-wrap: balance;
 }
 
 .hero-descriptor { color: var(--text-2); }
 
-.hero-index {
-  display: block;
-  border-left: 2px solid var(--sand);
-  padding-left: 0.7rem;
-  line-height: 1.2;
+/* ── The end card ─────────────────────────────────────────────────────
+   Centred, on the bare ground, and it stays until it is used. The film has
+   ended by here; this is a door, so it is built like one. */
+.hero.is-end { background: var(--oryx-black); }
+.hero.is-end .hero-copy {
+  align-self: center;
+  align-items: center;
+  padding-bottom: 0;
 }
 
-.hero-service {
-  font-size: var(--step-4);
-  color: var(--oryx-white);
+.hero-end {
+  display: grid;
+  justify-items: center;
+  gap: clamp(0.9rem, 2.4vh, 1.5rem);
+  text-align: center;
+  animation: end-in 0.9s var(--ease-out) both;
 }
-.hero-service span { display: block; }
-
-.hero-outro {
-  font-size: var(--step-3);
-  color: var(--oryx-white);
-}
-
-.hero-sub {
-  font-size: var(--step-1);
-  font-weight: 300;
-  color: var(--text-2);
-  max-width: 46ch;
-  text-wrap: pretty;
+@keyframes end-in {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-/* The mark, printed rather than composited — the closing shot needs it as a
-   glyph on the page, not as a layer over the animal. */
-.hero-mark-glyph {
-  display: block;
-  width: clamp(46px, 5vw, 68px);
+.hero-end-mark {
+  width: clamp(54px, 6vw, 82px);
   aspect-ratio: 0.4161;
   background: var(--sand);
   -webkit-mask: url('/mark.png') center / contain no-repeat;
   mask: url('/mark.png') center / contain no-repeat;
-  margin-bottom: 0.4rem;
 }
+
+.hero-end-word {
+  font-family: var(--font-group);
+  font-size: clamp(1.5rem, 3.4vw, 2.6rem);
+  font-weight: 600;
+  letter-spacing: 0.32em;
+  margin-right: -0.32em;
+  text-transform: uppercase;
+  color: var(--oryx-white);
+}
+
+.hero-end-slogan {
+  font-size: var(--step-1);
+  font-weight: 300;
+  letter-spacing: 0.02em;
+  color: var(--sand-text);
+}
+
+.hero-enter {
+  margin-top: clamp(0.6rem, 2vh, 1.2rem);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 1rem 2rem;
+  border: 1px solid var(--line-sand);
+  background: transparent;
+  font-size: var(--step--2);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--oryx-white);
+  transition: background 0.3s var(--ease-out), border-color 0.3s var(--ease-out),
+    color 0.3s var(--ease-out);
+}
+.hero-enter:hover {
+  background: var(--sand);
+  border-color: var(--sand);
+  color: var(--oryx-black);
+}
+.hero-enter i { font-style: normal; transition: transform 0.3s var(--ease-out); }
+.hero-enter:hover i { transform: translateX(5px); }
 
 /* ── Foot: progress and the way out ──────────────────────────────────── */
 .hero-foot {
@@ -427,13 +468,17 @@
   background: var(--sand);
   transform-origin: left;
 }
+/* Not upper-case, and this is the one place on the site where that is a
+   content decision rather than a stylistic one. The whole act is X resolving
+   into "eXcellence" — the capital is the letter being claimed, and it can only
+   be seen as a capital if the letters around it are not. `EXCELLENCE` throws
+   away the only thing this component exists to show. */
 .ir-word {
   display: block;
   font-family: var(--font);
-  font-size: var(--step--2);
+  font-size: var(--step--1);
   font-weight: 600;
-  letter-spacing: var(--track-label);
-  text-transform: uppercase;
+  letter-spacing: 0.04em;
   line-height: 1.25;
   color: var(--sand-text);
   /* The words are different lengths and must not be hyphenated apart. */

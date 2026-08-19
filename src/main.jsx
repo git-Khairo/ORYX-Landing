@@ -27,11 +27,15 @@ import '@fontsource/barlow/latin-500.css'
 import '@fontsource/ibm-plex-mono/latin-400.css'
 import '@fontsource/ibm-plex-mono/latin-600.css'
 
-/* Workforce — editorial and warm. Fraunces carries an optical-size axis, which
-   is the entire reason to choose it: it can be soft at reading size and sharp
-   at display size from one file. */
-import '@fontsource-variable/fraunces/opsz.css'
-import '@fontsource-variable/work-sans/wght.css'
+/* Workforce — site work, not editorial. Archivo is a wide, sturdy grotesque
+   run heavy for display and regular for text: workwear and signage rather
+   than a magazine. Its silhouette is the opposite of Transport's condensed
+   Barlow, which is what keeps the two pages apart at a glance.
+
+   It replaces Fraunces and Work Sans. Fraunces was also being asked for a
+   `SOFT` axis that the `opsz` subset never carried, so those declarations
+   were silently doing nothing. */
+import '@fontsource-variable/archivo/standard.css'
 
 /* Renovation — drafting table. */
 import '@fontsource-variable/space-grotesk/wght.css'

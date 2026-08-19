@@ -3,7 +3,7 @@ import gsap from 'gsap'
 import { brand } from '../content/copy'
 
 /**
- * O · R · Y · X resolving into Our Reliability, Your Excellence.
+ * O · R · Y · X resolving into Our Reliability, Your eXcellence.
  *
  * The slogan is a backronym of the name, so the film can do the one thing a
  * static lockup cannot: show where it comes from. Each letter of ORYX rises,

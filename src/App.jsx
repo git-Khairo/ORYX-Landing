@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import Nav from './components/Nav'
 import Cursor from './components/Cursor'
+import Ambience from './components/Ambience'
 import ServiceWorld from './components/ServiceWorld'
 import Hero from './sections/Hero'
 import Work from './sections/Work'
@@ -73,6 +74,10 @@ export default function App() {
           there the instant the intro clears — nothing has to load in behind it. */}
       <Cursor />
       <Nav />
+      {/* Armed from the first paint, so the soundtrack runs under the opening
+          film rather than starting after it. Ambience handles the case where
+          the browser refuses to autoplay. */}
+      <Ambience />
       <Work onOpenService={open} />
       <Footer onOpenService={open} />
 

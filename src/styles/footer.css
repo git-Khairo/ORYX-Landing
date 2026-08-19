@@ -29,20 +29,33 @@
    Never `sideways-lr`, which would give the same result in one line: Safari
    does not support it and falls back to horizontal, which would lay the whole
    wordmark across a fifty-pixel column. */
+/* Placement only — the carve, the gold and the size are `.wordmark-spine`
+   in global.css, shared with the gateway's so the two cannot drift apart. */
 .foot-spine {
-  writing-mode: vertical-rl;
-  transform: rotate(180deg);
-  display: grid;
-  place-items: center;
-  padding: clamp(1.4rem, 4vh, 2.6rem) clamp(0.5rem, 1vw, 0.9rem);
-  border-right: 1px solid var(--line);
-  font-family: var(--font-group);
-  font-size: clamp(0.8rem, 1.05vw, 1.05rem);
-  font-weight: 600;
-  letter-spacing: 0.42em;
-  text-transform: uppercase;
-  color: var(--text-3);
-  white-space: nowrap;
+  position: relative;
+  padding: clamp(1.4rem, 4vh, 2.6rem) clamp(0.6rem, 1.3vw, 1.1rem);
+}
+
+/* A thin gold rule down the right of the wordmark, closing the lockup.
+   Drawn as a gradient rather than a border because a border runs hard into
+   both edges of the footer; this one comes out of nothing at the top, holds
+   full sand across the middle where the name is, and goes back to nothing at
+   the bottom, so it reads as an inlay beside the carving rather than as a
+   panel division. */
+.foot-spine::after {
+  content: '';
+  position: absolute;
+  top: clamp(1rem, 3vh, 2rem);
+  bottom: clamp(1rem, 3vh, 2rem);
+  right: 0;
+  width: 1px;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    var(--sand) 18%,
+    var(--sand) 82%,
+    transparent 100%
+  );
 }
 
 .foot-body {

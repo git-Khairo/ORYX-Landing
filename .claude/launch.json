@@ -1,0 +1,10 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "oryx",
+      "url": "http://127.0.0.1:5185",
+      "port": 5185
+    }
+  ]
+}

@@ -87,7 +87,15 @@ export function Media({ clip, className = '' }) {
       {clip.kind === 'image' ? (
         <img src={clip.src} alt="" />
       ) : (
-        <video src={clip.src} muted loop playsInline preload="none" tabIndex={-1} />
+        <video
+          src={clip.src}
+          poster={clip.poster}
+          muted
+          loop
+          playsInline
+          preload="none"
+          tabIndex={-1}
+        />
       )}
     </div>
   )

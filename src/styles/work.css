@@ -11,7 +11,10 @@
   height: 100svh;
   overflow: hidden;
   display: grid;
-  grid-template-columns: 1.7fr 1fr;
+  /* Brand panel first, doors second. The DOM keeps the doors first because
+     they are the point of the page and should lead for a screen reader; the
+     grid puts the panel on the left visually. */
+  grid-template-columns: 1fr 1.7fr;
   background: var(--ground);
 }
 
@@ -20,6 +23,7 @@
    and takes most of the width; the other two stay shut and carry their names
    up their own edge. */
 .doors {
+  grid-column: 2;
   display: flex;
   min-width: 0;
   background: var(--sunk);
@@ -180,16 +184,21 @@
    a column of words beside a column of pictures. It also gets the lockup off
    the content column, which is what frees the full width for the statement. */
 .purpose {
+  grid-row: 1;
+  grid-column: 1;
   position: relative;
   background: var(--oryx-black);
-  border-left: 1px solid var(--line);
+  border-right: 1px solid var(--line);
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  /* Spine first now that the panel is on the left, so the wordmark still runs
+     down the *outer* edge of the screen rather than down the middle of it. */
+  grid-template-columns: auto minmax(0, 1fr);
   min-width: 0;
   overflow: hidden;
 }
 
 .purpose-body {
+  grid-column: 2;
   padding: clamp(1.6rem, 4vh, 2.8rem) clamp(1.4rem, 2.4vw, 2.4rem);
   display: flex;
   flex-direction: column;
@@ -255,6 +264,23 @@
 }
 .mvv-key:hover { opacity: 0.75; }
 
+/* A plus that loses its stem. No colour change and no rotation — the shape
+   alone carries the state, which is quieter than a spinning chevron and reads
+   just as fast. */
+.mvv-sign { position: relative; align-self: center; flex: none; width: 11px; height: 11px; }
+.mvv-sign::before,
+.mvv-sign::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  background: var(--sand);
+  transition: transform 0.45s var(--ease-out);
+}
+.mvv-sign::before { width: 11px; height: 1px; }
+.mvv-sign::after { width: 1px; height: 11px; }
+.mvv-item.is-open .mvv-sign::after { transform: scaleY(0); }
+
 .mvv-n {
   font-size: var(--step--2);
   font-weight: 600;
@@ -275,22 +301,9 @@
   color: var(--oryx-white);
 }
 
-/* A plus that loses its stem. The shape carries the state — quieter than a
-   spinning chevron and read just as fast. */
-.mvv-sign { position: relative; align-self: center; flex: none; width: 11px; height: 11px; }
-.mvv-sign::before,
-.mvv-sign::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  margin: auto;
-  background: var(--sand);
-  transition: transform 0.45s var(--ease-out);
-}
-.mvv-sign::before { width: 11px; height: 1px; }
-.mvv-sign::after { width: 1px; height: 11px; }
-.mvv-item.is-open .mvv-sign::after { transform: scaleY(0); }
-
+/* `0fr` → `1fr` on a single grid row. The height animates with nothing
+   measured, no max-height guess to be wrong about, and no layout read on every
+   frame. */
 .mvv-panel {
   display: grid;
   grid-template-rows: 0fr;
@@ -334,12 +347,14 @@
 }
 .mvv-vals li:hover { border-color: var(--sand); color: var(--sand); }
 
+/* Sentence case, deliberately: this renders `brand.slogan`, whose capital X is
+   the point. Set as a tracked label it read `YOUR EXCELLENCE` and the letter
+   the company is named after disappeared into the word. */
 .purpose-foot {
   margin-top: clamp(1rem, 2.6vh, 1.6rem);
-  font-size: var(--step--2);
+  font-size: var(--step--1);
   font-weight: 600;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
+  letter-spacing: 0.03em;
   color: var(--sand);
 }
 
@@ -353,18 +368,10 @@
    180° flip, so the two spines rotate toward each other rather than both
    leaning the same way. */
 .purpose-spine {
-  writing-mode: vertical-rl;
-  display: grid;
-  place-items: center;
-  padding: clamp(1.2rem, 3vh, 2rem) clamp(0.5rem, 1vw, 0.9rem);
-  border-left: 1px solid var(--line);
-  font-family: var(--font-group);
-  font-size: clamp(0.8rem, 1.05vw, 1.05rem);
-  font-weight: 600;
-  letter-spacing: 0.42em;
-  text-transform: uppercase;
-  color: var(--oryx-white);
-  white-space: nowrap;
+  grid-column: 1;
+  grid-row: 1;
+  padding: clamp(1.2rem, 3vh, 2rem) clamp(0.6rem, 1.3vw, 1.1rem);
+  border-right: 1px solid var(--line);
   overflow: hidden;
 }
 
@@ -390,5 +397,4 @@
   .door-index { text-align: left; padding-inline: clamp(1.4rem, 4vh, 2.6rem); }
   .door-body { display: none; }
 
-  .vmv-points div { grid-template-columns: 1fr; gap: 0.1rem; }
 }

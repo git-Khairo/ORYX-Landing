@@ -22,7 +22,7 @@ export default function Footer({ onOpenService }) {
   return (
     <footer className="foot" id="contact">
       {/* Down the left edge, answering the gateway's right. */}
-      <p className="foot-spine" aria-hidden="true">{brand.full}</p>
+      <p className="foot-spine wordmark-spine" aria-hidden="true">{brand.full}</p>
       <span className="sr-only">{brand.full}</span>
 
       <div className="foot-body">

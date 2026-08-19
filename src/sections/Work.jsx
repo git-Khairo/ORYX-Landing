@@ -23,12 +23,26 @@ import { portal } from '../content/media'
  * whole gateway hold to exactly one screen.
  */
 export default function Work({ onOpenService }) {
-  const [active, setActive] = useState(services[0].id)
-  const [open, setOpen] = useState(pillars[0].id)
+  /* Nullable, and starting closed. Nothing is open until you point at
+     something — the page opens on three equal doors rather than on one that
+     has already been chosen for you. */
+  const [active, setActive] = useState(null)
+  /* Starts closed, like the doors. With close-on-leave in play, opening on
+     Vision by default would mean the panel is open before the pointer has
+     been near it and shut for ever after. */
+  const [open, setOpen] = useState(null)
 
   return (
     <section className="gate" id="work" aria-label="Services and purpose">
-      <div className="doors">
+      {/* Everything closes when the pointer leaves the row — unless the
+          keyboard is in there, in which case closing would pull the panel out
+          from under someone who is still reading it with Tab. */}
+      <div
+        className="doors"
+        onMouseLeave={(e) => {
+          if (!e.currentTarget.contains(document.activeElement)) setActive(null)
+        }}
+      >
         {services.map((s) => {
             const isOn = active === s.id
             return (
@@ -36,10 +50,14 @@ export default function Work({ onOpenService }) {
                 key={s.id}
                 type="button"
                 className={`door ${isOn ? 'is-on' : ''}`}
-                onClick={() => onOpenService?.(s.id)}
+                /* A closed door opens on the first click and the world opens
+                   on the second, so every door can also be closed again. On a
+                   pointer the first step usually happens on hover, which makes
+                   the click behave exactly as it did before. */
+                onClick={() => (isOn ? onOpenService?.(s.id) : setActive(s.id))}
                 onMouseEnter={() => setActive(s.id)}
                 onFocus={() => setActive(s.id)}
-                aria-label={`${s.title}. ${s.promise} Open this service.`}
+                aria-label={`${s.title}. ${s.promise} ${isOn ? "Open this service." : "Show this service."}`}
               >
                 {/* Always playing, never a still that swaps in on hover —
                     footage that only starts on approach announces itself as a
@@ -103,17 +121,23 @@ export default function Work({ onOpenService }) {
 
           <p className="purpose-tagline">{brand.descriptor.join('  /  ')}</p>
 
-          <div className="mvv">
+          {/* Vision, mission and values, as a hover accordion. One open at a
+              time, and all three shut once the pointer leaves the group — the
+              panel is a preview, so it should not outlive the pointer that
+              asked for it. Guarded on focus for the same reason as the doors:
+              a keyboard user mid-read must not have it closed underneath them. */}
+          <div
+            className="mvv"
+            onMouseLeave={(e) => {
+              if (!e.currentTarget.contains(document.activeElement)) setOpen(null)
+            }}
+          >
             {pillars.map((p, i) => {
               const isOpen = open === p.id
               return (
                 <article
                   className={`mvv-item ${isOpen ? 'is-open' : ''}`}
                   key={p.id}
-                  /* Opens on approach, and the whole row is the target. Nothing
-                     closes on leave — the last one you looked at stays open,
-                     because a panel that shuts the moment the pointer drifts is
-                     one you cannot finish reading. */
                   onMouseEnter={() => setOpen(p.id)}
                 >
                   <h3>
@@ -122,9 +146,9 @@ export default function Work({ onOpenService }) {
                       className="mvv-key"
                       aria-expanded={isOpen}
                       aria-controls={`mvv-${p.id}`}
-                      /* Hover is not available to a keyboard or a touch
-                         screen, so the button keeps working: focus opens it
-                         the way a pointer would, and click still toggles. */
+                      /* Hover is unavailable to a keyboard or a touch screen,
+                         so the button keeps working: focus opens it the way a
+                         pointer would, and click toggles. */
                       onFocus={() => setOpen(p.id)}
                       onClick={() => setOpen(isOpen ? null : p.id)}
                     >
@@ -137,7 +161,7 @@ export default function Work({ onOpenService }) {
                   {/* A one-row grid from `0fr` to `1fr`: the height animates
                       with nothing measured, no max-height guess to be wrong
                       about, and no layout read on every frame. */}
-                  <div className="mvv-panel" id={`mvv-${p.id}`} role="region">
+                  <div className="mvv-panel" id={`mvv-${p.id}`}>
                     <div className="mvv-inner">
                       {p.id === 'values' ? (
                         <ul className="mvv-vals">
@@ -159,7 +183,7 @@ export default function Work({ onOpenService }) {
         </div>
 
         {/* The wordmark, down the outer edge, answering the door spines. */}
-        <p className="purpose-spine" aria-hidden="true">
+        <p className="purpose-spine wordmark-spine" aria-hidden="true">
           {brand.full}
         </p>
         <span className="sr-only">{brand.full}</span>

@@ -359,8 +359,9 @@
 /* Spaced generously for the same reason: stops packed tightly are a list, and
    a list does not need a marker travelling down it. */
 .t-stops {
+  --paddingLeft: 4.6rem;
   position: relative;
-  padding-left: 4.6rem;
+  padding-left: var(--paddingLeft);
   display: grid;
   /* Stretched against the parent's `align-items: start`, so the list fills the
      tall row and the stops distribute down it. Left at content height the
@@ -373,13 +374,34 @@
 .t-stop { min-height: 76px; }
 
 /* The line, and the run of it already travelled. `--run` is written by the
-   component on every scroll frame. */
+   component on every scroll frame.
+
+   Three things had to be true for the line to actually pass through the dots,
+   and none of them were:
+
+   1 · Horizontally it was 2.08px off. `--rail` is now the single number both
+       the line and the dots are placed from, so they cannot drift apart again.
+   2 · The line spanned the list box, which starts above the first dot and ends
+       far below the last — so the marker parked well under "Delivered". It is
+       now inset by exactly the distance from a stop's top edge to its dot's
+       centre, at both ends.
+   3 · Unpassed stops slid sideways and took their dots with them; that
+       transform has moved onto the stop's text. See `.t-stop`. */
+.t-stops {
+  --rail: 3rem;      /* centre of the line, from the list's padding box */
+  --dot: 9px;        /* painted diameter, border included */
+  --dot-y: 13.3px;   /* from a stop's top edge down to its dot's centre */
+}
+
 .t-line {
   position: absolute;
-  left: 3rem;
-  top: 0.6rem;
-  bottom: 0.6rem;
+  left: var(--rail);
+  /* Written by the component from the real dot positions; the fallbacks keep
+     the line sane for the frame before the first measurement lands. */
+  top: var(--line-top, 13.3px);
+  height: var(--line-h, calc(100% - 26.6px));
   width: 1px;
+  transform: translateX(-0.5px);
   background: var(--line);
 }
 .t-line-run {
@@ -411,19 +433,37 @@
   gap: 0.35rem 1.2rem;
   align-items: baseline;
   opacity: 0.4;
-  transform: translateX(18px);
-  transition: opacity 0.6s var(--ease-out), transform 0.6s var(--ease-out);
+  transition: opacity 0.6s var(--ease-out);
 }
-.t-stop.is-passed { opacity: 1; transform: translateX(0); }
+.t-stop.is-passed { opacity: 1; }
 
+/* The arrival moves the *text*. It used to be on the stop itself, which
+   dragged the absolutely-positioned dot 18px sideways with it — so a dot only
+   met the line once its stop had been passed, and sat 20px clear of it before
+   that. */
+.t-stop-t,
+.t-stop-body {
+  transform: translateX(18px);
+  transition: transform 0.6s var(--ease-out);
+}
+.t-stop.is-passed .t-stop-t,
+.t-stop.is-passed .t-stop-body { transform: translateX(0); }
+
+/* Placed from the rail, not from the stop's own edge — the old `-1.72rem` was
+   hand-derived and landed 2.08px right of the line. `calc()` puts the dot's
+   centre exactly on it, and because both read `--rail` the two stay together
+   at every breakpoint.
+
+   Unfilled until passed, so the line reads *through* the ring rather than being
+   knocked out by an opaque disc. */
 .t-stop-dot {
   position: absolute;
-  left: -1.72rem;
-  top: 0.55rem;
-  width: 9px;
-  height: 9px;
+  left: calc(var(--rail) - var(--paddingLeft) - var(--dot) / 2);
+  top: calc(var(--dot-y) - var(--dot) / 2);
+  width: var(--dot);
+  height: var(--dot);
   border: 1px solid var(--sand);
-  background: var(--tone);
+  background: transparent;
   border-radius: 50%;
   transition: background 0.4s var(--ease-out);
 }
@@ -714,6 +754,86 @@
 .t-chips span { font-size: var(--step-0); font-weight: 600; color: var(--oryx-white); }
 .t-chips small { font-size: var(--step--2); color: var(--text-2); line-height: 1.5; }
 
+/* ── The client tape ──────────────────────────────────────────────────
+   A board in an operations room: always moving, never asking to be read. Two
+   identical runs translated by exactly -50%, so the second copy is under the
+   pointer the instant the first leaves — one run would show a gap every pass.
+
+   The rail is masked at both ends rather than cut, so names arrive and leave
+   instead of appearing and vanishing at a hard edge. */
+.t-tape {
+  border-block: 1px solid var(--line);
+  background: var(--sunk);
+  padding: clamp(1.4rem, 3.5vh, 2.2rem) 0;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+}
+
+.t-tape-rail {
+  display: flex;
+  width: max-content;
+  animation: t-tape-run 42s linear infinite;
+}
+.t-tape:hover .t-tape-rail { animation-play-state: paused; }
+
+@keyframes t-tape-run {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+.t-tape-run {
+  display: flex;
+  align-items: center;
+  flex: none;
+}
+.t-tape-run li {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding-inline: clamp(1.6rem, 4vw, 3.4rem);
+  white-space: nowrap;
+}
+/* A hairline between names, so the tape reads as a list rather than a sentence
+   that lost its punctuation. */
+.t-tape-run li::after {
+  content: '';
+  width: 1px;
+  height: 14px;
+  background: var(--line-sand);
+}
+
+.t-tape-run span {
+  font-family: var(--font-display);
+  font-size: clamp(1rem, 1.5vw, 1.35rem);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  transition: color 0.3s var(--ease-out);
+}
+.t-tape:hover .t-tape-run span { color: var(--text-2); }
+
+/* Real logos, when they land: capped by height so wildly different aspect
+   ratios still sit on one optical line, and knocked back to sit with the type
+   rather than shouting over it. */
+.t-tape-run img {
+  height: clamp(20px, 2.4vh, 30px);
+  width: auto;
+  filter: grayscale(1) brightness(1.7);
+  opacity: 0.6;
+  transition: opacity 0.3s var(--ease-out);
+}
+.t-tape:hover .t-tape-run img { opacity: 0.95; }
+
+@media (prefers-reduced-motion: reduce) {
+  .t-tape-rail { animation: none; }
+  /* Static, it must not sit half-way through a name. */
+  .t-tape { -webkit-mask-image: none; mask-image: none; }
+  .t-tape-rail { flex-wrap: wrap; width: 100%; justify-content: center; }
+  .t-tape-run:last-child { display: none; }
+}
+
 /* ── The services ─────────────────────────────────────────────────────
    Promoted from a numbered list in a side column to the page's own catalogue:
    full width, five bordered cells, each with a mono reference and a condensed
@@ -832,6 +952,5 @@
   .t-route-intro,
   .t-pod { position: static; }
   .t-figs { grid-template-columns: 1fr; }
-  .t-stops { padding-left: 3.4rem; }
-  .t-line { left: 1.8rem; }
+  .t-stops { --paddingLeft: 3.4rem; --rail: 1.8rem; }
 }

@@ -4,23 +4,72 @@
    the second half of the page is a grid that populates person by person. */
 
 /* ── Its own navigation ───────────────────────────────────────────────
-   A masthead, not a toolbar. Tall, centred, on the cream ground, with the
-   sections set under a rule the way a magazine sets its contents — and it
-   scrolls away rather than sticking, because a bar that follows you down a
-   long read belongs to a tool, not to something you are reading. */
+   A site board, not a masthead. This was tall, centred and serif, and it
+   scrolled away — which reads as a magazine contents page. The page under it
+   is a rota, a coverage dial and four trades you switch between, so the bar
+   is short, sticky and hard-edged, and it keeps the domains reachable from
+   anywhere in a long scroll.
+
+   Blurred rather than solid: the opening frame runs film behind it, and a
+   filled bar would cut a rectangle out of the shot on first paint. */
 .w-nav {
+  position: sticky;
+  top: 0;
+  z-index: 6;
+  border-bottom: 1px solid var(--line);
+  background: color-mix(in srgb, var(--tone) 82%, transparent);
+  backdrop-filter: blur(14px) saturate(1.3);
+  -webkit-backdrop-filter: blur(14px) saturate(1.3);
+}
+.w-nav-inner {
   max-width: var(--maxw);
   margin: 0 auto;
-  padding: 1.1rem var(--gutter) 0;
-}
-.w-nav-top {
+  padding: 0.85rem var(--gutter);
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding-bottom: clamp(2rem, 6vh, 3.5rem);
+  gap: clamp(1rem, 4vw, 2.5rem);
 }
-.w-nav-back {
+
+/* Mark, word and unit on one baseline — the group's lockup with the service
+   named after it, which is the same construction the other two worlds use. */
+.w-nav-mark {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--text);
+}
+.w-nav-mark i {
+  width: 13px;
+  aspect-ratio: 0.4161;
+  background: var(--sand);
+  -webkit-mask: url('/mark.png') center / contain no-repeat;
+  mask: url('/mark.png') center / contain no-repeat;
+}
+.w-nav-word {
+  font-family: var(--font-display);
+  font-size: var(--step--1);
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+.w-nav-unit {
+  font-family: var(--font);
+  font-size: var(--step--2);
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--sand-text);
+  padding-left: 0.6rem;
+  border-left: 1px solid var(--line);
+}
+
+.w-nav-links {
+  margin-left: auto;
+  display: flex;
+  gap: clamp(0.9rem, 2.4vw, 2rem);
+}
+.w-nav-links a {
   font-family: var(--font);
   font-size: var(--step--2);
   font-weight: 600;
@@ -29,68 +78,27 @@
   color: var(--text-3);
   transition: color 0.2s var(--ease-out);
 }
-.w-nav-back:hover { color: var(--text); }
+.w-nav-links a:hover { color: var(--text); }
+
+/* Square, not a pill. The pill belonged to the editorial version; a heavy
+   page with no round corners anywhere else should not grow one here. */
 .w-nav-cta {
-  padding: 0.6rem 1.2rem;
-  border: 1px solid var(--text);
-  border-radius: 999px;
+  padding: 0.55rem 1.1rem;
+  background: var(--sand);
+  color: var(--oryx-black);
   font-family: var(--font);
   font-size: var(--step--2);
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  color: var(--text);
-  transition: background 0.2s var(--ease-out), color 0.2s var(--ease-out);
-}
-.w-nav-cta:hover { background: var(--text); color: var(--tone); }
-
-.w-nav-mast {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.9rem;
-  text-align: center;
-}
-.w-nav-mark {
-  width: 20px;
-  aspect-ratio: 0.4161;
-  background: var(--deep-brown);
-  -webkit-mask: url('/mark.png') center / contain no-repeat;
-  mask: url('/mark.png') center / contain no-repeat;
-}
-.w-nav-word {
-  font-family: var(--font-display);
-  font-variation-settings: 'opsz' 144, 'SOFT' 20;
-  font-size: clamp(2.2rem, 6vw, 4rem);
-  font-weight: 500;
-  letter-spacing: -0.02em;
-  color: var(--text);
-}
-.w-nav-strap {
-  margin-top: 0.5rem;
-  text-align: center;
-  font-size: var(--step--2);
-  font-weight: 600;
-  letter-spacing: var(--track-label);
+  font-weight: 700;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--sand-text);
+  transition: background 0.2s var(--ease-out);
 }
-.w-nav-links {
-  margin-top: clamp(1.6rem, 4vh, 2.4rem);
-  padding: 0.9rem 0;
-  border-top: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
-  display: flex;
-  justify-content: center;
-  gap: clamp(1.2rem, 5vw, 3.5rem);
+.w-nav-cta:hover { background: var(--oryx-white); }
+
+@media (max-width: 720px) {
+  .w-nav-links { display: none; }
+  .w-nav-cta { margin-left: auto; }
 }
-.w-nav-links a {
-  font-family: var(--font-display);
-  font-variation-settings: 'opsz' 24;
-  font-size: var(--step-0);
-  color: var(--text-2);
-  transition: color 0.2s var(--ease-out);
-}
-.w-nav-links a:hover { color: var(--text); }
 
 /* ── Its own footer ───────────────────────────────────────────────────
    Editorial: one large serif sign-off carrying the page and a quiet column of
@@ -170,6 +178,272 @@
   .w-foot-main { grid-template-columns: 1fr; }
 }
 
+/* ── The opening strip ────────────────────────────────────────────────
+   Four facts under the headline, before any prose. Transport does the same
+   with its manifest — same job, and the shared instinct is deliberate: both
+   pages are bought by someone checking whether you can cover a date. */
+.w-strip {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 0 var(--gutter) clamp(2.5rem, 7vh, 4rem);
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+}
+.w-strip > div {
+  background: var(--tone);
+  padding: clamp(1rem, 2.6vh, 1.5rem) clamp(0.9rem, 2vw, 1.4rem);
+  display: grid;
+  gap: 0.4rem;
+  align-content: start;
+}
+.w-strip dt {
+  font-family: var(--font);
+  font-size: var(--step--2);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+.w-strip dd {
+  font-family: var(--font-display);
+  font-size: var(--step-0);
+  font-weight: 800;
+  letter-spacing: var(--track-display);
+  text-transform: uppercase;
+  color: var(--text);
+  line-height: 1.15;
+}
+
+/* The strip is a bordered grid, so it cannot sit inside the gutter padding of
+   `.w-open` and also stretch edge to edge. Pull it out of the flow padding
+   instead of nesting a second container. */
+@media (max-width: 860px) {
+  .w-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 520px) {
+  .w-strip { grid-template-columns: 1fr; }
+}
+
+/* ── The domains ──────────────────────────────────────────────────────
+   The page's signature. Four trades that share one agreement but not much
+   else, so the differences get a switch rather than four stacked sections
+   the reader scrolls past.
+
+   The panel is one element that swaps content, not four panels with three
+   hidden: hidden panels would put every domain's kit list into the document
+   at once, and a screen reader would read all four. */
+.w-sectors {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: clamp(4rem, 11vh, 7rem) var(--gutter);
+  display: grid;
+  gap: clamp(1.6rem, 4vh, 2.4rem);
+}
+.w-sectors-head { display: grid; gap: 0.9rem; }
+
+/* An index, not a grid of buttons.
+   Nine equal boxes in a 3×3 block gave every sector the same weight and turned
+   the most important part of the page into a wall — you read all nine before
+   you could look at any one of them. A vertical index is what nine of anything
+   wants: it scans top to bottom in one movement, the names set flush left at a
+   readable size instead of being fitted into a box, and the panel gets the
+   width it needs rather than what a third of the row left over.
+
+   It also stops the section fighting Transport, whose manifest is the only
+   other tabbed thing on the site and is horizontal. */
+.w-sector-body {
+  display: grid;
+  grid-template-columns: minmax(15rem, 21rem) minmax(0, 1fr);
+  gap: clamp(1.5rem, 4vw, 3rem);
+  align-items: start;
+}
+
+.w-tabs {
+  display: grid;
+  align-content: start;
+  border-top: 1px solid var(--line);
+}
+
+/* A row, not a plate. The live state is a sand rule down the leading edge and
+   the name coming up to full strength — the same grammar as the gateway's open
+   door, which is the other place on the site where one of several is chosen. */
+.w-tab {
+  position: relative;
+  padding: clamp(0.7rem, 1.9vh, 1rem) 0 clamp(0.7rem, 1.9vh, 1rem) 1.1rem;
+  border-bottom: 1px solid var(--line);
+  display: grid;
+  grid-template-columns: 2.1rem minmax(0, 1fr);
+  gap: 0.8rem;
+  align-items: baseline;
+  text-align: left;
+  color: var(--text-3);
+  transition: color 0.22s var(--ease-out), padding-left 0.22s var(--ease-out);
+}
+.w-tab::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--sand);
+  transform: scaleY(0);
+  transform-origin: center;
+  transition: transform 0.28s var(--ease-out);
+}
+.w-tab:hover { color: var(--text-2); padding-left: 1.4rem; }
+
+.w-tab-n {
+  font-family: var(--font);
+  font-size: var(--step--2);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-3);
+  transition: color 0.22s var(--ease-out);
+}
+.w-tab-k {
+  font-family: var(--font-display);
+  font-size: var(--step-0);
+  font-weight: 800;
+  letter-spacing: var(--track-display);
+  text-transform: uppercase;
+  line-height: 1.15;
+  text-wrap: balance;
+}
+
+.w-tab.is-live { color: var(--text); padding-left: 1.4rem; }
+.w-tab.is-live::before { transform: scaleY(1); }
+.w-tab.is-live .w-tab-n { color: var(--sand); }
+
+/* The panel is a field beside the index, not a drawer under a row of buttons,
+   so it carries a ground of its own and no top rule joining it to anything. */
+.w-panel {
+  border: 1px solid var(--line);
+  background: var(--raise);
+  padding: clamp(1.6rem, 4vh, 2.6rem);
+  display: grid;
+  gap: clamp(1.4rem, 4vh, 2rem);
+  animation: w-panel-in 0.5s var(--ease-out) both;
+}
+@keyframes w-panel-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .w-panel { animation: none; }
+}
+
+.w-panel-lead { display: grid; gap: 0.7rem; align-content: start; }
+.w-domain-name {
+  font-size: var(--step-3);
+  color: var(--text);
+  line-height: 1;
+  text-wrap: balance;
+}
+.w-domain-n {
+  font-family: var(--font);
+  font-size: var(--step--1);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--sand-text);
+}
+.w-domain-d {
+  font-size: var(--step-0);
+  color: var(--text-2);
+  max-width: 58ch;
+  line-height: 1.55;
+}
+.w-domain-who {
+  margin-top: 0.2rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--line);
+  font-size: var(--step--1);
+  color: var(--text-2);
+}
+.w-domain-who span {
+  font-weight: 700;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  font-size: var(--step--2);
+  color: var(--text-3);
+  margin-right: 0.5rem;
+}
+
+.w-panel-cols {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(1.4rem, 3vw, 2.4rem);
+  align-content: start;
+}
+.w-panel-cols h4 {
+  font-family: var(--font);
+  font-size: var(--step--2);
+  font-weight: 700;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--text-3);
+  padding-bottom: 0.7rem;
+  border-bottom: 1px solid var(--line);
+}
+
+@media (max-width: 900px) {
+  /* The index goes back to a row of chips above the panel — a 21rem rail on a
+     narrow screen would leave the panel unreadable. */
+  .w-sector-body { grid-template-columns: 1fr; }
+  .w-tabs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+  }
+  .w-tab { background: var(--tone); border-bottom: 0; padding: 0.9rem 1rem; }
+  .w-tab:hover, .w-tab.is-live { padding-left: 1rem; }
+  .w-tab.is-live { background: var(--raise-2); }
+}
+@media (max-width: 560px) {
+  .w-tabs { grid-template-columns: 1fr; }
+  .w-panel-cols { grid-template-columns: 1fr; }
+}
+
+/* Chevrons, not bullets or ticks. The mark is a pair of horns; a list marker
+   drawn from the same angle is the cheapest way for a component this small to
+   still belong to the brand. */
+.w-ticks { display: grid; gap: 0.55rem; margin-top: 0.9rem; }
+.w-ticks li {
+  position: relative;
+  padding-left: 1.3rem;
+  font-size: var(--step--1);
+  color: var(--text-2);
+  line-height: 1.45;
+}
+.w-ticks li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.52em;
+  width: 6px;
+  height: 6px;
+  border-right: 1.5px solid var(--sand);
+  border-bottom: 1.5px solid var(--sand);
+  transform: translateY(-50%) rotate(-45deg);
+}
+
+@media (max-width: 860px) {
+  .w-tabs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .w-panel { grid-template-columns: 1fr; }
+}
+@media (max-width: 520px) {
+  .w-tabs { grid-template-columns: 1fr; }
+}
+@media (max-width: 520px) {
+  .w-panel-cols { grid-template-columns: 1fr; }
+}
+
 /* ── The shift ────────────────────────────────────────────────────────── */
 .w-shift {
   max-width: var(--maxw);
@@ -178,9 +452,11 @@
   display: grid;
   grid-template-columns: 0.95fr 1.2fr;
   gap: clamp(2.5rem, 6vw, 6rem);
-  align-items: start;
+  /* Not `align-items: start`. The heading has to stay on screen while its own
+     list scrolls past, and that needs the grid item stretched to the row so the
+     sticky wrapper inside it has somewhere to travel. */
 }
-.w-shift-intro { position: sticky; top: 2rem; display: grid; gap: 1.4rem; }
+.w-shift-intro { min-width: 0; }
 
 .w-blocks { display: grid; }
 
@@ -220,173 +496,158 @@
 }
 .w-block-d { font-size: var(--step-0); color: var(--text-2); max-width: 42ch; }
 
-/* ── The building, staffed ────────────────────────────────────────────
-   Workforce's counterpart to Transport's lorry, driven the same way: a tall
-   section, a sticky stage, and one `--p` from `useSmoothProgress`. Each floor
-   slices its own window out of `--p` with clamp(), so the crews land in
-   sequence with no per-element JavaScript.
+/* ── The deployment ───────────────────────────────────────────────────
+   A venue in plan with the whole shift posted on it. Third attempt at
+   Workforce's counterpart to Transport's lorry: an elevation filling with
+   light drew the architecture, a muster of figures drew the headcount, and
+   only a plan draws the thing being sold — positions, held at once, on one
+   site.
 
-   Deep Brown line-work on cream — the light page's own two colours. */
-.w-staff {
+   Same mechanism as the other two scroll scenes: a tall section, a sticky
+   stage, one `--p` from `useSmoothProgress`, and every post slicing its own
+   window out of it with clamp(). No per-element JavaScript, nothing measured. */
+.w-deploy {
   height: 300svh;
   background: var(--sunk);
   border-block: 1px solid var(--line);
 }
-.w-staff-sticky {
+/* Wider than the page's own measure, and tighter vertically. The drawing is
+   height-constrained in a sticky viewport, so every millimetre spent on
+   padding, on the gap, or on a third line of intro copy comes straight off the
+   plan. `--maxw` was leaving it about a third smaller than the row allowed. */
+.w-deploy-sticky {
   position: sticky;
   top: 0;
   height: 100svh;
-  max-width: var(--maxw);
+  max-width: min(1560px, 96vw);
   margin: 0 auto;
-  padding: var(--gutter);
+  padding: clamp(0.9rem, 2.4vh, 1.6rem) clamp(1rem, 2.4vw, 2rem);
   display: grid;
-  grid-template-rows: auto 1fr;
-  align-content: center;
-  gap: clamp(1rem, 3vh, 2rem);
+  grid-template-rows: auto minmax(0, 1fr);
+  align-content: stretch;
+  gap: clamp(0.6rem, 1.6vh, 1rem);
 }
-.w-staff-head { display: grid; gap: 0.9rem; max-width: 46ch; }
-.w-staff-scene { display: grid; place-items: center; min-height: 0; }
-.w-staff-scene svg { width: 100%; height: 100%; max-height: 62svh; overflow: visible; }
+.w-deploy-head { display: grid; gap: 0.5rem; max-width: 64ch; }
 
-.w-staff-ground { stroke: var(--line); stroke-width: 2; fill: none; }
-.w-staff-shell {
-  fill: none;
-  stroke: var(--deep-brown);
-  stroke-width: 2.5;
-  stroke-linejoin: round;
+.w-deploy-scene {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: clamp(0.4rem, 1.2vh, 0.8rem);
+  min-height: 0;
 }
-.w-staff-roof { stroke: var(--deep-brown); stroke-width: 4; fill: none; }
-.w-staff-slab { stroke: var(--line); stroke-width: 1.5; fill: none; }
-.w-staff-door { fill: none; stroke: var(--deep-brown); stroke-width: 2.5; }
+/* `height: 100%` plus `min-height: 0` lets the SVG shrink inside the grid row
+   instead of forcing it open; the viewBox then scales the drawing to whichever
+   of the two dimensions runs out first. */
+.w-deploy-scene svg { width: 100%; height: 100%; min-height: 0; display: block; }
 
-/* Each floor takes its turn. The windows of a floor light together but with a
-   small per-window stagger, so a floor coming on reads as lights being
-   switched rather than a block changing colour. */
-.w-staff-floor {
-  --l: clamp(0, (var(--p, 0) - var(--i) * 0.115) / 0.16, 1);
-}
-
-.w-staff-win {
-  fill: var(--sand);
-  stroke: var(--deep-brown);
-  stroke-width: 1;
-  opacity: calc(clamp(0, (var(--l) - var(--w) * 0.06) / 0.5, 1) * 0.9 + 0.08);
-}
-
-/* The badge slides in from its side and docks against the floor. */
-.w-staff-badge rect {
-  fill: var(--deep-brown);
-  opacity: var(--l);
-}
-.w-staff-badge text {
-  fill: var(--oryx-white);
-  font-family: var(--font);
-  font-size: 15px;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  opacity: var(--l);
-}
-.w-staff-badge.is-left { transform: translateX(calc((1 - var(--l)) * -140px)); }
-.w-staff-badge.is-right { transform: translateX(calc((1 - var(--l)) * 140px)); }
-
-.w-staff-lead {
+/* The building. Drawn as a hairline outline on a barely-lifted ground, the way
+   a plan sits on a sheet — filled, it would compete with the posts, which are
+   the only thing on this drawing that changes. */
+.w-plan-shell {
+  fill: color-mix(in srgb, var(--sand) 4%, transparent);
   stroke: var(--line-sand);
-  stroke-width: 1.5;
+  stroke-width: 2;
+}
+.w-plan-wall path {
   fill: none;
-  opacity: var(--l);
+  stroke: var(--line-sand);
+  stroke-width: 2;
+}
+/* Doorways read as openings because the wall stops; the sand stub is the leaf,
+   which is what tells you it is a door and not a missing wall. */
+.w-plan-door path {
+  fill: none;
+  stroke: var(--sand);
+  stroke-width: 3;
+  opacity: 0.55;
+}
+.w-plan-zone text {
+  fill: var(--text-3);
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
 }
 
-@media (max-width: 760px) {
-  .w-staff { height: 240svh; }
-  .w-staff-badge text { font-size: 22px; }
+/* Each post lands on its own slice of `--p`, in the order the array is
+   written — which is deliberately not left-to-right but control point first,
+   then outward, because that is the order a venue is actually staffed. */
+.w-post {
+  --in: clamp(0, calc(var(--p, 0) * var(--of) - var(--i)), 1);
+  opacity: var(--in);
+}
+.w-post-ring {
+  fill: none;
+  stroke: var(--sand);
+  stroke-width: 1.5;
+  opacity: 0.4;
+  /* Opens out as the post fills, so a post arriving reads as ground being
+     taken rather than as a dot appearing. */
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: scale(calc(0.4 + var(--in) * 0.6));
+}
+.w-post-dot { fill: var(--text-2); }
+
+.w-post.is-lead .w-post-dot { fill: var(--sand); }
+.w-post.is-lead .w-post-ring { opacity: 0.85; stroke-width: 2.5; }
+.w-post.is-lead .w-post-k { fill: var(--sand); }
+
+/* The roving pair are the one post that is not a position, so their ground is
+   dashed — the only broken line in the drawing. */
+.w-post.is-rove .w-post-ring { stroke-dasharray: 5 5; opacity: 0.5; }
+.w-post.is-rove .w-post-dot { fill: var(--text-3); }
+
+.w-post-k {
+  fill: var(--text);
+  font-family: var(--font-display);
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+.w-post-n {
+  fill: var(--text-3);
+  font-family: var(--font);
+  font-size: 13.5px;
+  letter-spacing: 0.04em;
+}
+
+.w-deploy-total {
+  justify-self: end;
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+}
+.w-deploy-n {
+  font-family: var(--font-display);
+  font-size: var(--step-4);
+  font-weight: 800;
+  color: var(--sand);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  /* Lands once the last post is filled — it is the answer to the drawing, not
+     a heading above it. */
+  opacity: clamp(0, calc(var(--p, 0) * var(--of) - var(--of) + 1.6), 1);
+}
+.w-deploy-l {
+  font-size: var(--step--2);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--text-3);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .w-staff-badge.is-left,
-  .w-staff-badge.is-right { transform: none; }
+  .w-post { opacity: 1; }
+  .w-post-ring { transform: none; }
+  .w-deploy-n { opacity: 1; }
 }
 
-/* ── The crew ─────────────────────────────────────────────────────────
-   Badges, not cards. An ID badge is the object this service actually hands
-   over: a coloured strip, a role, and what that role covers. */
-.w-crew {
-  background: var(--sunk);
-  border-block: 1px solid var(--line);
-  padding: clamp(3.5rem, 9vh, 6rem) var(--gutter);
+@media (max-width: 720px) {
+  .w-deploy { height: 240svh; }
+  .w-deploy-scene svg { max-height: 52svh; }
 }
-.w-crew-head {
-  max-width: var(--maxw);
-  margin: 0 auto clamp(2rem, 5vh, 3rem);
-  display: grid;
-  gap: 1rem;
-}
-
-/* Three across, not `auto-fit`. Auto-fitting six badges into a 1280 viewport
-   produced five and a stranded one — a crew that looks like somebody is
-   missing, on the one page whose whole argument is that the right number of
-   people turn up. Fixed counts keep the grid full at every breakpoint. */
-.w-badges {
-  max-width: var(--maxw);
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: clamp(0.8rem, 1.6vw, 1.2rem);
-}
-@media (max-width: 900px) {
-  .w-badges { grid-template-columns: repeat(2, 1fr); }
-}
-@media (max-width: 520px) {
-  .w-badges { grid-template-columns: 1fr; }
-}
-
-/* The stagger is what makes the grid assemble rather than appear. `--i` comes
-   off the index, so each badge lands a beat after the one before it. */
-.w-badge {
-  position: relative;
-  background: var(--raise);
-  border: 1px solid var(--line);
-  padding: 1.3rem 1.2rem 1.2rem;
-  display: grid;
-  gap: 0.35rem;
-  align-content: start;
-  min-height: 148px;
-  transition-delay: calc(var(--i, 0) * 70ms);
-}
-.w-badge-strip {
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 3px;
-  background: var(--fill-strong);
-}
-.w-badge-r {
-  font-family: var(--font-display);
-  font-size: var(--step-1);
-  text-transform: uppercase;
-  letter-spacing: var(--track-display);
-  color: var(--text);
-  line-height: 1.15;
-}
-.w-badge-n { font-size: var(--step--2); color: var(--text-2); letter-spacing: 0.02em; }
-/* The mark, small, in the corner — the badge is issued by somebody. */
-.w-badge-mark {
-  position: absolute;
-  right: 1rem;
-  bottom: 1rem;
-  width: 11px;
-  aspect-ratio: 0.4161;
-  background: var(--line-sand);
-  -webkit-mask: url('/mark.png') center / contain no-repeat;
-  mask: url('/mark.png') center / contain no-repeat;
-}
-
-.w-crew-shot {
-  max-width: var(--maxw);
-  margin: clamp(2rem, 5vh, 3rem) auto 0;
-  overflow: hidden;
-}
-.w-crew-shot img { width: 100%; aspect-ratio: 21 / 9; object-fit: cover; }
 
 /* ── How we place people ─────────────────────────────────────────────
    Numbered entries down a single column, generously spaced. Transport lays
@@ -399,10 +660,27 @@
   display: grid;
   grid-template-columns: 0.9fr 1.1fr;
   gap: clamp(2rem, 5vw, 4rem);
-  align-items: start;
 }
-.w-process-head { position: sticky; top: 2rem; display: grid; gap: 0.9rem; }
+.w-process-head { min-width: 0; }
 .w-process-head h3 { font-size: var(--step-3); color: var(--text); max-width: 14ch; }
+
+/* The sticky wrapper both sections share. `top` clears the navigation, which
+   is itself sticky — at `top: 2rem` the heading parked underneath the bar and
+   was invisible for exactly the scroll where it was supposed to be doing its
+   job. */
+.w-stick {
+  position: sticky;
+  top: calc(3.4rem + 1.6rem);
+  display: grid;
+  gap: 1rem;
+  align-content: start;
+}
+
+@media (max-width: 900px) {
+  /* One column: the heading is directly above its list and has nothing to
+     stay in view for. */
+  .w-stick { position: static; }
+}
 
 .w-steps { display: grid; }
 .w-steps li {
@@ -432,62 +710,6 @@
   color: var(--text);
 }
 .w-step-d { font-size: var(--step-0); line-height: 1.6; color: var(--text-2); max-width: 46ch; }
-
-/* ── The kit ──────────────────────────────────────────────────────────
-   What a site manager physically sees. Set on the darker cream band so it
-   reads as evidence set apart from the argument around it. */
-.w-kit {
-  background: var(--raise-2);
-  border-block: 1px solid var(--line);
-  padding: clamp(3.5rem, 9vh, 6rem) var(--gutter);
-  display: grid;
-  gap: clamp(2rem, 5vh, 3rem);
-}
-.w-kit-copy {
-  max-width: var(--maxw);
-  width: 100%;
-  margin: 0 auto;
-  display: grid;
-  gap: 0.9rem;
-}
-.w-kit-copy h3 { font-size: var(--step-3); color: var(--text); max-width: 18ch; }
-
-.w-kit-list {
-  max-width: var(--maxw);
-  width: 100%;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 1px;
-  background: var(--line);
-  border: 1px solid var(--line);
-}
-.w-kit-list li {
-  background: var(--tone);
-  padding: clamp(1.4rem, 3.5vh, 2rem) clamp(1.1rem, 1.8vw, 1.5rem);
-  display: grid;
-  gap: 0.5rem;
-  align-content: start;
-  transition-delay: calc(var(--i, 0) * 70ms);
-}
-/* The mark on every item — this section is literally about the mark being
-   visible on site, so it appears on each piece of kit. */
-.w-kit-mark {
-  width: 12px;
-  aspect-ratio: 0.4161;
-  background: var(--deep-brown);
-  -webkit-mask: url('/mark.png') center / contain no-repeat;
-  mask: url('/mark.png') center / contain no-repeat;
-  margin-bottom: 0.4rem;
-}
-.w-kit-k { font-size: var(--step-1); font-weight: 600; color: var(--text); line-height: 1.15; }
-.w-kit-d { font-size: var(--step--1); line-height: 1.5; color: var(--text-2); }
-
-@media (max-width: 900px) {
-  .w-process { grid-template-columns: 1fr; }
-  .w-process-head { position: static; }
-  .w-kit-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-}
 
 /* ── The quote ────────────────────────────────────────────────────────
    Set at display size with no quotation marks drawn around it — the measure,
@@ -540,75 +762,6 @@
 }
 .w-quote-where { font-size: var(--step--2); color: var(--text-3); }
 
-/* ── Vetting ──────────────────────────────────────────────────────────
-   Two columns of checks, each ticking in as it is reached. Deliberately quiet:
-   this section's job is reassurance, and reassurance that shouts reads as
-   defensiveness. */
-.w-vetting {
-  background: var(--sunk);
-  border-block: 1px solid var(--line);
-  padding: clamp(3.5rem, 9vh, 6rem) var(--gutter);
-}
-.w-vetting-head {
-  max-width: var(--maxw);
-  margin: 0 auto clamp(2rem, 5vh, 3rem);
-  display: grid;
-  gap: 0.9rem;
-}
-.w-vetting-head h3 { font-size: var(--step-3); color: var(--text); max-width: 16ch; }
-
-.w-checks {
-  max-width: var(--maxw);
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0;
-}
-.w-checks li {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  gap: 1rem;
-  align-items: start;
-  padding: clamp(1.1rem, 2.8vh, 1.6rem) clamp(1rem, 2vw, 2rem) clamp(1.1rem, 2.8vh, 1.6rem) 0;
-  border-top: 1px solid var(--line);
-  transition-delay: calc(var(--i, 0) * 60ms);
-}
-
-/* The tick draws itself rather than fading in — a check being made, not a
-   glyph appearing. Two borders on a rotated box is the whole mark. */
-.w-check-tick {
-  width: 20px;
-  height: 20px;
-  margin-top: 0.15rem;
-  border: 1px solid var(--line-sand);
-  display: grid;
-  place-items: center;
-  flex: none;
-  position: relative;
-}
-.w-check-tick::after {
-  content: '';
-  width: 5px;
-  height: 10px;
-  border-right: 2px solid var(--deep-brown);
-  border-bottom: 2px solid var(--deep-brown);
-  rotate: 45deg;
-  translate: 0 -1px;
-  transform-origin: center;
-  scale: 0;
-  transition: scale 0.35s var(--ease-out);
-  transition-delay: calc(0.15s + var(--i, 0) * 60ms);
-}
-.w-checks li.is-in .w-check-tick::after { scale: 1; }
-
-.w-check-body { display: grid; gap: 0.3rem; }
-.w-check-k { font-size: var(--step-0); font-weight: 600; color: var(--text); }
-.w-check-d { font-size: var(--step--1); line-height: 1.55; color: var(--text-2); }
-
-@media (max-width: 760px) {
-  .w-checks { grid-template-columns: 1fr; }
-}
-
 /* ── The day, as a dial ───────────────────────────────────────────────
    Concentric arcs on a 24-hour clock. Each ring is one crew; overlaps at
    handover are visible as rings sitting alongside each other, and night cover
@@ -627,21 +780,33 @@
   inherits: false;
 }
 
-.w-day-block {
+.w-cover {
   max-width: var(--maxw);
   margin: 0 auto;
   padding: clamp(3.5rem, 9vh, 6rem) var(--gutter);
   display: grid;
   gap: clamp(1.8rem, 4vh, 2.6rem);
+  border-top: 1px solid var(--line);
 }
-.w-day-head { display: grid; gap: 1rem; }
+.w-cover-head { display: grid; gap: 1rem; max-width: 62ch; }
+
+/* Dial left, week and figures right. The two were separate sections and both
+   were answering "when" — a day drawn round beside a week drawn square says
+   one thing at two scales, which is an argument, where the same two stacked
+   were just repetition. */
+.w-cover-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  gap: clamp(2rem, 5vw, 4rem);
+  align-items: start;
+}
+.w-cover-side { display: grid; gap: clamp(1.6rem, 4vh, 2.4rem); align-content: start; }
 
 .w-dial {
   margin: 0;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr);
-  gap: clamp(2rem, 5vw, 4rem);
-  align-items: center;
+  gap: clamp(1.2rem, 3vh, 1.8rem);
+  align-content: start;
 }
 .w-dial svg { width: 100%; max-width: 460px; height: auto; justify-self: center; }
 
@@ -716,22 +881,12 @@
   letter-spacing: 0.04em;
 }
 
-@media (max-width: 860px) {
-  .w-dial { grid-template-columns: 1fr; }
+@media (max-width: 1000px) {
+  .w-cover-grid { grid-template-columns: 1fr; }
 }
 
-/* ── The week ─────────────────────────────────────────────────────────
-   The rota grid. Seven fixed columns against a label — never `auto-fit`, since
+/* The rota grid. Seven fixed columns against a label — never `auto-fit`, since
    a week that reflows to five columns on a narrow screen is not a week. */
-.w-roster {
-  max-width: var(--maxw);
-  margin: 0 auto;
-  padding: clamp(3.5rem, 9vh, 6rem) var(--gutter);
-  display: grid;
-  gap: clamp(1.8rem, 4vh, 2.6rem);
-}
-.w-roster-head { display: grid; gap: 1rem; }
-
 .w-grid { display: grid; gap: 4px; }
 
 .w-grid-days,
@@ -792,34 +947,26 @@
   .w-grid-r { font-size: var(--step--2); }
 }
 
-/* ── What it is ───────────────────────────────────────────────────────
-   Rows, not cards: four short definitions read faster as a list with a hard
-   left edge than as four boxes competing for the same attention. */
-.w-define {
-  max-width: var(--maxw);
-  margin: 0 auto;
-  padding: clamp(3.5rem, 9vh, 6rem) var(--gutter);
+/* The figures sit under the week rather than in a section of their own: they
+   are the numbers behind the coverage claim, and they were being asked to
+   carry a whole section on nothing but four short strings. */
+.w-figs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); }
+.w-figs li {
+  background: var(--tone);
+  padding: clamp(0.9rem, 2.4vh, 1.3rem) clamp(0.8rem, 2vw, 1.2rem);
   display: grid;
+  gap: 0.3rem;
 }
-.w-define-row {
-  display: grid;
-  grid-template-columns: 14rem minmax(0, 1fr);
-  gap: 1.5rem;
-  align-items: baseline;
-  padding: clamp(1.1rem, 3vh, 1.6rem) 0;
-  border-top: 1px solid var(--line);
+.w-fig-n {
+  font-family: var(--font-display);
+  font-size: var(--step-2);
+  font-weight: 800;
+  letter-spacing: var(--track-display);
+  color: var(--sand-text);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
 }
-.w-define-row:last-child { border-bottom: 1px solid var(--line); }
-/* One step down from the section headings. At `--step-2` the longest of these
-   labels — "Accountable", in tracked capitals — overran a fixed column and
-   collided with its own definition; at `--step-1` all four sit inside 14rem, so
-   the definitions start on one axis and the rows read as a list rather than as
-   four headings that happen to have text beside them. */
-.w-define-row h3 {
-  font-size: var(--step-1);
-  color: var(--text);
-}
-.w-define-row p { font-size: var(--step-0); color: var(--text-2); max-width: 46ch; }
+.w-fig-l { font-size: var(--step--2); color: var(--text-3); }
 
 /* ── Interlude ────────────────────────────────────────────────────────── */
 .w-interlude {
@@ -849,113 +996,185 @@
   color: var(--oryx-white);
 }
 
-/* ── Proof ────────────────────────────────────────────────────────────── */
-.w-proof {
+/* ── The levels ───────────────────────────────────────────────────────
+   A ladder, not a table. Each rung is inset a little further than the one
+   below it, so the eye climbs — the proposal's claim is that a worker moves up
+   through these, and five equal rows in a grid would say the opposite. */
+.w-levels {
   max-width: var(--maxw);
   margin: 0 auto;
-  padding: clamp(3.5rem, 9vh, 6rem) var(--gutter);
+  padding: clamp(4rem, 11vh, 7rem) var(--gutter);
   display: grid;
-  grid-template-columns: 0.8fr 1.2fr;
-  gap: clamp(2.5rem, 6vw, 5rem);
-  align-items: start;
+  gap: clamp(1.6rem, 4vh, 2.4rem);
 }
-.w-figs { display: grid; gap: 1px; background: var(--line); border: 1px solid var(--line); }
-.w-figs li {
+.w-levels-head { display: grid; gap: 0.9rem; max-width: 62ch; }
+
+.w-ladder { display: grid; gap: 1px; background: var(--line); border: 1px solid var(--line); }
+.w-rung {
   background: var(--tone);
-  padding: clamp(1.2rem, 3vh, 1.8rem);
+  padding: clamp(1rem, 2.6vh, 1.5rem) clamp(1rem, 2vw, 1.6rem);
+  /* The step. Small — 1.6rem across the whole ladder — because the rungs still
+     have to read as one column of text, not as a staircase of cards. */
+  padding-left: calc(clamp(1rem, 2vw, 1.6rem) + var(--i) * 1.6rem);
   display: grid;
-  gap: 0.3rem;
+  grid-template-columns: 3.2rem minmax(0, 1fr);
+  gap: 0.3rem 1.4rem;
+  align-items: baseline;
+  transition: background 0.25s var(--ease-out);
 }
-.w-fig-n {
-  font-family: var(--font-display);
-  font-size: var(--step-3);
-  color: var(--sand);
+.w-rung:hover { background: var(--raise); }
+.w-rung-n {
+  font-family: var(--font);
+  font-size: var(--step--1);
+  font-weight: 700;
+  color: var(--text-3);
   font-variant-numeric: tabular-nums;
-  line-height: 1;
+  letter-spacing: 0.1em;
 }
-.w-fig-l { font-size: var(--step--2); color: var(--text-3); }
-
-.w-for-line { font-size: var(--step-1); color: var(--text); max-width: 44ch; }
-.w-sectors { margin-top: 1.6rem; display: grid; }
-.w-sectors div {
-  display: grid;
-  grid-template-columns: 12rem 1fr;
-  gap: 0.2rem 1.2rem;
-  padding: 0.9rem 0;
-  border-top: 1px solid var(--line);
+.w-rung-body { display: grid; gap: 0.3rem; }
+.w-rung-k {
+  font-family: var(--font-display);
+  font-size: var(--step-1);
+  font-weight: 800;
+  letter-spacing: var(--track-display);
+  text-transform: uppercase;
+  color: var(--text);
+  line-height: 1.1;
 }
-.w-sectors dt { font-size: var(--step-0); font-weight: 600; color: var(--text); }
-.w-sectors dd { font-size: var(--step--1); color: var(--text-2); }
+.w-rung-d { font-size: var(--step-0); color: var(--text-2); max-width: 52ch; }
+.w-rung-ex {
+  font-size: var(--step--2);
+  letter-spacing: 0.04em;
+  color: var(--sand-text);
+}
 
-/* ── Inside ───────────────────────────────────────────────────────────── */
-.w-inside-block {
+@media (max-width: 720px) {
+  /* The inset is the first thing to go: at phone widths it eats the measure
+     and the ladder stops being readable before it stops being a ladder. */
+  .w-rung { padding-left: clamp(1rem, 2vw, 1.6rem); }
+  .w-rung { grid-template-columns: 2.6rem minmax(0, 1fr); }
+}
+
+/* ── The solutions ────────────────────────────────────────────────────
+   Five ways to buy the same people. Team-Based is the differentiator the
+   proposal names, so it is the one card that carries a fill — and it sits
+   directly under the deployment plan, which draws exactly that model. */
+.w-solutions {
   max-width: var(--maxw);
   margin: 0 auto;
-  padding: clamp(3rem, 8vh, 5rem) var(--gutter) clamp(4rem, 10vh, 7rem);
+  padding: clamp(4rem, 11vh, 7rem) var(--gutter);
   display: grid;
-  grid-template-columns: 1.2fr 0.9fr;
-  gap: clamp(2.5rem, 6vw, 5rem);
-  align-items: start;
+  gap: clamp(1.6rem, 4vh, 2.4rem);
 }
-.w-inside-copy { display: grid; gap: 1.2rem; }
-.w-inside-head { font-size: var(--step-3); color: var(--text); max-width: 14ch; }
+.w-solutions-head { display: grid; gap: 0.9rem; max-width: 56ch; }
 
-/* Editorial entries rather than list rows: the name gets display size and its
-   own line, and the number sits above it as a folio. Buried in a 3rem gutter
-   these read as footnotes; this is what the client is buying. */
-.w-inside { margin-top: 0.6rem; display: grid; }
-.w-inside li {
-  position: relative;
+/* Five explicit columns, not `auto-fit`. Auto-fit fitted four and wrapped the
+   fifth onto a row of its own beside an empty cell — five models are a set,
+   and a set should not have a widow. */
+.w-models {
   display: grid;
-  gap: 0.4rem;
-  padding: clamp(1.8rem, 4.5vh, 2.6rem) 0 clamp(1.6rem, 4vh, 2.2rem) clamp(1.4rem, 3vw, 2.6rem);
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+}
+.w-model {
+  background: var(--tone);
+  padding: clamp(1.2rem, 3vh, 1.8rem) clamp(1rem, 2vw, 1.4rem);
+  display: grid;
+  gap: 0.5rem;
+  align-content: start;
+  transition: background 0.25s var(--ease-out);
+}
+.w-model:hover { background: var(--raise); }
+.w-model-n {
+  font-family: var(--font);
+  font-size: var(--step--2);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+}
+.w-model-k {
+  font-family: var(--font-display);
+  font-size: var(--step-1);
+  font-weight: 800;
+  letter-spacing: var(--track-display);
+  text-transform: uppercase;
+  color: var(--text);
+  line-height: 1.05;
+}
+.w-model-d { font-size: var(--step--1); color: var(--text-2); line-height: 1.5; }
+/* The example is the offer. Set apart on its own rule so it reads as a figure
+   rather than as the last sentence of the description. */
+.w-model-ex {
+  margin-top: 0.3rem;
+  padding-top: 0.7rem;
   border-top: 1px solid var(--line);
-  transition: padding-left 0.4s var(--ease-out);
-}
-/* A brown rule in the margin that lengthens as the entry is pointed at —
-   the editorial equivalent of Transport's sand bar, doing the same job of
-   making these read as the offer rather than as a list. */
-.w-inside li::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: clamp(1.8rem, 4.5vh, 2.6rem);
-  width: 2px;
-  height: 1.6em;
-  background: var(--deep-brown);
-  opacity: 0.35;
-  transition: opacity 0.4s var(--ease-out), height 0.4s var(--ease-out);
-}
-.w-inside li:hover::before { opacity: 1; height: 2.6em; }
-.w-inside li:last-child { border-bottom: 1px solid var(--line); }
-.w-inside-n {
   font-size: var(--step--2);
   font-weight: 600;
-  letter-spacing: var(--track-label);
   color: var(--sand-text);
-  font-variant-numeric: tabular-nums;
 }
-.w-inside-body { display: grid; gap: 0.4rem; }
-.w-inside-k {
-  font-family: var(--font-display);
-  font-variation-settings: 'opsz' 72, 'SOFT' 40;
-  font-size: var(--step-3);
-  font-weight: 500;
-  letter-spacing: var(--track-display);
-  line-height: 1.02;
-  color: var(--text);
-}
-.w-inside-d { font-size: var(--step-0); line-height: 1.6; color: var(--text-2); max-width: 48ch; }
-.w-inside-shot { position: sticky; top: 2rem; }
-.w-inside-shot img { width: 100%; aspect-ratio: 3 / 4; object-fit: cover; }
+.w-model.is-lead { background: var(--raise-2); }
+.w-model.is-lead .w-model-k { color: var(--sand); }
 
-@media (max-width: 900px) {
-  .w-shift,
-  .w-proof,
-  .w-inside-block { grid-template-columns: 1fr; }
-  .w-shift-intro,
-  .w-inside-shot { position: static; }
-  .w-define-row,
-  .w-sectors div { grid-template-columns: 1fr; gap: 0.4rem; }
-  .w-block { grid-template-columns: 4.2rem 1fr; gap: 1rem; }
+/* ── The principle ────────────────────────────────────────────────────
+   Set like the quote band, because that is what it is: a statement the company
+   is making about itself, not another table of data. */
+.w-compliance {
+  border-block: 1px solid var(--line);
+  background: var(--sunk);
+  padding: clamp(3rem, 9vh, 5rem) var(--gutter);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: clamp(2rem, 6vw, 5rem);
+  align-items: start;
+  max-width: var(--maxw);
+  margin: 0 auto;
+}
+.w-compliance-say { display: grid; gap: 1rem; }
+.w-compliance-line {
+  font-family: var(--font-display);
+  font-size: var(--step-3);
+  font-weight: 800;
+  letter-spacing: var(--track-display);
+  text-transform: uppercase;
+  line-height: 1.02;
+  color: var(--sand);
+  max-width: 14ch;
+}
+.w-compliance-d { font-size: var(--step-0); color: var(--text-2); max-width: 46ch; line-height: 1.55; }
+
+.w-checks { display: grid; gap: 1px; background: var(--line); border: 1px solid var(--line); }
+.w-checks li {
+  background: var(--tone);
+  padding: clamp(0.9rem, 2.4vh, 1.2rem) clamp(0.9rem, 2vw, 1.3rem);
+  display: grid;
+  grid-template-columns: minmax(6rem, 8rem) minmax(0, 1fr);
+  gap: 1rem;
+  align-items: baseline;
+}
+.w-check-k {
+  font-family: var(--font);
+  font-size: var(--step--2);
+  font-weight: 700;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--sand-text);
+}
+.w-check-d { font-size: var(--step--1); color: var(--text-2); }
+
+@media (max-width: 1100px) {
+  .w-models { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 720px) {
+  .w-models { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 480px) {
+  .w-models { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 860px) {
+  .w-compliance { grid-template-columns: 1fr; }
+  .w-checks li { grid-template-columns: 1fr; gap: 0.3rem; }
 }

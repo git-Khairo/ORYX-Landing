@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef } from 'react'
 import gsap from 'gsap'
 import { film } from '../content/media'
 import OryxOrigin from './OryxOrigin'
@@ -36,10 +36,9 @@ const wipePath = (p, down) => {
  * stall would land exactly on the cut. Off-screen clips are paused so only one
  * is ever decoding.
  */
-export default function FilmStage({ activeId, enter, cam, hold, reduced }) {
+export default function FilmStage({ activeId, enter, cam, hold, variant, reduced }) {
   const videos = useRef({})
   const wipe = useRef(null)
-  const [ready, setReady] = useState({})
 
   /* The outgoing shot has to stay on screen for the length of the cut — a wipe
      needs something to wipe *over*.
@@ -58,7 +57,11 @@ export default function FilmStage({ activeId, enter, cam, hold, reduced }) {
     prev.current = seen.current
     seen.current = activeId
   }
-  const prevId = prev.current
+  /* The end card has no film behind it (`activeId` is null). Dropping the
+     previous shot there as well is deliberate: the card is the mark on the
+     ground, and leaving the last frame of the letters underneath it would put
+     footage behind something that is meant to be bare. */
+  const prevId = activeId ? prev.current : null
 
   useEffect(() => {
     Object.entries(videos.current).forEach(([id, node]) => {
@@ -121,9 +124,7 @@ export default function FilmStage({ activeId, enter, cam, hold, reduced }) {
         return (
           <div
             key={id}
-            className={`stage-clip ${live ? 'is-live' : ''} ${prev ? 'is-prev' : ''} ${
-              ready[id] ? 'is-ready' : ''
-            }`}
+            className={`stage-clip ${live ? 'is-live' : ''} ${prev ? 'is-prev' : ''}`}
             /* The live shot carries its own camera move and runs it over its
                own hold. Every shot pushing in at the same rate is what made
                six clips read as a slideshow; a film changes setup on the cut,
@@ -133,10 +134,15 @@ export default function FilmStage({ activeId, enter, cam, hold, reduced }) {
             style={live ? { '--hold': `${hold}s` } : undefined}
             ref={live ? wipe : null}
           >
-            {/* The origin shot is a composite, not a clip — the animal and the
-                mark have to move independently for the horns to detach. */}
-            {id === 'oryx' ? (
-              <OryxOrigin play={live} reduced={reduced} />
+            {/* The two oryx shots are composites, not clips — the plate, the
+                mark and the sun are separate objects that have to move against
+                each other. They share one component and differ by variant. */}
+            {id === 'oryx' || id === 'oryxSun' ? (
+              <OryxOrigin
+                play={live}
+                reduced={reduced}
+                variant={id === 'oryxSun' ? 'sunset' : 'day'}
+              />
             ) : clip.kind === 'image' && clip.src ? (
               <img src={clip.src} alt="" />
             ) : clip.src ? (
@@ -150,7 +156,6 @@ export default function FilmStage({ activeId, enter, cam, hold, reduced }) {
                 playsInline
                 preload="auto"
                 tabIndex={-1}
-                onCanPlay={() => setReady((r) => (r[id] ? r : { ...r, [id]: true }))}
               />
             ) : null}
           </div>

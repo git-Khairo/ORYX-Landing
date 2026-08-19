@@ -37,7 +37,7 @@ export default function RenovationWorld({ service, onClose, onRequest }) {
         </button>
 
         <nav className="r-nav-cell r-nav-links" aria-label="Renovation sections">
-          <a href="#r-drawing">Drawing</a>
+          <a href="#r-build">Drawing</a>
           <a href="#r-programme">Programme</a>
           <a href="#r-build">Build-up</a>
           <a href="#r-spec">Specification</a>
@@ -81,50 +81,14 @@ export default function RenovationWorld({ service, onClose, onRequest }) {
           A floor plan that draws itself. Transport gets a map and Workforce a
           rota; this is the document this trade actually works from, and no
           other page on the site could carry it. */}
-      <section className="r-plan-block" id="r-drawing">
-        <div className="r-plan-head">
-          <p className="world-kicker" data-reveal>Drawn before it is built</p>
-          <p className="world-line" data-reveal>
-            Every partition, service run and finish agreed on paper first, so the
-            programme has something to be measured against.
-          </p>
-        </div>
-
-        <figure className="r-plan" data-reveal>
-          <svg viewBox="0 0 860 460" role="img" aria-label="Floor plan of a commercial fit-out">
-            <path className="r-plan-shell" d={world.plan.shell} pathLength="1" />
-            {world.plan.walls.map((d, i) => (
-              <path className="r-plan-wall" key={d} d={d} pathLength="1" style={{ '--i': i }} />
-            ))}
-            {world.plan.rooms.map((r, i) => (
-              <text
-                className="r-plan-room"
-                key={r.k}
-                x={r.x}
-                y={r.y}
-                style={{ '--i': i }}
-              >
-                {r.k}
-              </text>
-            ))}
-            {/* A dimension line, because a plan without one is a diagram. */}
-            <g className="r-plan-dim">
-              <path d="M40 442 H820" />
-              <path d="M40 436 V448" />
-              <path d="M820 436 V448" />
-              <text x="430" y="432">1 240 m²</text>
-            </g>
-          </svg>
-        </figure>
-      </section>
-
       {/* ── The programme ─────────────────────────────────────────────
           Twelve weeks, five phases, and visible overlap. The overlap is the
           product: trades running into each other is what one accountable
           programme buys, and what a queue of separate contractors cannot. */}
       <section className="r-programme" id="r-programme">
         <div className="r-prog-head">
-          <p className="world-kicker" data-reveal>One programme, one date</p>
+          <p className="world-kicker" data-reveal>Programme · Gantt</p>
+          <h3 className="r-prog-h" data-reveal>One programme, one date</h3>
           <p className="world-line" data-reveal>
             Phases overlap on purpose. A queue of separate contractors cannot do
             this — it is the whole reason to hold the trades under one contract.
@@ -199,7 +163,7 @@ export default function RenovationWorld({ service, onClose, onRequest }) {
       {/* ── What it is ────────────────────────────────────────────────── */}
       <section className="r-define">
         {world.definition.map((it, i) => (
-          <article className="r-define-card" key={it.k} data-reveal>
+          <article className="r-define-card" key={it.k} data-reveal style={{ '--i': i }}>
             <span className="r-define-n">{String(i + 1).padStart(2, '0')}</span>
             <h3>{it.k}</h3>
             <p>{it.d}</p>
@@ -216,8 +180,8 @@ export default function RenovationWorld({ service, onClose, onRequest }) {
       {/* ── Proof and audience ────────────────────────────────────────── */}
       <section className="r-proof">
         <ul className="r-figs">
-          {world.figures.map((f) => (
-            <li key={f.l} data-reveal>
+          {world.figures.map((f, i) => (
+            <li key={f.l} data-reveal style={{ '--i': i }}>
               <span className="r-fig-n">{f.n}</span>
               <span className="r-fig-l">{f.l}</span>
             </li>
@@ -238,24 +202,6 @@ export default function RenovationWorld({ service, onClose, onRequest }) {
       </section>
 
       {/* ── What's inside ─────────────────────────────────────────────── */}
-      <section className="r-inside-block" id="r-scope">
-        <div className="r-inside-head">
-          <p className="world-kicker" data-reveal>Scope of works</p>
-          <h3 data-reveal>Five packages, one contract</h3>
-        </div>
-        <ol className="r-inside">
-          {world.inside.map((it, i) => (
-            <li key={it.k} data-reveal>
-              {/* Clause numbering, as a specification would carry it — the
-                  packages are things you sign for, not bullet points. */}
-              <span className="r-inside-n">{`0${i + 1}.${(i + 1) * 10}`}</span>
-              <span className="r-inside-k">{it.k}</span>
-              <span className="r-inside-d">{it.d}</span>
-            </li>
-          ))}
-        </ol>
-      </section>
-
       <RenovationFooter service={service} onClose={onClose} onRequest={onRequest} />
     </WorldShell>
   )
@@ -364,6 +310,13 @@ function Layers({ layers }) {
       const h = scroller.clientHeight
       const span = r.height - h
       const p = span > 0 ? Math.min(1, Math.max(0, -r.top / span)) : 0
+
+      /* Two readings of the same scroll. `--p` is continuous and drives the
+         separation, so the drawing pulls apart smoothly; `live` is quantised
+         and drives which label is lit, because a label cannot be 40% lit.
+         Written straight to the element — putting a continuous value through
+         React state would re-render the section on every frame. */
+      el.style.setProperty('--p', p.toFixed(4))
       setLive(Math.min(layers.length - 1, Math.floor(p * layers.length)))
     }
     const onScroll = () => {
@@ -381,9 +334,20 @@ function Layers({ layers }) {
   return (
     <section className="r-layers" id="r-build" ref={section}>
       <div className="r-layers-sticky">
-        <p className="world-kicker">In the order it is built</p>
+        <div className="r-layers-head">
+          <p className="world-kicker">In the order it is built</p>
+          <p className="world-line">
+            A commercial floor, pulled apart. Each plate is a stage of the works
+            and a point where something gets signed off — the order is not a
+            preference, it is what closing a ceiling over an untested service
+            run costs to undo.
+          </p>
+        </div>
 
-        <ol className="r-stack">
+        <div className="r-build">
+          <Axo layers={layers} live={live} />
+
+          <ol className="r-stack">
           {layers.map((l, i) => (
             <li
               key={l.k}
@@ -396,10 +360,120 @@ function Layers({ layers }) {
               <span className="r-layer-k">{l.k}</span>
               <span className="r-layer-d">{l.d}</span>
             </li>
-          ))}
-        </ol>
+            ))}
+          </ol>
+        </div>
       </div>
     </section>
+  )
+}
+
+/**
+ * The build-up, drawn.
+ *
+ * A dimetric projection: plan coordinates in 0–1 go through `iso()` and come
+ * back as screen points, so every layer's motif is authored as if on a flat
+ * plan and the projection is applied once. Hand-writing the diamonds would
+ * have meant recomputing four corners for every line on every plate.
+ *
+ * The separation is CSS, not JavaScript — each plate reads `--p` off the
+ * section and lifts by its own index, which keeps the whole animation on the
+ * compositor and off the main thread.
+ */
+const W = 300
+const K = 0.54
+/* The base y sets where the stack sits at rest, and it has to leave headroom:
+   the top plate lifts by `4 × --lift` as the section scrolls, so the space
+   above the drawing is not padding, it is the travel. 208 is the lowest this
+   can go and still keep the finishes plate inside the box at full separation —
+   it was 250, which parked the whole drawing too far down its own frame and
+   left a gap under the heading. */
+const iso = (u, v) => [360 + (u - v) * W, 208 + (u + v) * W * K]
+const pt = (u, v) => iso(u, v).join(',')
+const line = (u1, v1, u2, v2) => `M${pt(u1, v1)} L${pt(u2, v2)}`
+
+function Axo({ layers, live }) {
+  const plate = [pt(0, 0), pt(1, 0), pt(1, 1), pt(0, 1)].join(' ')
+
+  /* One motif per plate, authored in plan space. Five identical diamonds
+     would separate beautifully and say nothing about what happens on each. */
+  const motifs = [
+    /* 01 Slab — the bare structural grid, columns marked. */
+    <g key="slab" className="r-axo-slab">
+      {[0.25, 0.5, 0.75].map((u) => <path key={`u${u}`} d={line(u, 0, u, 1)} />)}
+      {[0.25, 0.5, 0.75].map((v) => <path key={`v${v}`} d={line(0, v, 1, v)} />)}
+      {[[0.25, 0.25], [0.75, 0.25], [0.25, 0.75], [0.75, 0.75]].map(([u, v]) => (
+        <circle key={`${u}-${v}`} cx={iso(u, v)[0]} cy={iso(u, v)[1]} r="5" />
+      ))}
+    </g>,
+
+    /* 02 Services — runs crossing the floor, drawn heavier than the grid
+       because on a real drawing they are the thing being coordinated. */
+    <g key="svc" className="r-axo-svc">
+      <path d={line(0.08, 0.2, 0.92, 0.2)} />
+      <path d={line(0.08, 0.5, 0.92, 0.5)} />
+      <path d={line(0.08, 0.8, 0.92, 0.8)} />
+      <path className="r-axo-riser" d={line(0.15, 0.2, 0.15, 0.8)} />
+      <path className="r-axo-riser" d={line(0.85, 0.2, 0.85, 0.8)} />
+    </g>,
+
+    /* 03 Partitions — walls with height, so this plate reads as the one that
+       builds upward. Each is a plan line extruded by a fixed screen offset. */
+    <g key="part" className="r-axo-part">
+      {[[0.4, 0, 0.4, 0.62], [0.4, 0.62, 1, 0.62], [0, 0.35, 0.4, 0.35]].map(([a, b, c, d], i) => {
+        const [x1, y1] = iso(a, b)
+        const [x2, y2] = iso(c, d)
+        const h = 26
+        return (
+          <polygon
+            key={i}
+            points={`${x1},${y1} ${x2},${y2} ${x2},${y2 - h} ${x1},${y1 - h}`}
+          />
+        )
+      })}
+    </g>,
+
+    /* 04 Ceiling — a tile grid, the densest plate, which is what a ceiling
+       looks like from above and reads as at a glance. */
+    <g key="ceil" className="r-axo-ceil">
+      {Array.from({ length: 7 }, (_, i) => (i + 1) / 8).map((u) => (
+        <path key={`u${u}`} d={line(u, 0, u, 1)} />
+      ))}
+      {Array.from({ length: 7 }, (_, i) => (i + 1) / 8).map((v) => (
+        <path key={`v${v}`} d={line(0, v, 1, v)} />
+      ))}
+    </g>,
+
+    /* 05 Finishes — furniture blocks, the only filled shapes in the drawing,
+       because this is the only plate that is about the room being used. */
+    <g key="fin" className="r-axo-fin">
+      {[[0.1, 0.08, 0.3, 0.26], [0.55, 0.08, 0.9, 0.3], [0.1, 0.68, 0.34, 0.92], [0.6, 0.66, 0.9, 0.92]].map(
+        ([a, b, c, d], i) => (
+          <polygon key={i} points={[pt(a, b), pt(c, b), pt(c, d), pt(a, d)].join(' ')} />
+        )
+      )}
+    </g>,
+  ]
+
+  return (
+    <figure className="r-axo" data-reveal>
+      <svg viewBox="0 0 720 596" role="img" aria-label="Exploded axonometric of a commercial floor: slab, services, partitions, ceiling, finishes">
+        {/* Bottom plate first, so the ones above overlap it as they should. */}
+        {layers.map((l, i) => (
+          <g
+            key={l.k}
+            className={`r-axo-layer ${i <= live ? 'is-built' : ''} ${i === live ? 'is-live' : ''}`}
+            style={{ '--i': layers.length - 1 - i }}
+          >
+            <polygon className="r-axo-plate" points={plate} />
+            {motifs[i]}
+            <text className="r-axo-n" x={iso(1, 0)[0] + 16} y={iso(1, 0)[1]}>
+              {l.n}
+            </text>
+          </g>
+        ))}
+      </svg>
+    </figure>
   )
 }
 

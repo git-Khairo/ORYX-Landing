@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import WorldShell, { Media } from './WorldShell'
 import { film, portal, gallery, closing } from '../../content/media'
+import { clients } from '../../content/copy'
 import { useSmoothProgress } from '../../lib/useReveal'
 
 /**
@@ -144,6 +145,32 @@ export default function TransportWorld({ service, onClose, onRequest }) {
               </li>
             ))}
           </ul>
+        </div>
+      </section>
+
+      {/* ── Who it runs for ───────────────────────────────────────────
+          A tape, because a client list on a dispatch page should behave like
+          the board in an operations room: always moving, never demanding to be
+          read. It renders sector names until real logos are dropped into
+          `/public/clients/` — see `clients` in copy.js. */}
+      <section className="t-tape" aria-label="Clients">
+        <div className="t-tape-rail">
+          {/* Two identical runs. The loop is a translate of exactly -50%, so
+              the second copy is under the pointer at the instant the first
+              leaves — one copy would show a gap on every pass. */}
+          {[0, 1].map((copy) => (
+            <ul className="t-tape-run" key={copy} aria-hidden={copy === 1}>
+              {clients.map((c) => (
+                <li key={c.name}>
+                  {c.logo ? (
+                    <img src={c.logo} alt={c.name} loading="lazy" />
+                  ) : (
+                    <span>{c.name}</span>
+                  )}
+                </li>
+              ))}
+            </ul>
+          ))}
         </div>
       </section>
 
@@ -429,6 +456,23 @@ function Route({ stops, lede, shot }) {
       const p = span > 0 ? Math.min(1, Math.max(0, (0.75 * h - r.top) / span)) : 0
       el.style.setProperty('--run', String(p))
       setLive(Math.min(stops.length - 1, Math.floor(p * stops.length)))
+
+      /* Pin the line to the first and last dot, measured.
+         CSS can put its top on the first dot easily enough — that offset is a
+         constant — but its foot cannot be expressed at all: `bottom` counts up
+         from the container, and the distance from there to the last dot's
+         centre is whatever the last stop's content happens to make it. Left to
+         CSS the line overshot by 55–120px and the marker parked below
+         "Delivered" rather than on it. Two numbers, written here, and the line
+         spans dot-centre to dot-centre exactly. */
+      const dots = ol.querySelectorAll('.t-stop-dot')
+      if (dots.length > 1) {
+        const first = dots[0].getBoundingClientRect()
+        const last = dots[dots.length - 1].getBoundingClientRect()
+        const top = first.top + first.height / 2 - r.top
+        ol.style.setProperty('--line-top', `${top}px`)
+        ol.style.setProperty('--line-h', `${last.top + last.height / 2 - r.top - top}px`)
+      }
     }
     const onScroll = () => {
       if (!frame) frame = requestAnimationFrame(update)

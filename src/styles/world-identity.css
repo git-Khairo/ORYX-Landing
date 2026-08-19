@@ -64,7 +64,6 @@
 .world--transport .t-inside-n,
 .world--transport .t-pod-meta,
 .world--transport .t-map-s,
-.world--transport .world-index,
 .world--transport .world-eyebrow {
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
@@ -87,21 +86,90 @@
   letter-spacing: 0.22em;
 }
 
-/* ═══ 02 · Workforce — "Roster" ═════════════════════════════════════════
-   The light one. Same five colours, inverted: Oryx White is the ground and
-   Oryx Black is the type, with Deep Brown carrying the accents that sand is
-   too pale to carry on a light surface.
+/* ═══ 02 · Workforce — "Site" ═══════════════════════════════════════════
+   The heavy one. Warm near-black, sand at full strength, and a wide grotesque
+   run at 800 for display — workwear and signage, not an editorial feature.
 
-   This is the people page, and it is the only one that reads like something
-   written rather than something operated. */
+   It was light and serif for a while, which was wrong twice over: a page about
+   crews, uniforms and site work does not want a magazine's voice, and the
+   light ground also broke its own opening frame — the eyebrow and promise
+   render Deep Brown over a 94%-opaque near-black scrim, about 1.5:1 and
+   effectively invisible. Both problems go with the inversion. */
 .world--workforce {
-  --font-display: 'Fraunces Variable', 'Fraunces', Georgia, serif;
-  --font: 'Work Sans Variable', 'Work Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Archivo Variable', 'Archivo', ui-sans-serif, system-ui, sans-serif;
+  --font: 'Archivo Variable', 'Archivo', ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font);
 
-  --track-display: -0.012em;
-  --track-display-lg: -0.02em;
-  --track-label: 0.14em;
+  --track-display: 0.01em;
+  --track-display-lg: 0.04em;
+  --track-label: 0.18em;
+
+  --tone: #16150f;
+  --ground: #16150f;
+  --sunk: #0f0e0a;
+  --raise: #1f1d15;
+  --raise-2: #29261c;
+
+  --text: #f4f1e8;
+  --text-2: #b6b2a4;
+  --text-3: #86826f;
+  --sand-text: #d4b98d;
+
+  --fill-strong: var(--sand);
+  --fill-soft: rgba(200, 169, 120, 0.34);
+
+  --line: rgba(244, 241, 232, 0.14);
+  --line-soft: rgba(244, 241, 232, 0.07);
+  --line-sand: rgba(200, 169, 120, 0.34);
+}
+
+/* Heavy, tight and upper-case. Archivo carries weight to 900; at display size
+   it wants 800 — 900 closes the counters up at these sizes and the words stop
+   being shapes you can read at a glance. */
+.world--workforce h1,
+.world--workforce h2,
+.world--workforce h3 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: var(--track-display);
+  line-height: 0.98;
+}
+
+/* The display spans get the same treatment. These were un-capitalised for
+   Fraunces, which is exactly the setting a serif needs and exactly the wrong
+   one here. */
+.world--workforce .w-block-k,
+.world--workforce .w-tab-k,
+.world--workforce .w-dial-c,
+.world--workforce .w-domain-name {
+  font-family: var(--font-display);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: var(--track-display);
+}
+
+/* ═══ 03 · Renovation — "Programme" ═════════════════════════════════════
+   The light one, and it is the right page for it: this is drawings,
+   specifications and finished interiors, all of which live on paper. Cream
+   ground, Oryx Black type, Deep Brown carrying the accents that sand is too
+   pale to carry on a light surface.
+
+   The voice stays a drafting face and a mono, and the page is still laid out
+   as a drawing sheet — which is now literally what it looks like. */
+.world--renovation {
+  /* The UA paints scrollbars and form controls from this. `global.css` sets
+     `dark` on the root for the whole site, so without this the one light page
+     keeps dark scrollbars and a dark caret in its range slider. */
+  color-scheme: light;
+
+  --font-display: 'Space Grotesk Variable', 'Space Grotesk', ui-sans-serif, sans-serif;
+  --font: 'Space Grotesk Variable', 'Space Grotesk', ui-sans-serif, sans-serif;
+  --font-mono: 'Space Mono', ui-monospace, 'SFMono-Regular', monospace;
+
+  --track-display: -0.005em;
+  --track-display-lg: 0.01em;
+  --track-label: 0.16em;
 
   --tone: #f4f1e8;
   --ground: #f4f1e8;
@@ -112,8 +180,7 @@
   --text: #1c1c1a;
   --text-2: #55534c;
   --text-3: #7d7a72;
-  /* Sand at #c8a978 is 2.1:1 on this ground — fine as a fill, unreadable as
-     type. Deep Brown is the accent that survives the inversion. */
+  /* Sand is 2.1:1 on this ground — fine as a fill, unreadable as type. */
   --sand-text: #6b4f2a;
 
   --fill-strong: var(--deep-brown);
@@ -121,81 +188,7 @@
 
   --line: rgba(28, 28, 26, 0.16);
   --line-soft: rgba(28, 28, 26, 0.08);
-  --line-sand: rgba(74, 56, 40, 0.3);
-}
-
-/* Fraunces is an optical-size serif with a soft, high-contrast display cut.
-   Set in capitals it would look like a wedding invitation; set in sentence
-   case at a large optical size it looks like an editorial feature, which is
-   what this page is. */
-.world--workforce h1,
-.world--workforce h2,
-.world--workforce h3 {
-  font-family: var(--font-display);
-  font-weight: 500;
-  font-variation-settings: 'opsz' 96, 'SOFT' 30;
-  text-transform: none;
-  letter-spacing: var(--track-display);
-  line-height: 1.06;
-}
-
-/* The same applies to the display spans, which are not headings but are set in
-   the display face. They were authored in tracked capitals for Cinzel, and
-   capitals are the one setting Fraunces should never be in. */
-.world--workforce .w-block-k,
-.world--workforce .w-badge-r,
-.world--workforce .w-dial-c {
-  font-family: var(--font-display);
-  font-weight: 500;
-  font-variation-settings: 'opsz' 72, 'SOFT' 40;
-  text-transform: none;
-  letter-spacing: var(--track-display);
-}
-
-/* At reading size the optical axis goes the other way: lower `opsz` thickens
-   the hairlines so small settings do not disintegrate. */
-.world--workforce .w-block-d,
-.world--workforce .world-line,
-.world--workforce .world-lede,
-.world--workforce p {
-  font-family: var(--font);
-}
-
-/* The editorial move: an asymmetric measure. Where Transport fills its width
-   with a dense read-out, this page holds its text to a comfortable column and
-   lets the margin carry the page — which is what makes it read as something
-   written rather than something operated. */
-.world--workforce .w-shift { grid-template-columns: 0.85fr 1.15fr; }
-.world--workforce .world-lede { font-size: var(--step-2); line-height: 1.4; max-width: 22ch; }
-.world--workforce .w-block-d { max-width: 46ch; line-height: 1.6; }
-
-/* ═══ 03 · Renovation — "Programme" ═════════════════════════════════════
-   Deep Brown dominant, sand as line-work rather than as highlight. The voice
-   is a drafting face and a mono, and the page is laid out like a drawing
-   sheet — which is the document this trade actually works from. */
-.world--renovation {
-  --font-display: 'Space Grotesk Variable', 'Space Grotesk', ui-sans-serif, sans-serif;
-  --font: 'Space Grotesk Variable', 'Space Grotesk', ui-sans-serif, sans-serif;
-  --font-mono: 'Space Mono', ui-monospace, 'SFMono-Regular', monospace;
-
-  --track-display: -0.005em;
-  --track-display-lg: 0.01em;
-  --track-label: 0.16em;
-
-  --tone: #191310;
-  --ground: #191310;
-  --sunk: #120d0a;
-  --raise: #241a13;
-  --raise-2: #2e2118;
-
-  --text: #f4f1e8;
-  --text-2: #b6ada2;
-  --text-3: #8a7f72;
-  --sand-text: #d4b98d;
-
-  --line: rgba(244, 241, 232, 0.13);
-  --line-soft: rgba(244, 241, 232, 0.06);
-  --line-sand: rgba(200, 169, 120, 0.34);
+  --line-sand: rgba(74, 56, 40, 0.32);
 }
 
 .world--renovation h1,
@@ -211,12 +204,9 @@
    the annotation voice of a drawing. */
 .world--renovation .r-layer-n,
 .world--renovation .r-define-n,
-.world--renovation .r-inside-n,
 .world--renovation .r-fig-n,
 .world--renovation .r-gantt-scale,
-.world--renovation .r-plan-room,
-.world--renovation .r-plan-dim text,
-.world--renovation .world-index,
+.world--renovation .r-axo-n,
 .world--renovation .world-eyebrow,
 .world--renovation .r-swatch-k {
   font-family: var(--font-mono);
@@ -231,14 +221,16 @@
    single word is looked at. */
 .world--renovation .world-scroll {
   background-image:
-    linear-gradient(to right, rgba(200, 169, 120, 0.05) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(200, 169, 120, 0.05) 1px, transparent 1px);
+    /* Dark ink at low alpha. As sand-on-dark this was invisible the moment the
+       ground went cream — graph paper is ruled in ink, not in highlight. */
+    linear-gradient(to right, rgba(74, 56, 40, 0.09) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(74, 56, 40, 0.09) 1px, transparent 1px);
   background-size: 44px 44px;
 }
 
 /* Sections that carry drawings sit on the sheet, boxed, the way a detail is
    boxed on a real drawing. */
-.world--renovation .r-plan,
+.world--renovation .r-axo,
 .world--renovation .r-gantt,
 .world--renovation .r-scrub {
   border: 1px solid var(--line-sand);

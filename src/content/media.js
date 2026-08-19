@@ -10,6 +10,22 @@
  * downloaded into `public/film/`. Every URL verified in session: 200, video/mp4.
  */
 export const film = {
+  /* The film opens here: the animal small in a wide desert, walking. A gemsbok
+     like the close-up that follows, so the push from this frame into that one
+     reads as one continuous move on one animal rather than a cut between two.
+
+     Held as its own entry so a commissioned or licensed clip can replace this
+     single line later without touching the sequence around it. */
+  oryxWide: {
+    kind: 'image',
+    src: 'https://images.pexels.com/photos/34800154/pexels-photo-34800154.jpeg?auto=compress&cs=tinysrgb&w=2400',
+    credit: 'https://www.pexels.com/photo/oryx-antelope-in-namibian-desert-34800154/',
+    /* Where the animal stands, as a fraction of the plate. The push targets
+       this point, so swapping the plate means re-measuring these two numbers
+       and nothing else. */
+    subject: { x: 0.34, y: 0.62 },
+  },
+
   /* The origin shot, and the only frame on the site where the animal appears.
      A still rather than a clip, deliberately: the free libraries have no
      front-facing oryx footage, and this shot needs the head square to camera
@@ -33,6 +49,16 @@ export const film = {
        these three numbers are the only thing that needs re-measuring. */
     horn: { x: 0.62, y: 0.32, spread: 0.144 },
   },
+  /* The sunset shot points at the *same file* as the close-up above. That is
+     the whole trick: shot three is not a second animal photographed at dusk —
+     which would never match — it is the identical plate under a warm grade
+     with a sun rising inside the mark. A time-lapse jump on one frame. */
+  oryxSun: {
+    kind: 'image',
+    src: 'https://images.pexels.com/photos/37177683/pexels-photo-37177683.jpeg?auto=compress&cs=tinysrgb&w=2400',
+    credit: 'https://www.pexels.com/photo/close-up-of-a-gemsbok-37177683/',
+  },
+
   facilities: {
     src: 'https://videos.pexels.com/video-files/8783705/8783705-hd_1920_1080_30fps.mp4',
     credit: 'https://www.pexels.com/video/drone-footage-of-modern-city-buildings-8783705/',
@@ -48,10 +74,31 @@ export const film = {
     src: 'https://videos.pexels.com/video-files/6195153/6195153-hd_1920_1080_25fps.mp4',
     credit: 'https://www.pexels.com/video/cleaners-carrying-working-tools-6195153/',
   },
+  /* A building going up, sped up — a genuine time-lapse of a concrete frame
+     rising, scaffolded, with a tower crane behind it.
+
+     Chosen on two constraints beyond the subject. No writing anywhere in
+     frame: every other free construction time-lapse is a Hong Kong or
+     Singapore shoot with Chinese signage on the hoardings, and 6164052 — the
+     one that best matched otherwise — carries a banner across the building.
+     And no saturated primary: the tilt-shift family (5513059, 5513062,
+     8598730, 8598739, 9425993) is all cobalt netting and orange barriers,
+     which is four colours this palette does not have. This one is concrete,
+     haze and grey sky, which is the Renovation page's own range.
+
+     ⚠ 64 MB — the only rendition Pexels offers for it is 1080p60. Fine while
+     it is a placeholder; re-encode to ~1080p30 when these move into
+     `public/film/`, or it is the heaviest thing on the site by a wide margin. */
   renovation: {
-    src: 'https://videos.pexels.com/video-files/6473935/6473935-hd_1920_1080_25fps.mp4',
-    credit: 'https://www.pexels.com/video/a-man-polishing-the-ceiling-using-a-drywall-sander-6473935/',
+    src: 'https://videos.pexels.com/video-files/29794133/12800975_1920_1080_60fps.mp4',
+    /* First frame as a still, so the section paints the moment it opens rather
+       than sitting black while 64 MB starts arriving. */
+    poster:
+      'https://images.pexels.com/videos/29794133/architecture-building-building-construction-construction-work-29794133.jpeg?auto=compress&cs=tinysrgb&w=1600',
+    credit: 'https://www.pexels.com/video/urban-building-construction-progress-timelapse-29794133/',
   },
+
+
   /* Warm aerial at sunset. The previous closing clip was shot monochrome, which
      is why that act looked black — not a bug in the player. */
   outro: {
@@ -117,18 +164,23 @@ export const gallery = {
     { src: shot(4353622), alt: 'Uniformed team preparing equipment' },
     { src: shot(19038677), alt: 'Facility crew on shift' },
   ],
-  /* [0] and [2] are the two halves of the before/after scrub, so they are
-     chosen as a pair rather than individually: both are empty interiors shot
-     square-on, which is what lets the slider read as one space changing rather
-     than two unrelated photographs meeting at a line.
+  /* [0] and [2] are the two halves of the before/after scrub, and they are now
+     a genuine matched pair rather than two rooms that happened to look alike:
+     the same floor, the same camera position, the same lens, the same doorway
+     in the same place in the far wall. Only the finish state differs, which is
+     the one thing the comparison is claiming.
 
-     The previous [2] was a pair of orange tower cranes against a blue sky —
-     wrong subject for "finished and handed back", and the only primary colour
-     anywhere on the site. [1] was two unfinished tower blocks on a building
-     plot, which is development, not refurbishment. */
+     Local files, not stock. No free library has a matched pair — the format
+     only exists behind Getty and iStock licences — so these were made to the
+     brief. Swap them for photographs of a real ORYX floor as soon as one is
+     shot; the scrub clips rather than resizes, so any pair framed alike will
+     drop straight in.
+
+     JPEG, not the source PNG: 5.1 MB of lossless photograph became 644 KB with
+     nothing visible lost. The PNGs stay beside them as the masters. */
   renovation: [
-    { src: shot(5691533), alt: 'Stripped interior under dust sheets, before refurbishment' },
+    { src: '/renovation/before.jpg', alt: 'Commercial floor stripped back before refurbishment: bare concrete, services exposed overhead, walls back to substrate' },
     { src: shot(12526862), alt: 'Commercial floor part-cleared during fit-out' },
-    { src: shot(19837082), alt: 'Finished interior, daylit and handed back clean' },
+    { src: '/renovation/after.jpg', alt: 'The same floor completed: oak flooring, suspended ceiling with linear lighting, desks in place' },
   ],
 }

@@ -7,11 +7,12 @@
  * brand, and the descriptor line does the explaining underneath.
  */
 export const brand = {
-  name: 'ORYX',
   full: 'ORYX GROUP',
-  /* The slogan reads as an expansion of the name, which is why it earns the
-     dash when it is set as a lockup: ORYX — Our Reliability, Your Excellence. */
-  slogan: 'Our Reliability, Your Excellence',
+  /* The capital X is the point, not a typo. The slogan is a backronym of the
+     name and X is the letter it gives up — setting it "Excellence" hides the
+     one word doing the work. Held as a single string so the capital cannot
+     drift between the three places this renders. */
+  slogan: 'Our Reliability, Your eXcellence',
   /* The same slogan, split against the letters it comes out of. Stored as
      explicit pairs rather than derived from the words' first letters, because
      the last pair does not survive that: X is taken from e(X)cellence, which is
@@ -20,21 +21,11 @@ export const brand = {
     { k: 'O', w: 'Our' },
     { k: 'R', w: 'Reliability' },
     { k: 'Y', w: 'Your' },
-    { k: 'X', w: 'Excellence' },
+    { k: 'X', w: 'eXcellence' },
   ],
   /* The board's four-part descriptor. Chrome and metadata only — it says what
      the company does, where the slogan says what it is like to work with. */
   descriptor: ['Building', 'People', 'Services', 'Solutions'],
-  /* The board sets its four descriptor words as a list with a line of
-     explanation against each. Kept in that form, because four abstract nouns
-     on their own say almost nothing — it is the gloss that makes them a
-     description of a company rather than a mood. */
-  descriptorNotes: [
-    { k: 'Building', d: 'Refurbishment and fit-out of commercial premises.' },
-    { k: 'People', d: 'Crew, cleaning teams and facility staff, placed and supervised.' },
-    { k: 'Services', d: 'The day-to-day work that keeps a site open and running.' },
-    { k: 'Solutions', d: 'Transport and logistics, with the reporting that proves them.' },
-  ],
   /* The identity board's own purpose statement, used verbatim. It sits beside
      the three services on the gateway, which is the only place on the site
      that has to answer "who is this" before "what do they do". */
@@ -44,76 +35,63 @@ export const brand = {
 }
 
 /**
- * The opening film, as six shots of one sequence.
+ * The opening film — five shots, and the subject is the name.
  *
- * Three things keep this from being a slideshow, and none of them is the
- * transition:
+ * The services are gone from it. They were three shots in the middle listing
+ * what the company sells, which is what the page underneath is for; a title
+ * sequence that lists your services is a contents page with music. What is
+ * left is the one thing only the film can say: where the mark comes from.
  *
- * `enter` is `cut` for most shots. A film is overwhelmingly hard cuts; a
- * decorated transition on every single edit is the surest sign of a slideshow,
- * however good the decoration. The chevron wipe survives at exactly two
- * points — into the long shot, and into the finale — where it marks a change
- * of act rather than merely the next picture.
+ * The three middle shots are one continuous idea — the animal far off, the
+ * push onto its head where the mark turns out to be its horns, then the same
+ * frame again at sunset with the sun coming up inside them. Shots 2 and 3 are
+ * literally the same plate, so the sunset is a time-lapse jump on one image
+ * rather than a cut between two different animals that would never match.
  *
- * `hold` is uneven. Four seconds, then three fast ones, then a long one, then
- * the finale. Equal-length shots are slides by definition.
- *
- * `cam` is different for every shot. One shared slow push across six clips
- * reads as a screensaver.
+ * `enter` is `cut` where the edit should be invisible. The chevron wipe is
+ * kept for the two edits that change subject: into the letters, and into the
+ * end card.
  */
 export const acts = [
   {
-    /* Establishing shot. The film opens on the work, not on the brand — the
-       animal has moved to the end, where it is a payoff rather than a preface. */
-    id: 'open',
-    kind: 'brand',
-    film: 'facilities',
-    hold: 4.2,
+    /* Establishing. No copy at all — the film earns its title by showing the
+       animal first, and a caption over the opening frame would spend that. */
+    id: 'wild',
+    kind: 'plate',
+    film: 'oryxWide',
+    hold: 4.4,
     enter: 'up',
-    cam: 'riseIn',
-    line: 'ORYX GROUP',
-    sub: 'Building · People · Services · Solutions',
+    cam: 'stalk',
+    line: 'ORYX',
+    sub: 'An oryx in the Namib.',
   },
-  /* The middle is a montage: three short shots, cut faster than anything
-     around them, each moving a different way. Equal-length shots that all
-     pushed in at the same rate is exactly what made the sequence read as a
-     slideshow rather than as film. */
   {
-    id: 'transport',
-    kind: 'service',
-    film: 'transport',
-    hold: 1.9,
+    /* The push lands. The mark fades up exactly on the horns and stays there —
+       it does not detach here. The point of this shot is the equivalence. */
+    id: 'mark',
+    kind: 'origin',
+    film: 'oryx',
+    variant: 'day',
+    hold: 5.0,
     enter: 'cut',
-    cam: 'panR',
-    index: '01',
-    line: 'Transport\n& Logistics',
-    sub: 'Goods moved on a schedule you can plan around.',
+    cam: 'none',
+    line: 'ORYX',
+    sub: 'The horns are the mark.',
   },
   {
-    id: 'workforce',
-    kind: 'service',
-    film: 'workforce',
-    hold: 1.9,
+    /* Same plate, hours later. The sun comes up inside the V it makes. */
+    id: 'sun',
+    kind: 'origin',
+    film: 'oryxSun',
+    variant: 'sunset',
+    hold: 5.4,
     enter: 'cut',
-    cam: 'panL',
-    index: '02',
-    line: 'Workforce',
-    sub: 'The right people, placed where the work is.',
+    cam: 'none',
+    line: 'ORYX',
+    sub: 'Strength · Focus · Resilience',
   },
   {
-    id: 'renovation',
-    kind: 'service',
-    film: 'renovation',
-    hold: 1.9,
-    enter: 'cut',
-    cam: 'closeIn',
-    index: '03',
-    line: 'Renovation',
-    sub: 'Buildings brought back into service.',
-  },
-  {
-    /* The film breathes out here: a long, slow shot after three quick ones.
-       The slogan comes apart into the four letters it is built from. */
+    /* The name comes apart into the promise it is built from. */
     id: 'promise',
     kind: 'initials',
     film: 'outro',
@@ -124,19 +102,38 @@ export const acts = [
     sub: 'ORYX GROUP · Netherlands',
   },
   {
-    /* The finale. The animal, with the mark standing in for its horns, and the
-       mark then rising out of the head into the logo — the identity's own
-       origin, held back until the end so the film resolves on it instead of
-       spending it in the first four seconds. Its camera is its own. */
-    id: 'oryx',
-    kind: 'origin',
-    film: 'oryx',
-    hold: 6.4,
+    /* The end card. No film behind it — the mark on the ground, the slogan,
+       and the way in. This one has no `hold`: the timeline stops here and the
+       film waits to be dismissed rather than dismissing itself. */
+    id: 'enter',
+    kind: 'end',
+    film: null,
+    hold: 0,
     enter: 'up',
     cam: 'none',
-    line: 'ORYX',
-    sub: 'Our Reliability, Your Excellence',
+    line: 'ORYX GROUP',
+    sub: 'Our Reliability, Your eXcellence',
   },
+]
+
+/**
+ * The client tape.
+ *
+ * `logo` is a path under `/public/clients/`; until one exists the tape renders
+ * `name` as type instead, so nothing on the page claims a relationship that
+ * cannot be evidenced. Drop a file in and fill the field — one line per client,
+ * nothing else to change.
+ *
+ * The names below are SECTORS, not companies, and are safe to ship as they
+ * stand. Replace them with real clients only when the logos are cleared.
+ */
+export const clients = [
+  { name: 'Retail groups', logo: null },
+  { name: 'Manufacturing', logo: null },
+  { name: 'Healthcare', logo: null },
+  { name: 'Multi-site offices', logo: null },
+  { name: 'Events & venues', logo: null },
+  { name: 'Public sector', logo: null },
 ]
 
 /**
@@ -230,27 +227,64 @@ export const services = [
     index: '02',
     title: 'Workforce',
     short: 'Workforce',
-    promise: 'The right people, placed where the work is.',
-    body: 'Event crew, cleaning teams, facility staff — supplied to organisations and clients who need capable people at short notice and to a known standard.',
+    promise: 'From people to complete workforce solutions.',
+    body: 'The people, skills and teams you need to keep your operation moving — from a single tradesperson to a complete crew with its own supervisor, across nine sectors.',
     world: {
-      headline: 'The right people.\nWhere they are needed.',
+      headline: 'People. Skills.\nTeams. Operations.',
+      /* The Workforce Journey (§12). The proposal lists nine steps internally;
+         §18 proposes seven for the website, and seven is right — Assess folds
+         into Screen and Evaluate into Monitor, because as separate numbered
+         items they read as process for its own sake. */
       process: [
-        { k: 'Brief', d: 'The role, the site, the shift pattern and the skills that actually matter.' },
-        { k: 'Screen', d: 'Right to work, tickets and references checked before anyone is put forward.' },
-        { k: 'Deploy', d: 'Briefed on the building and the task before the first shift starts.' },
-        { k: 'Supervise', d: 'Attendance, conduct and replacement cover stay our problem, not yours.' },
+        { k: 'Source', d: 'Recruit against the sectors we actually staff, so the pool is deep where the work is.' },
+        { k: 'Screen', d: 'Interview, practical experience and trade skill assessed before anyone is put forward.' },
+        { k: 'Verify', d: 'Identity, work documents, licences and certificates checked and dated — not taken on trust.' },
+        { k: 'Match', d: 'Worker or team linked to the client, the site and the role, against the stated requirement.' },
+        { k: 'Deploy', d: 'Deployment organised with onboarding and site instruction before the first shift starts.' },
+        { k: 'Monitor', d: 'Attendance, performance, safety and client feedback followed up while the work runs.' },
+        { k: 'Develop', d: 'Training, recertification and progression to the next ORYX level.' },
       ],
       /* The most concrete thing this service can say. Uniform, badge and a
          named supervisor are what a site manager actually sees on the day —
          everything else on the page is a promise about them. */
-      kit: {
-        head: 'You will know our people on sight',
-        line: 'Every ORYX worker arrives badged, briefed and in branded workwear, so your supervisor always knows who is on the floor.',
-        items: [
-          { k: 'Branded workwear', d: 'Issued and replaced by us, to your site rules.' },
-          { k: 'Certified PPE', d: 'To the standard the site requires, checked before entry.' },
-          { k: 'Photo ID badge', d: 'Worn visibly, matched to the name on your rota.' },
-          { k: 'A named supervisor', d: 'One per shift, on site, reachable.' },
+      /* The five ORYX levels (§5). The point is progression, not grading: a
+         worker moves up through training and experience, which is why the
+         section is drawn as a ladder rather than a table. */
+      levels: [
+        { n: '01', k: 'General', d: 'Generally deployable; limited or no formal trade certification.', ex: 'Labourer · Cleaner · Warehouse assistant' },
+        { n: '02', k: 'Skilled', d: 'Demonstrable practical experience, works independently within the trade.', ex: 'Skilled construction worker · Experienced order picker' },
+        { n: '03', k: 'Certified', d: 'Required or relevant certificates demonstrably verified.', ex: 'VCA · Forklift · Code 95 · ADR · IPAF · TCVT' },
+        { n: '04', k: 'Specialist', d: 'Specialist expertise, several years of experience or additional qualifications.', ex: 'CNC operator · Service engineer · Heavy machine operator' },
+        { n: '05', k: 'Supervisory', d: 'Managerial and coordinating roles.', ex: 'Team leader · Foreman · Site supervisor' },
+      ],
+
+      /* The five engagement models (§10). The examples are the persuasive part
+         — "a flexible pool" is an abstraction and "5–20 workers depending on
+         weekly volume" is an offer — so they are content, not decoration.
+
+         `lead` marks Team-Based, which §11 names as the key differentiator and
+         which the deployment plan alongside this section illustrates. */
+      solutions: [
+        { k: 'Temporary Staffing', d: 'Short-term or temporary deployment of individual workers.', ex: '10 warehouse workers for 3 weeks' },
+        { k: 'Flexible Workforce', d: 'A pool that scales up and down with your volume.', ex: '5–20 workers depending on weekly volume' },
+        { k: 'Long-Term Staffing', d: 'Workers placed with the same client for a longer period.', ex: '15 construction workers for 12 months' },
+        { k: 'Team-Based Workforce', d: 'A complete crew covering every role the job needs, supervisor included.', ex: '1 supervisor + 4 skilled + 5 general workers', lead: true },
+        { k: 'Managed Workforce', d: 'Planning, follow-up and operational coordination alongside supply.', ex: 'A full industrial cleaning crew with supervisor' },
+      ],
+
+      /* §20, the quality principle — stated as a principle and nothing more.
+         The proposal's certificate matrix is deliberately not published: §22
+         requires it to be legally validated first, and which certificate is
+         mandatory depends on machine, site, risk class and current Dutch law.
+         Naming the categories is honest; publishing the matrix is a claim. */
+      compliance: {
+        line: 'No verification, no deployment.',
+        d: 'A worker goes to site once the documents, certificates, instructions and competences that assignment needs have been checked. Not after, and not on the assumption that someone else has done it.',
+        checks: [
+          { k: 'Safety', d: 'VCA at the level the role and the site call for.' },
+          { k: 'Transport', d: 'Licence category, Code 95 and ADR, checked in date.' },
+          { k: 'Machinery', d: 'IPAF and TCVT recorded by exact machine category.' },
+          { k: 'Electrical', d: 'NEN 3140 designation and task authorisation.' },
         ],
       },
       lede: 'Staffing is judged on the shifts nobody remembers. The right number of people arrived, they knew the site, they knew the standard, and the day ran. We supply people the way an operations team would want them supplied.',
@@ -262,35 +296,30 @@ export const services = [
         { t: '17:00', k: 'Handover', d: 'Written, to a named person, with what is outstanding.' },
       ],
       /* The crew grid — roles that populate as the page is read. */
-      crew: [
-        { r: 'Event crew', n: 'Build · Run · Strike' },
-        { r: 'Cleaning', n: 'Daily · Periodic · Deep' },
-        { r: 'Facilities', n: 'Caretaking · Post · Stock' },
-        { r: 'Front of house', n: 'Reception · Access' },
-        { r: 'Supervisors', n: 'One per shift, named' },
-        { r: 'Floating cover', n: 'Absence, same day' },
-      ],
-      definition: [
-        { k: 'Placed', d: 'Our people, working to your standard, on your site.' },
-        { k: 'Briefed', d: 'They know the building before their first shift, not during it.' },
-        { k: 'Covered', d: 'Absence is our problem to solve, not yours.' },
-        { k: 'Accountable', d: 'One contact, one agreement, one invoice.' },
-      ],
-      audience: {
-        line: 'For organisations that need capable people at short notice and to a known standard.',
-        items: [
-          { k: 'Event organisers', d: 'Crew for build, run and strike, scaled to the day.' },
-          { k: 'Facility managers', d: 'Cleaning and support staff on a standing rota.' },
-          { k: 'Property groups', d: 'Front-of-house and caretaking across a portfolio.' },
-          { k: 'Seasonal operations', d: 'Volume that triples for six weeks and then stops.' },
-        ],
-      },
-      inside: [
-        { k: 'Event crew', d: 'Build, run and strike teams, briefed on the venue and the schedule.' },
-        { k: 'Cleaning teams', d: 'Daily, periodic and deep-clean cycles to a written specification.' },
-        { k: 'Facility staff', d: 'Caretaking, front-of-house, post and stock handling.' },
-        { k: 'Cover and escalation', d: 'Sickness and no-shows absorbed inside one shift.' },
-        { k: 'Vetting and training', d: 'Checked, inducted and insured before they reach your door.' },
+      /* The deployment plan. `x`/`y` are plan coordinates in the scene's own
+         1120×600 space, so a post moves by editing two numbers here rather
+         than by touching the drawing.
+
+         A distribution site, not a venue. It was Stage, Concourse and Front of
+         house — an event crew, which is the one sector this business turned
+         out not to have. The composition is now the Logistics Team from §11
+         (1 coordinator + 2 truck operators + 8 warehouse workers), so the
+         drawing illustrates the Team-Based model beside it rather than a
+         made-up job.
+
+         `lead` marks the coordinator; `rove` marks the pair deliberately not
+         fixed to a position. Ordered control-first and then outward, which is
+         both how a site is staffed and how the posts fill. */
+      posts: [
+        { k: 'Shift office', r: 'Coordinator', n: 1, x: 200, y: 145, lead: true },
+        { k: 'Inbound', r: 'Warehouse', n: 2, x: 520, y: 145 },
+        { k: 'Racking', r: 'Reach truck', n: 1, x: 830, y: 150 },
+        { k: 'Pick face', r: 'Order pickers', n: 4, x: 230, y: 320 },
+        { k: 'Pack bench', r: 'Warehouse', n: 2, x: 560, y: 335 },
+        { k: 'Floating', r: 'Cover', n: 2, x: 760, y: 305, rove: true },
+        { k: 'Loading dock', r: 'Forklift', n: 1, x: 830, y: 460 },
+        { k: 'Returns', r: 'Warehouse', n: 2, x: 190, y: 480 },
+        { k: 'Dispatch', r: 'Outbound', n: 2, x: 530, y: 480 },
       ],
       /* Social proof, and the only quote on the site. Placeholder wording
          until a real one is supplied — the attribution is deliberately a role
@@ -304,14 +333,6 @@ export const services = [
       /* The checks, in the order they actually happen. Staffing is bought on
          risk, and "vetted, trained and insured" is four words carrying the
          single largest objection this service has to answer. */
-      vetting: [
-        { k: 'Identity and right to work', d: 'Documents seen, copied and held before a shift is offered.' },
-        { k: 'References taken', d: 'Two, checked by us, for the work they are actually being placed into.' },
-        { k: 'Screening where required', d: 'DBS and sector checks arranged before access is granted.' },
-        { k: 'Insured', d: "Employer's and public liability, ours not yours." },
-        { k: 'Site induction', d: 'Building, scope and standard, before the first shift rather than during it.' },
-        { k: 'Uniform and PPE', d: 'Issued and replaced by us, to your site rules.' },
-      ],
       /* The day, as a clock rather than a table. `f` and `t` are hours on a
          24-hour dial; night cover deliberately wraps past midnight, which is
          the one shift a rectangular timetable cannot draw without cutting it
@@ -319,9 +340,111 @@ export const services = [
       dial: [
         { k: 'Night cover', f: 22, t: 5 },
         { k: 'Cleaning', f: 5, t: 13 },
-        { k: 'Front of house', f: 7, t: 19 },
-        { k: 'Facilities', f: 8, t: 17 },
-        { k: 'Event crew', f: 12, t: 23 },
+        { k: 'Logistics', f: 6, t: 18 },
+        { k: 'Construction', f: 7, t: 16 },
+        { k: 'Transport', f: 4, t: 20 },
+      ],
+      /* The domains, one tab each.
+         Staffing is not one job — the checks, the kit and the shift pattern
+         differ enough between a stage crew and a night guard that a single
+         "workforce" page describes none of them. Each tab carries what the
+         domain covers, who buys it, and the two things specific to it: what
+         its people are cleared for, and what they arrive wearing. */
+      /* The nine sectors, from the workforce proposal (§3, catalogue in §4).
+         These replace four invented domains — two of which, Event crew and
+         Security, were not part of this business at all, while seven real
+         sectors were missing.
+
+         `roles` carries the catalogue's actual job titles. It is the field the
+         old copy had no equivalent of, and it is the whole substance: "we do
+         construction" is a claim anyone can make, and "formwork carpenters,
+         pointers, concrete-sawing operatives" is not.
+
+         `cleared` names Dutch regimes, because this is a Dutch company. The
+         previous lists cited SIA, COSHH and right-to-work checks, all of which
+         are British and none of which apply here. */
+      sectors: [
+        {
+          id: 'construction',
+          k: 'Construction & Demolition',
+          n: 'Build · Strip · Finish',
+          d: 'Trades and site labour across new build, renovation, demolition and civils — from first strip-out to final finish.',
+          who: 'Main contractors, developers, fit-out firms and civils contractors.',
+          roles: ['Bricklayers and carpenters', 'Formwork carpenters and pointers', 'Painters, plasterers and tilers', 'Demolition and strip-out crews', 'Groundworkers and pavers', 'Cable and fibre layers'],
+          cleared: ['B-VCA where the client requires it', 'Working at height and fall protection', 'Site induction before first shift', 'DAV/DTA where asbestos risk applies'],
+        },
+        {
+          id: 'cleaning',
+          k: 'Cleaning & Facility',
+          n: 'Daily · Deep · Controlled',
+          d: 'Commercial and industrial cleaning, post-construction handover cleans, and controlled environments worked to site protocol.',
+          who: 'Facility managers, landlords, manufacturers and healthcare sites.',
+          roles: ['Office and commercial cleaners', 'Industrial and machine cleaning', 'Post-construction and handover cleans', 'Window and facade cleaning', 'Floor and carpet maintenance', 'Cleanroom and laboratory staff'],
+          cleared: ['Chemical and SDS instruction', 'Machine instruction carried', 'Cleanroom protocol where applicable', 'Out-of-hours and lone-working cover'],
+        },
+        {
+          id: 'transport',
+          k: 'Transport & Distribution',
+          n: 'Deliver · Haul · Distribute',
+          d: 'Drivers across every licence category, from parcel and last-mile work to CE tractor-trailer and specialised loads.',
+          who: 'Hauliers, distributors, wholesalers and construction logistics.',
+          roles: ['Category B delivery and van drivers', 'Category C rigid truck drivers', 'CE tractor-trailer drivers', 'ADR and tanker transport', 'Refrigerated and waste transport', 'Concrete mixer and crane truck'],
+          cleared: ['Licence category verified', 'Code 95 checked and in date', 'ADR certificate where carried', 'Tachograph and driver documents'],
+        },
+        {
+          id: 'logistics',
+          k: 'Logistics & Warehousing',
+          n: 'Pick · Move · Dispatch',
+          d: 'Warehouse floors and the equipment on them, up to coordinators who run the shift rather than work in it.',
+          who: 'Distribution centres, third-party logistics and e-commerce operations.',
+          roles: ['Order pickers and packers', 'Inbound, outbound and dispatch', 'Forklift and reach truck operators', 'Electric pallet truck (EPT)', 'Cross-docking and sorting', 'Logistics and transport coordinators'],
+          cleared: ['Demonstrable truck instruction and competence', 'Machine type recorded per operator', 'Site traffic rules before first shift', 'Client acceptance where required'],
+        },
+        {
+          id: 'industry',
+          k: 'Industry & Production',
+          n: 'Produce · Operate · Inspect',
+          d: 'Production lines, machine operation and quality control, including food environments and cold storage.',
+          who: 'Manufacturers, food producers and process industry.',
+          roles: ['Production and assembly workers', 'Packaging and line staff', 'Machine and CNC operators', 'Process operators', 'Food production and cold storage', 'Quality inspectors and measurement'],
+          cleared: ['Machine-specific instruction', 'Hygiene training for food environments', 'Line safety and lock-out procedure', 'Shift and night-work availability'],
+        },
+        {
+          id: 'technical',
+          k: 'Technical & Maintenance',
+          n: 'Install · Maintain · Repair',
+          d: 'Electrical, mechanical and installation trades, plus the maintenance staff who keep a building working after handover.',
+          who: 'Installers, maintenance contractors and in-house technical services.',
+          roles: ['Electricians and panel builders', 'Cable jointers', 'Mechanical and maintenance fitters', 'Breakdown engineers', 'Plumbers and HVAC technicians', 'Solar, heat pump and EV charging installers'],
+          cleared: ['NEN 3140 VOP/VP designation', 'Task authorisation from the responsible person', 'Insulated tools and measuring equipment', 'Manufacturer training where required'],
+        },
+        {
+          id: 'plant',
+          k: 'Heavy Equipment & Machinery',
+          n: 'Lift · Move · Reach',
+          d: 'Certified operators for earthmoving, lifting and access equipment, recorded by exact machine category rather than by job title.',
+          who: 'Civils contractors, lifting firms and any site running plant.',
+          roles: ['Excavator and mini-excavator operators', 'Wheel loaders and bulldozers', 'Tower and mobile crane operators', 'Lift supervisors and riggers', 'Scissor and boom lift operators', 'Telehandler operators'],
+          cleared: ['TCVT certification for crane work at 10 tm and above', 'IPAF/PAL card with exact categories', 'TCVT W4-08 / W4-09 for lifting roles', 'Lifting plan and authorisation on site'],
+        },
+        {
+          id: 'green',
+          k: 'Green & Outdoor',
+          n: 'Plant · Maintain · Harvest',
+          d: 'Grounds and landscape work, plus seasonal and agricultural support that scales with the calendar rather than the contract.',
+          who: 'Landscapers, grounds contractors, growers and municipalities.',
+          roles: ['Gardeners and landscapers', 'Grounds maintenance staff', 'Tree care assistants', 'Seasonal and harvest workers', 'Greenhouse planting and picking', 'Sorting and packing support'],
+          cleared: ['Machinery instruction for the tools carried', 'Seasonal availability confirmed', 'Transport to site arranged', 'Weather and daylight shift patterns'],
+        },
+        {
+          id: 'general',
+          k: 'General Workforce',
+          n: 'Load · Assist · Support',
+          d: 'Generally deployable people for the work that does not need a trade ticket but still needs turning up, on time, briefed.',
+          who: 'Anyone with a volume peak, a move, a clearance or a deadline.',
+          roles: ['General workers and labourers', 'Site and production assistants', 'Warehouse assistants', 'Loading and unloading crews', 'Removal and assembly support', 'Clearance and materials handling'],
+          cleared: ['Identity and work documents', 'Manual handling instruction', 'Site induction before first shift', 'PPE issued or verified'],
+        },
       ],
       /* A week of cover, as a rota actually looks. `c` is one cell per day,
          Monday to Sunday: 2 = full crew, 1 = reduced, 0 = not staffed. The
@@ -330,23 +453,23 @@ export const services = [
       roster: {
         days: ['M', 'T', 'W', 'T', 'F', 'S', 'S'],
         rows: [
-          { r: 'Event crew', c: [1, 1, 2, 2, 2, 2, 1] },
+          { r: 'Construction', c: [2, 2, 2, 2, 2, 1, 0] },
           { r: 'Cleaning', c: [2, 2, 2, 2, 2, 1, 1] },
-          { r: 'Facilities', c: [2, 2, 2, 2, 2, 0, 0] },
-          { r: 'Front of house', c: [2, 2, 2, 2, 2, 1, 0] },
+          { r: 'Transport', c: [2, 2, 2, 2, 2, 1, 0] },
+          { r: 'Logistics', c: [2, 2, 2, 2, 2, 2, 1] },
           { r: 'Supervisors', c: [2, 2, 2, 2, 2, 2, 2] },
           { r: 'Floating cover', c: [1, 1, 1, 1, 2, 2, 1] },
         ],
         key: [
           { n: 2, k: 'Full crew' },
           { n: 1, k: 'Reduced' },
-          { n: 0, k: 'Closed' },
+          { n: 0, k: 'Not staffed' },
         ],
       },
       figures: [
         { n: '48h', l: 'From brief to crew on site' },
         { n: '1', l: 'Account manager, start to finish' },
-        { n: '100%', l: 'Staff vetted, trained and insured' },
+        { n: '5', l: 'Levels, from general to supervisory' },
       ],
       prompt: 'Tell us where you need people, and when.',
     },
@@ -372,10 +495,11 @@ export const services = [
       /* The layer stack this page is built around — assembled on scroll, in
          the order the building itself is assembled. */
       layers: [
-        { n: '01', k: 'Shell', d: 'Strip-out complete, structure surveyed, back to the substrate.' },
+        { n: '01', k: 'Slab', d: 'Strip-out complete, structure surveyed, back to the substrate.' },
         { n: '02', k: 'Services', d: 'Electrical, ventilation and data set out before anything closes over them.' },
-        { n: '03', k: 'Partitions', d: 'Walls, ceilings and openings built to the agreed plan.' },
-        { n: '04', k: 'Finish', d: 'Flooring, joinery, decoration — snagged and handed back clean.' },
+        { n: '03', k: 'Partitions', d: 'Walls and openings built to the agreed plan, off the survey.' },
+        { n: '04', k: 'Ceiling', d: 'Grid, lighting and diffusers hung once the services above are signed off.' },
+        { n: '05', k: 'Finishes', d: 'Flooring, joinery, decoration — snagged and handed back clean.' },
       ],
       /* Real material names, so the swatch strip is a specification rather
          than decoration. */
@@ -401,13 +525,6 @@ export const services = [
           { k: 'Retail and hospitality', d: 'Short closures where every day dark is revenue.' },
         ],
       },
-      inside: [
-        { k: 'Strip-out', d: 'Clearance and disposal, with materials separated for recycling.' },
-        { k: 'Fit-out', d: 'Partitions, ceilings, flooring, joinery and finishes.' },
-        { k: 'Building services', d: 'Electrical, lighting, ventilation and data, coordinated as one.' },
-        { k: 'Phasing', d: 'Work sequenced around occupation, out of hours where it has to be.' },
-        { k: 'Handover', d: 'Snagging closed out, site cleaned, documentation delivered.' },
-      ],
       /* The programme, as a bar chart of weeks. `f` and `t` are week numbers
          across a twelve-week span. The overlaps are the argument: trades run
          into each other on purpose, which is what "one programme" buys you and
@@ -424,20 +541,6 @@ export const services = [
       },
       /* The floor plan the page draws. Authored in the plan's own viewBox
          units: `walls` are the shell, `rooms` the partitions. */
-      plan: {
-        shell: 'M40 40 H820 V420 H40 Z',
-        walls: [
-          'M300 40 V250', 'M300 250 H560', 'M560 250 V420',
-          'M560 140 H820', 'M40 320 H300',
-        ],
-        rooms: [
-          { k: 'Reception', x: 168, y: 190 },
-          { k: 'Open floor', x: 430, y: 130 },
-          { k: 'Meeting', x: 690, y: 92 },
-          { k: 'Services', x: 690, y: 330 },
-          { k: 'Store', x: 168, y: 375 },
-        ],
-      },
       figures: [
         { n: '1', l: 'Contract covering every trade' },
         { n: '0', l: 'Days a floor closes unnecessarily' },

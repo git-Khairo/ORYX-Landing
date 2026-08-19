@@ -66,12 +66,6 @@ h1, h2, h3 {
   text-wrap: balance;
 }
 
-/* The largest sizes get more air still, matching the board's ORYX lockup. */
-.display-xl {
-  font-size: var(--step-5);
-  letter-spacing: var(--track-display-lg);
-  line-height: 1;
-}
 
 /* ── Operational voice ─────────────────────────────────────────────────
    Montserrat, tracked out, tabular figures. For anything that is data rather
@@ -86,7 +80,6 @@ h1, h2, h3 {
   font-variant-numeric: tabular-nums;
 }
 
-.label-sand { color: var(--sand-text); }
 
 .lede {
   font-size: var(--step-1);
@@ -109,30 +102,7 @@ h1, h2, h3 {
   border: 0;
 }
 
-/* The one sand hairline. Used to open a section, never to box one in. */
-.rule-sand {
-  height: 1px;
-  width: 64px;
-  background: var(--sand);
-  border: 0;
-}
 
-/* ── Inverted band ─────────────────────────────────────────────────────
-   Oryx White ground for the sections that carry long reading. Declared once
-   here so every band inverts identically and the tokens do the work. */
-.invert {
-  background: var(--invert-bg);
-  color: var(--invert-text-2);
-  --text: var(--invert-text);
-  --text-2: var(--invert-text-2);
-  --text-3: #7d7a72;
-  --sand-text: #8a6a3b;
-  --line: var(--invert-line);
-  --line-soft: rgba(28, 28, 26, 0.07);
-  --ground: var(--invert-bg);
-  --raise: #eae6da;
-  --raise-2: #e0dbcd;
-}
 
 .sr-only {
   position: absolute;
@@ -169,4 +139,44 @@ h1, h2, h3 {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* ── The wordmark spine ───────────────────────────────────────────────
+   ORYX GROUP set vertically down an outer edge. It appears twice — once on
+   the gateway's brand panel, once in the footer — and the two bracket the
+   site, so they have to be the same object: same size, same gold, same carve.
+   They were not, and could not stay in step while each stylesheet held its
+   own copy of the treatment.
+
+   Everything that makes it the wordmark lives here. The two users add only
+   where they sit: grid placement, padding, borders.
+
+   Carved rather than printed: the fill sits below full sand because a letter
+   cut into a surface is in shade, with a dark groove down one edge of each
+   stroke and a pale catch-light down the other. Both axes get a dark/light
+   pair — the element is rotated 180°, so offsets land on screen mirrored from
+   how they read here, and giving both axes a pair means the bevel reads as
+   carved either way round without having to reason about the rotation.
+
+   It also has to be big. A bevel built from ±1px shadows is invisible under
+   about 1rem, which is what the old 0.8rem label size was: the carve was
+   there and simply could not be seen. */
+.wordmark-spine {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  display: grid;
+  place-items: center;
+  font-family: var(--font-group);
+  font-size: clamp(1.05rem, 1.6vw, 1.6rem);
+  font-weight: 600;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  white-space: nowrap;
+
+  color: color-mix(in srgb, var(--sand) 72%, var(--oryx-black));
+  text-shadow:
+    0 1px 0 rgba(10, 9, 6, 0.85),
+    0 -1px 0 rgba(244, 241, 232, 0.16),
+    1px 0 1px rgba(10, 9, 6, 0.5),
+    -1px 0 1px rgba(244, 241, 232, 0.07);
 }

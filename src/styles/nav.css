@@ -86,3 +86,70 @@
   .nav-mark span { letter-spacing: 0.2em; margin-right: -0.2em; }
   .nav-links { gap: 0.7rem; }
 }
+
+/* ══ The sound toggle ════════════════════════════════════════════════════
+   Fixed bottom-left, over everything, always visible. Bottom-left because the
+   page's own furniture is on the right (the world bars, the scroll progress)
+   and the footer's wordmark spine only occupies the left at the very end of
+   the scroll, by which point this has scrolled past nothing — it is fixed.
+
+   Always visible is the point. A music control that has to be hunted for is
+   the reason background music has the reputation it has. */
+.sound {
+  position: fixed;
+  left: clamp(0.9rem, 2vw, 1.6rem);
+  bottom: clamp(0.9rem, 2vw, 1.6rem);
+  z-index: 60;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 0.9rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--oryx-black) 72%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  font-family: var(--font);
+  font-size: var(--step--2);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--text-3);
+  transition: color 0.25s var(--ease-out), border-color 0.25s var(--ease-out);
+}
+.sound:hover { color: var(--oryx-white); border-color: var(--line-sand); }
+.sound.is-on { color: var(--sand); }
+
+.sound-eq {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 12px;
+}
+.sound-eq i {
+  width: 2px;
+  height: 3px;
+  background: currentColor;
+  transition: height 0.25s var(--ease-out);
+}
+/* Only the playing state animates. Off, the bars sit flat at their resting
+   height, which is the honest picture of what the audio is doing. */
+.sound.is-on .sound-eq i {
+  animation: sound-eq 0.9s var(--ease-out) infinite alternate;
+  animation-delay: calc(var(--i) * 0.12s);
+}
+@keyframes sound-eq {
+  from { height: 3px; }
+  to { height: 12px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sound.is-on .sound-eq i { animation: none; height: 8px; }
+}
+
+@media (max-width: 640px) {
+  /* The label is the first thing to go — the bars plus `aria-label` still say
+     what it is and what state it is in. */
+  .sound-l { display: none; }
+  .sound { padding: 0.6rem; }
+}
