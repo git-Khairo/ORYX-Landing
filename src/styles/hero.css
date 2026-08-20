@@ -57,6 +57,25 @@
 .stage-clip.is-prev { opacity: 1; z-index: 1; }
 .stage-clip.is-live { opacity: 1; z-index: 2; }
 
+/* The one dissolve. Opt-in per shot rather than a change to the rule above,
+   which stays hard on purpose: a crossfade running under the chevron would
+   soften that wipe into a dissolve and undo the reason it exists.
+
+   This edit needs it because shots 2 and 3 were generated separately and the
+   head lands at a slightly different scale either side of the cut. The
+   outgoing shot is already holding underneath at `z-index: 1`, so fading the
+   incoming one in over it is the whole mechanism. */
+.stage-clip.is-live[data-enter='dissolve'] {
+  animation: clip-dissolve 0.35s var(--ease-out) both;
+}
+@keyframes clip-dissolve {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .stage-clip.is-live[data-enter='dissolve'] { animation: none; }
+}
+
 .stage-clip img,
 .stage-clip video {
   width: 100%;
@@ -143,22 +162,18 @@
    so they are exempt from the shared push. They are graded harder than any
    other shot: the mark is sand and sits directly on the horns, so the horns
    have to go down to a ghost or the two simply merge. */
+/* Exactly the grade every other clip gets. It used to run its own — darker and
+   flatter, so a sand mark would stand out against a daylight still — and that
+   was a second reason the cut into this shot popped: the picture changed
+   brightness and saturation on the edit as well as size. The mark reads fine
+   against the sunset silhouette without help. */
 .origin img,
 .origin video {
   animation: none;
   transform: none;
-  filter: brightness(0.44) saturate(0.5) contrast(1.1) sepia(0.16);
+  filter: saturate(0.7) contrast(1.06) brightness(0.82) sepia(0.14);
 }
 
-/* The sunset is the same photograph pushed warm and dark — the sun about to
-   come up behind it does the lighting, so the plate itself drops back. */
-/* Lighter than the still version was graded. The sun is *in* the footage now
-   rather than drawn on top of it, and at brightness 0.3 the disc between the
-   horns — the entire point of the shot — went to a dull smudge. */
-.origin--sunset img,
-.origin--sunset video {
-  filter: brightness(0.62) saturate(0.9) contrast(1.1) sepia(0.16);
-}
 
 .stage-scrim {
   position: absolute;
@@ -205,20 +220,27 @@
    It is also rendered at about twice viewport width, which turns a 3/4 body
    shot into a close-up on the head. Both numbers are chosen so the plate still
    covers the frame in every direction; nothing here may let an edge show. */
+/* Sized so the video lands pixel-for-pixel where a plain `.stage-clip` would
+   put it. That is the whole fix for the mismatched cut.
+
+   A plain clip is `object-fit: cover` in the viewport with `scale(1.06)` on
+   top. This plate reproduces that arithmetic directly: cover width for the
+   *video's* aspect, times 1.06, centred. It was 3/2 at `max(112vw, 168svh)` —
+   an aspect inherited from the old still photograph, which is not the aspect
+   of the footage (848×480 ≈ 1.767). So the shot was cropped differently and
+   rendered about 13% larger than the one it cut from, and the head jumped.
+
+   The 1.06 is baked into the width rather than applied as a transform on
+   purpose: a transform here would become the containing block for the mark's
+   `position: fixed`, and the closing travel would fly off to the wrong place. */
 .origin-plate {
-  /* The clip is already a close-up, so it does not need the 2× crop the old
-     wide still did — that magnification on 848-wide footage would be visible
-     mush. Just enough over 100% to cover any aspect ratio. */
-  --plate-w: max(112vw, 168svh);
+  --vid-r: 1.76667;
+  --plate-w: calc(max(100vw, 100svh * var(--vid-r)) * 1.06);
   position: absolute;
   width: var(--plate-w);
-  aspect-ratio: 3 / 2;
-  left: calc(50vw - var(--horn-fx) * var(--plate-w));
-  /* The skull sits at 38% of the height, not the middle. Centred vertically,
-     the horns ran out of headroom at the top and the muzzle was sliced off at
-     the bottom; held high, the whole face clears the frame and the horns keep
-     the room they need to leave it. */
-  top: calc(42svh - var(--horn-fy) * var(--plate-w) / 1.4993);
+  aspect-ratio: var(--vid-r);
+  left: calc((100vw - var(--plate-w)) / 2);
+  top: calc((100svh - var(--plate-w) / var(--vid-r)) / 2);
 }
 
 .origin-photo {
@@ -265,28 +287,30 @@
    Sized and placed so that merge point lands exactly on the animal's skull and
    the tips leave the top of frame just as the real horns do. */
 .origin-mark {
-  /* ── Alignment, as tunable numbers ────────────────────────────────────
-     Everything below is derived from three measurements: the mark's own
-     geometry (tips at x 0.068/0.932, arms merging at y 0.713, ratio 0.4161)
-     and where the animal's horns converge in the plate (x 62%, y 30.7%).
-
-     To re-aim the mark after swapping the photograph, change `--horn-x` and
-     `--horn-y` and nothing else — the start position falls out of them. */
+  /* ── Alignment, as two numbers ────────────────────────────────────────
+     Where the animal's horns converge in the plate. Re-aim the mark after a
+     footage swap by changing these and nothing else — the vertical offset is
+     derived below rather than measured again. */
   --horn-x: 50%;
-  /* Tuned against the footage frame by frame, not derived. At the old 30%/16.5%
-     the mark floated *between* the horns as a separate graphic; the shot only
-     works when its two arms sit *on* them and the merge point lands on the
-     skull, which is what these values do. */
-  --horn-y: 33%;
-  --merge: 0.713;   /* where the mark's two arms meet, as a fraction of height */
-  --mark-w: 24%;    /* of plate width; height follows from the aspect ratio */
+  /* Re-tuned against the corrected plate. The old pair were fitted to a plate
+     that cropped and magnified the shot differently, so they no longer meant
+     what they used to once the geometry was fixed. */
+  --horn-y: 41.5%;
+  --mark-w: 23.5%; /* of plate width; height follows from the mark's own ratio */
 
+  /* The mark's own geometry: tips at x 0.068/0.932, arms merging at y 0.713 of
+     its height, giving a 0.4161 width-to-height ratio.
+
+     `top` puts that merge point exactly on the skull. The factor is
+     `0.713 ÷ 0.4161 × 1.76667` — the merge fraction, converted from the mark's
+     own height into plate widths, then into plate *heights* via the video
+     aspect. It was a hard-coded 42.4%, which was correct only for a 16.5% mark
+     on a 3:2 plate; both of those have since changed and the constant did not,
+     so the mark had to be nudged by hand to compensate. Derived, it follows
+     `--mark-w` and the plate on its own. */
   position: absolute;
   left: var(--horn-x);
-  /* Puts the arms' merge point exactly on the skull. 16.5% of plate width is
-     59.46% of plate height at this ratio, so the mark starts with its tips
-     above the frame — as the real horns do, because they are cropped too. */
-  top: calc(var(--horn-y) - 42.4%);
+  top: calc(var(--horn-y) - var(--mark-w) * 3.0271);
   width: var(--mark-w);
   aspect-ratio: 0.4161;
 
@@ -325,11 +349,20 @@
    They are a single continuous idea and should not change voice halfway. */
 .hero-line {
   font-family: var(--font);
-  font-size: var(--step-1);
+  /* Hero scale, not caption scale. At `--step-1` these were body size under a
+     full-bleed film, which reads as a subtitle rather than as the film's own
+     voice.
+
+     Montserrat, not Cinzel: Cinzel's lowercase are small capitals, so "An oryx
+     in the Namib." would set as an unbroken block of caps — the same trap that
+     caught the gateway's purpose statement. Light at display size is the
+     setting `.purpose-line` and `.foot-line` already use. */
+  font-size: var(--step-3);
   font-weight: 300;
-  letter-spacing: 0.02em;
+  line-height: 1.08;
+  letter-spacing: -0.005em;
   color: var(--oryx-white);
-  max-width: 34ch;
+  max-width: 20ch;
   text-wrap: balance;
 }
 
@@ -345,18 +378,44 @@
   padding-bottom: 0;
 }
 
+/* The block mounts one beat early, at `travel`, so the slot can be measured
+   while the mark is still on the horns. Everything except the slot stays
+   invisible until the mark has arrived — otherwise the wordmark would fade up
+   underneath a logo still crossing the screen toward it. */
 .hero-end {
   display: grid;
   justify-items: center;
   gap: clamp(0.9rem, 2.4vh, 1.5rem);
   text-align: center;
+}
+.hero-end > :not(.hero-end-slot) {
+  opacity: 0;
+  transform: translateY(16px);
+}
+.hero-end.is-open > :not(.hero-end-slot) {
   animation: end-in 0.9s var(--ease-out) both;
 }
 @keyframes end-in {
   from { opacity: 0; transform: translateY(16px); }
   to { opacity: 1; transform: translateY(0); }
 }
+@media (prefers-reduced-motion: reduce) {
+  .hero-end > :not(.hero-end-slot) { opacity: 1; transform: none; }
+}
 
+/* Not a mark — a space for one. The mark that lands here is the same element
+   that was sitting on the animal's horns a second earlier; this box exists only
+   to be measured, so the travel has somewhere to arrive. Painting a second mark
+   in it would give the beat two logos, one fading out as the other faded in,
+   which is exactly the cut this replaces. */
+.hero-end-slot {
+  width: clamp(54px, 6vw, 82px);
+  aspect-ratio: 0.4161;
+}
+
+/* The single-file promo path has no travelling mark to receive — its video
+   carries whatever logo animation was baked into the edit — so its end card
+   still paints a real one. */
 .hero-end-mark {
   width: clamp(54px, 6vw, 82px);
   aspect-ratio: 0.4161;

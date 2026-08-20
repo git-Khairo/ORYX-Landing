@@ -24,7 +24,7 @@ import { film } from '../content/media'
  * at every window size. Positioning the mark against the viewport instead would
  * let the two drift apart the moment the aspect ratio changed.
  */
-export default function OryxOrigin({ play, reduced }) {
+export default function OryxOrigin({ play, phase, reduced }) {
   const root = useRef(null)
   const video = useRef(null)
   const clip = film.oryxSun
@@ -66,22 +66,60 @@ export default function OryxOrigin({ play, reduced }) {
       tl.fromTo('.origin-mark', { opacity: 0 }, { opacity: 0.5, duration: 0.9, ease: 'power2.out' }, 0.4)
       tl.to('.origin-mark', { opacity: 1, duration: 0.8, ease: 'power2.inOut' }, 1.7)
 
-      /* The hand-off. The mark shrinks toward the size and place it occupies on
-         the end card while the footage gives out beneath it, so the last shot
-         does not cut to the card so much as become it. Scaling the mark rather
-         than cross-fading two of them is what makes it read as one object
-         travelling, which is the entire point of the beat. */
-      tl.to('.origin-mark', {
-        scale: 0.34,
-        y: '26%',
-        duration: 1.5,
-        ease: 'power2.inOut',
-      }, 6.5)
-      tl.to('.origin-photo', { opacity: 0, duration: 1.4, ease: 'power2.inOut' }, 6.6)
-      tl.to('.origin-grade', { opacity: 0, duration: 1.4, ease: 'power2.inOut' }, 6.6)
     }, root)
 
   }, [play, reduced])
+
+  /* The hand-off, and the reason there is only one mark on this page.
+     The end block renders an empty `.hero-end-slot` rather than a second mark;
+     this measures it, pins the mark that is already on the horns at its current
+     viewport rect, and tweens it into that slot. One element travels, so the
+     logo never blinks out and back — which is what makes it read as the same
+     object arriving rather than a cut between two frames that both happen to
+     have a logo in them.
+
+     `position: fixed` is safe here specifically because nothing between this
+     element and the viewport carries a transform, filter or `will-change`
+     other than the mark's own — a transformed ancestor would make `fixed`
+     resolve against *it* and throw the mark somewhere unintended. The grade
+     and camera filters live on the sibling `.origin-photo`, not on any
+     ancestor of the mark. */
+  useEffect(() => {
+    if (phase !== 'travel' || reduced) return
+    const mark = root.current?.querySelector('.origin-mark')
+    const slot = document.querySelector('.hero-end-slot')
+    if (!mark || !slot) return
+
+    const from = mark.getBoundingClientRect()
+    const to = slot.getBoundingClientRect()
+
+    const ctx = gsap.context(() => {
+      gsap.set(mark, {
+        position: 'fixed',
+        left: from.left,
+        top: from.top,
+        width: from.width,
+        height: from.height,
+        margin: 0,
+        zIndex: 6,
+      })
+      gsap.to(mark, {
+        left: to.left,
+        top: to.top,
+        width: to.width,
+        height: to.height,
+        duration: 1.2,
+        ease: 'power2.inOut',
+      })
+      /* The picture goes, the mark stays. */
+      gsap.to(['.origin-photo', '.origin-grade'], {
+        opacity: 0,
+        duration: 1.1,
+        ease: 'power2.inOut',
+      })
+    }, root)
+    return () => ctx.revert()
+  }, [phase, reduced])
 
   return (
     <div className="origin origin--sunset" ref={root} aria-hidden="true">

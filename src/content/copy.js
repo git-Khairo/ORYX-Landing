@@ -65,8 +65,8 @@ export const acts = [
     sub: 'An oryx in the Namib.',
   },
   {
-    /* The push onto the head, carrying what the name stands for. Cuts on an
-       identical frame at both ends, so no dissolve is needed or wanted. */
+    /* The push onto the head, carrying what the name stands for. This one cuts
+       hard: it shares its opening frame with the shot before it. */
     id: 'push',
     kind: 'plate',
     film: 'oryxPush',
@@ -77,37 +77,26 @@ export const acts = [
     sub: 'Strength · Focus · Resilience',
   },
   {
-    /* The closing shot, and it carries three beats rather than one.
-       The clip runs day into sunset and the sun comes up inside the V the horns
-       make — filmed, not drawn. The mark fades up onto those horns. Then the
-       letters unfold into the promise, and the mark shrinks away as the
-       footage gives out to the bare ground the end card sits on.
+    /* The finale, and it is one shot rather than a shot and then a card.
+       The clip runs day into sunset with the sun coming up inside the V the
+       horns make. The mark fades onto those horns, the letters unfold into the
+       promise, and then the same mark — one element, never swapped — shrinks
+       into its place while the footage gives out beneath it and the way in
+       appears under it.
 
-       `hold` is well past the clip's 3.56s on purpose: the video plays out and
-       holds its final frame while the letters run over it. That is why the
-       element does not loop — a loop would jump the sunset back to daylight
-       under the type. */
-    id: 'sun',
-    kind: 'origin',
+       `enter: 'dissolve'` because this is the one edit whose two shots were
+       generated separately and do not share the frame they should cut on.
+
+       No `hold`: the timeline stops here and the film waits to be dismissed
+       rather than dismissing itself. */
+    id: 'finale',
+    kind: 'finale',
     film: 'oryxSun',
-    hold: 8.6,
-    enter: 'cut',
+    hold: 0,
+    enter: 'dissolve',
     cam: 'none',
     line: 'ORYX GROUP',
     sub: 'ORYX GROUP · Netherlands',
-  },
-  {
-    /* The end card. No film behind it — the mark on the ground, the slogan,
-       and the way in. No `hold`: the timeline stops here and the film waits to
-       be dismissed rather than dismissing itself. */
-    id: 'enter',
-    kind: 'end',
-    film: null,
-    hold: 0,
-    enter: 'up',
-    cam: 'none',
-    line: 'ORYX GROUP',
-    sub: 'Our Reliability, Your eXcellence',
   },
 ]
 

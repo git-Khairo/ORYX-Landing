@@ -36,7 +36,7 @@ const wipePath = (p, down) => {
  * stall would land exactly on the cut. Off-screen clips are paused so only one
  * is ever decoding.
  */
-export default function FilmStage({ activeId, enter, cam, hold, variant, reduced }) {
+export default function FilmStage({ activeId, enter, cam, hold, phase, reduced }) {
   const videos = useRef({})
   const wipe = useRef(null)
 
@@ -95,6 +95,10 @@ export default function FilmStage({ activeId, enter, cam, hold, variant, reduced
        as slides no matter how the pictures move. The wipe is kept for the two
        edits that mark a change of act. */
     if (enter === 'cut') return
+    /* A dissolve is not a wipe, and it does its work in CSS off `data-enter`.
+       Bailing here matters: falling through would run the chevron as well and
+       the shot would be both wiped and faded. */
+    if (enter === 'dissolve') return
 
     const down = enter === 'down'
     el.style.clipPath = wipePath(0, down)
@@ -131,13 +135,17 @@ export default function FilmStage({ activeId, enter, cam, hold, variant, reduced
                and it is the grade and the cut language that carry continuity,
                not identical motion. */
             data-cam={live ? cam : undefined}
+            /* Only the incoming shot carries it, and only for the one edit that
+               needs it — shots 2 and 3 came from separate generations and do
+               not share the frame they were meant to cut on. */
+            data-enter={live ? enter : undefined}
             style={live ? { '--hold': `${hold}s` } : undefined}
             ref={live ? wipe : null}
           >
             {/* The sunset shot is a composite, not a clip: the footage and the
                 mark are separate objects that have to sit in register. */}
             {id === 'oryxSun' ? (
-              <OryxOrigin play={live} reduced={reduced} />
+              <OryxOrigin play={live} phase={phase} reduced={reduced} />
             ) : clip.kind === 'image' && clip.src ? (
               <img src={clip.src} alt="" />
             ) : clip.src ? (

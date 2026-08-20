@@ -146,16 +146,46 @@ function PlayedSequence({ onFinish }) {
   const dismissed = useRef(false)
 
   const act = acts[index]
-  /* The letters do not open the closing shot — the mark does. They arrive once
-     the clip has run out to its held sunset frame, which is why this is a timer
-     rather than simply rendering them with the act. */
-  const [letters, setLetters] = useState(false)
+
+  /* The finale is one shot carrying four beats, so it runs a phase rather than
+     handing off to another act. There is no end card any more — the card *is*
+     this shot, once the footage has gone.
+
+       mark   the mark settles onto the animal's horns
+       letters O·R·Y·X unfolds over the held sunset frame
+       travel  the same mark shrinks into its place; the footage gives out
+       door    wordmark, slogan and the way in, under the mark
+
+     Timers rather than a scroll or a tween, because each beat has to land at a
+     fixed moment in a fixed-length shot. */
+  const [phase, setPhase] = useState('mark')
+  const ended = phase === 'door'
+  /* The centred end layout has to be in place *before* the mark is measured
+     against its slot, not after. `.hero.is-end` recentres `.hero-copy`, so
+     applying it only at `door` meant the slot was measured while the copy was
+     still bottom-left — the mark travelled to where the slot used to be and
+     the layout then jumped out from under it. That is why it never landed. */
+  const centred = phase === 'travel' || phase === 'door'
 
   useEffect(() => {
-    setLetters(false)
-    if (act.kind !== 'origin' || reduced) return
-    const t = setTimeout(() => setLetters(true), 2600)
-    return () => clearTimeout(t)
+    if (act.kind !== 'finale') {
+      setPhase('mark')
+      return
+    }
+    /* Reduced motion resolves straight to the door: the mark in place, the copy
+       up, the button live. Waiting on tweens that will never run would leave a
+       visitor staring at a frozen frame with no way forward. */
+    if (reduced) {
+      setPhase('door')
+      return
+    }
+    setPhase('mark')
+    const t = [
+      setTimeout(() => setPhase('letters'), 2600),
+      setTimeout(() => setPhase('travel'), 6000),
+      setTimeout(() => setPhase('door'), 7200),
+    ]
+    return () => t.forEach(clearTimeout)
   }, [index, act.kind, reduced])
 
   useScrollLock(!reduced)
@@ -208,11 +238,11 @@ function PlayedSequence({ onFinish }) {
    * beat, brings a title up over it, takes the title away, and only then cuts.
    * Those two gaps of nothing-but-footage are what the eye reads as film.
    *
-   * The end card is exempt — it has to stay up, because it is asking for a
-   * click.
+   * The finale is exempt. It runs its own phases and ends on a door that has
+   * to stay up, because it is asking for a click.
    */
   useEffect(() => {
-    if (reduced || act.kind === 'end') return
+    if (reduced || act.kind === 'finale') return
     const ctx = gsap.context(() => {
       const tl = gsap.timeline()
       tl.fromTo(
@@ -239,9 +269,7 @@ function PlayedSequence({ onFinish }) {
 
   return (
     <section
-      className={`hero ${leaving ? 'is-leaving' : ''} ${
-        act.kind === 'end' ? 'is-end' : ''
-      }`}
+      className={`hero ${leaving ? 'is-leaving' : ''} ${centred ? 'is-end' : ''}`}
       id="hero"
       aria-label="Introduction"
     >
@@ -250,7 +278,7 @@ function PlayedSequence({ onFinish }) {
         enter={act.enter}
         cam={act.cam}
         hold={act.hold}
-        variant={act.variant}
+        phase={phase}
         reduced={reduced}
       />
 
@@ -260,28 +288,30 @@ function PlayedSequence({ onFinish }) {
       </p>
 
       <div className="hero-copy shell" ref={root} key={act.id}>
-        {/* The establishing frame and the two oryx shots all carry one line,
-            set the same way — they are one continuous idea and should not
-            change their voice halfway through. */}
-        {(act.kind === 'plate' || act.kind === 'origin') && (
+        {/* The two travelling shots carry one line, set the same way — they
+            are one continuous idea and should not change voice halfway. */}
+        {act.kind === 'plate' && (
           <p className="hero-line" data-act-in>{act.sub}</p>
         )}
 
-        {/* The closing shot carries the letters over its held frame. Not
-            wrapped in `data-act-in` — InitialsReveal runs its own entrance,
-            letter by letter, and the generic stagger would fade the whole block
-            in over the top of it. */}
-        {act.kind === 'origin' && letters && (
+        {/* The finale carries the letters over its held frame. Not wrapped in
+            `data-act-in` — InitialsReveal runs its own entrance, letter by
+            letter, and the generic stagger would fade the whole block in over
+            the top of it. */}
+        {act.kind === 'finale' && phase === 'letters' && (
           <div className="hero-letters">
             <InitialsReveal play reduced={reduced} />
             <p className="hero-descriptor label">{act.sub}</p>
           </div>
         )}
 
-        {/* The end card. Centred, on the bare ground, and it stays. */}
-        {act.kind === 'end' && (
-          <div className="hero-end">
-            <span className="hero-end-mark" aria-hidden="true" />
+        {/* The way in, under the mark that has just travelled down to meet it.
+            `.hero-end-slot` is an empty box for the mark to land in rather than
+            a second mark — the point of the beat is that there is only ever
+            one, and it never blinks out and back. */}
+        {act.kind === 'finale' && (phase === 'travel' || ended) && (
+          <div className={`hero-end ${ended ? 'is-open' : ''}`}>
+            <span className="hero-end-slot" aria-hidden="true" />
             <p className="hero-end-word">{brand.full}</p>
             <p className="hero-end-slogan">{brand.slogan}</p>
             <button type="button" className="hero-enter" onClick={dismiss}>
@@ -292,10 +322,10 @@ function PlayedSequence({ onFinish }) {
       </div>
 
       <div className="hero-foot">
-        {/* Present from the first frame, and gone on the end card — by then the
-            way in is the button in the middle of the screen, and offering two
-            of them is offering a choice that does not exist. */}
-        {act.kind !== 'end' && (
+        {/* Present from the first frame, and gone once the door is up — by then
+            the way in is the button in the middle of the screen, and offering
+            two of them is offering a choice that does not exist. */}
+        {!ended && (
           <button type="button" className="hero-cue" onClick={dismiss}>
             <span>Skip intro</span>
             <i aria-hidden="true" />
