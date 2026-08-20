@@ -1,7 +1,12 @@
 import { useEffect, useLayoutEffect, useRef } from 'react'
 import gsap from 'gsap'
 import { film } from '../content/media'
+import { acts } from '../content/copy'
 import OryxOrigin from './OryxOrigin'
+
+/* The ids the sequence actually uses. Everything else in `film` belongs to
+   the service worlds and must not be mounted here. */
+const usedFilms = new Set(acts.map((a) => a.film).filter(Boolean))
 
 /** The wipe, as a function of progress.
  *
@@ -122,7 +127,14 @@ export default function FilmStage({ activeId, enter, cam, hold, phase, reduced }
 
   return (
     <div className="stage" aria-hidden="true">
-      {Object.entries(film).map(([id, clip]) => {
+      {Object.entries(film)
+        /* Only the clips the acts actually play. `film` also carries the
+           service worlds' footage — five Pexels files, one of them 64 MB —
+           and mounting those here with `preload="auto"` had all of them
+           downloading and decoding underneath the intro. That was most of the
+           stutter. */
+        .filter(([id]) => usedFilms.has(id))
+        .map(([id, clip]) => {
         const live = id === activeId
         const prev = id === prevId && !live
         return (
@@ -155,7 +167,6 @@ export default function FilmStage({ activeId, enter, cam, hold, phase, reduced }
                 }}
                 src={clip.src}
                 muted
-                loop
                 playsInline
                 preload="auto"
                 tabIndex={-1}

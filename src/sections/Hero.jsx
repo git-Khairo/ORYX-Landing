@@ -152,9 +152,12 @@ function PlayedSequence({ onFinish }) {
      this shot, once the footage has gone.
 
        mark   the mark settles onto the animal's horns
-       letters O·R·Y·X unfolds over the held sunset frame
-       travel  the same mark shrinks into its place; the footage gives out
-       door    wordmark, slogan and the way in, under the mark
+       brief   a short line about the company reads over the held frame
+       horns   the mark fades up on the animal's horns and holds
+       travel  the transform, all at once: the footage goes to the dark
+               ground, the mark shrinks into the middle, and the copy and
+               the way in come up beneath it
+       door    the resting state the transform lands in
 
      Timers rather than a scroll or a tween, because each beat has to land at a
      fixed moment in a fixed-length shot. */
@@ -166,6 +169,7 @@ function PlayedSequence({ onFinish }) {
      still bottom-left — the mark travelled to where the slot used to be and
      the layout then jumped out from under it. That is why it never landed. */
   const centred = phase === 'travel' || phase === 'door'
+  const dark = centred
 
   useEffect(() => {
     if (act.kind !== 'finale') {
@@ -180,10 +184,15 @@ function PlayedSequence({ onFinish }) {
       return
     }
     setPhase('mark')
+    /* Two moments, not five. The horns beat stands alone — the logo IS the
+       horns for a breath — and then the entire transform happens at once:
+       dark, shrink, copy. `door` follows travel by only the beat the end
+       copy's own entrance needs to start under the still-moving mark. */
     const t = [
-      setTimeout(() => setPhase('letters'), 2600),
-      setTimeout(() => setPhase('travel'), 6000),
-      setTimeout(() => setPhase('door'), 7200),
+      setTimeout(() => setPhase('brief'), 2600),
+      setTimeout(() => setPhase('horns'), 4000),
+      setTimeout(() => setPhase('travel'), 5800),
+      setTimeout(() => setPhase('door'), 6100),
     ]
     return () => t.forEach(clearTimeout)
   }, [index, act.kind, reduced])
@@ -242,34 +251,26 @@ function PlayedSequence({ onFinish }) {
    * to stay up, because it is asking for a click.
    */
   useEffect(() => {
-    if (reduced || act.kind === 'finale') return
+    if (reduced || act.kind !== 'plate' || act.text !== 'letters') return
     const ctx = gsap.context(() => {
-      const tl = gsap.timeline()
-      tl.fromTo(
-        '[data-act-in]',
-        { y: 24, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.8, ease: 'expo.out', stagger: 0.07 },
-        0.5,
-      )
-
-      /* Out before the edit, but only when the shot is long enough to hold the
-         title still first — otherwise the words flash rather than read. */
-      const settled = 0.5 + 0.8 + 0.14
-      const exit = act.hold - 0.9
-      if (exit > settled + 0.6) {
-        tl.to(
-          ['[data-act-in]', '.initials'],
-          { opacity: 0, y: -10, duration: 0.5, ease: 'power2.in' },
-          exit,
-        )
-      }
+      /* Out before the edit. The entrance is InitialsReveal's own, letter by
+         letter; the only job left here is taking the block away in time for
+         the cut, so the words never ride through an edit they do not belong
+         to. */
+      gsap.to('.hero-letters', {
+        opacity: 0,
+        y: -10,
+        duration: 0.5,
+        ease: 'power2.in',
+        delay: act.hold - 0.9,
+      })
     }, root)
     return () => ctx.revert()
-  }, [index, reduced, act.hold, act.kind])
+  }, [index, reduced, act.hold, act.kind, act.text])
 
   return (
     <section
-      className={`hero ${leaving ? 'is-leaving' : ''} ${centred ? 'is-end' : ''}`}
+      className={`hero ${leaving ? 'is-leaving' : ''} ${dark ? 'is-dark' : ''} ${centred ? 'is-end' : ''}`}
       id="hero"
       aria-label="Introduction"
     >
@@ -288,21 +289,27 @@ function PlayedSequence({ onFinish }) {
       </p>
 
       <div className="hero-copy shell" ref={root} key={act.id}>
-        {/* The two travelling shots carry one line, set the same way — they
-            are one continuous idea and should not change voice halfway. */}
-        {act.kind === 'plate' && (
-          <p className="hero-line" data-act-in>{act.sub}</p>
-        )}
+        {/* The opening shot carries nothing — the film earns its title by
+            showing the animal before it says a word. */}
 
-        {/* The finale carries the letters over its held frame. Not wrapped in
-            `data-act-in` — InitialsReveal runs its own entrance, letter by
-            letter, and the generic stagger would fade the whole block in over
-            the top of it. */}
-        {act.kind === 'finale' && phase === 'letters' && (
+        {/* The push carries the name itself: O·R·Y·X unfolding into the
+            slogan. Not wrapped in `data-act-in` — InitialsReveal runs its own
+            entrance, letter by letter, and a generic fade over the top of it
+            would blur the one animation this component exists to do. */}
+        {act.kind === 'plate' && act.text === 'letters' && (
           <div className="hero-letters">
             <InitialsReveal play reduced={reduced} />
-            <p className="hero-descriptor label">{act.sub}</p>
           </div>
+        )}
+
+        {/* The finale's brief — a line about the company over the held sunset
+            frame. Mounted through `travel` with an exit class rather than
+            unmounted at the phase flip, so it fades out under the moving mark
+            instead of vanishing on the exact frame the travel starts. */}
+        {act.kind === 'finale' && ['brief', 'horns', 'travel'].includes(phase) && (
+          <p className={`hero-brief ${phase === 'travel' ? 'is-out' : ''}`}>
+            {act.sub}
+          </p>
         )}
 
         {/* The way in, under the mark that has just travelled down to meet it.

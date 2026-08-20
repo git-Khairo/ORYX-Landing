@@ -22,7 +22,7 @@ import { portal } from '../content/media'
  * carries the same content in a third of the height, which is what lets the
  * whole gateway hold to exactly one screen.
  */
-export default function Work({ onOpenService }) {
+export default function Work({ onOpenService, warm = true }) {
   /* Nullable, and starting closed. Nothing is open until you point at
      something — the page opens on three equal doors rather than on one that
      has already been chosen for you. */
@@ -64,7 +64,7 @@ export default function Work({ onOpenService }) {
                     trick. Different clips from the opening film, so the page
                     is not showing the same six seconds twice. */}
                 <span className="door-film" aria-hidden="true">
-                  {portal[s.id]?.src && (
+                  {warm && portal[s.id]?.src && (
                     <video
                       src={portal[s.id].src}
                       muted

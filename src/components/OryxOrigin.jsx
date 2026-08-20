@@ -27,6 +27,13 @@ import { film } from '../content/media'
 export default function OryxOrigin({ play, phase, reduced }) {
   const root = useRef(null)
   const video = useRef(null)
+  /* Every finale tween ever started, killed only when the component leaves.
+     The phase effect must NOT kill them itself: its cleanup runs on every
+     phase change, and `door` follows `travel` by 300ms — killing there froze
+     the 1.2s transform a quarter of the way in, which is exactly "the logo is
+     not getting smaller and the background is still the footage". A one-shot
+     tween that has been allowed to start must be allowed to finish. */
+  const running = useRef([])
   const clip = film.oryxSun
 
   /* Start the clip when the shot goes live, not when it mounts.
@@ -47,79 +54,87 @@ export default function OryxOrigin({ play, phase, reduced }) {
     if (!reduced) v.play?.().catch(() => {})
   }, [play, reduced])
 
-  useEffect(() => {
-    if (!play) return
 
-    /* Reduced motion gets the resolved frame. The composition carries the idea
-       on its own; only the arrival is dropped. */
-    if (reduced) {
-      const ctx = gsap.context(() => gsap.set('.origin-mark', { opacity: 1 }), root)
-      return () => ctx.revert()
+  /* The ending, beat by beat, driven by the phase Hero passes down.
+
+       horns   the footage has run out to its held frame; the mark fades up
+               exactly on the animal's horns and holds there — a beat where
+               the logo *is* the horns, before anything else moves
+       fade    the picture and its scrim go to the dark ground underneath;
+               the mark stays, now alone on black
+       travel  the same mark — one element, never swapped — shrinks into the
+               empty `.hero-end-slot` the end block has just mounted
+
+     No cleanup on phase change at all — neither revert (which undid finished
+     beats) nor kill (which froze in-flight ones when `door` arrived 300ms
+     into the 1.2s transform). Tweens accumulate in `running` and are killed
+     once, on unmount, where stopping mid-flight is what you want.
+
+     `position: fixed` for the travel is safe because nothing between the mark
+     and the viewport carries a transform or filter — the grade and camera
+     filters live on the sibling `.origin-photo`, not on an ancestor. */
+  useEffect(() => {
+    if (reduced) return
+    const mark = root.current?.querySelector('.origin-mark')
+    if (!mark) return
+    const tweens = running.current
+
+    if (phase === 'horns') {
+      tweens.push(gsap.to(mark, { opacity: 1, duration: 0.9, ease: 'power2.out' }))
     }
 
-    const ctx = gsap.context(() => {
-      const tl = gsap.timeline()
+    if (phase === 'travel') {
+      /* The whole transform in one breath — the picture to the dark ground,
+         the mark to its place — rather than as consecutive beats. The held
+         previous shot fades with it: it is the daylight head at full opacity
+         underneath this one, and leaving it put a bright oryx where the dark
+         ground should be. */
+      const layers = [
+        root.current.querySelector('.origin-photo'),
+        root.current.querySelector('.origin-grade'),
+        document.querySelector('.stage-scrim'),
+        document.querySelector('.stage-clip.is-prev'),
+      ].filter(Boolean)
+      tweens.push(gsap.to(layers, { opacity: 0, duration: 1.2, ease: 'power2.inOut' }))
 
-      /* Dim first, then hardening — the mark arrives as part of the animal
-         rather than as a graphic laid over it. Up by the time the sun has
-         cleared the horns. */
-      tl.fromTo('.origin-mark', { opacity: 0 }, { opacity: 0.5, duration: 0.9, ease: 'power2.out' }, 0.4)
-      tl.to('.origin-mark', { opacity: 1, duration: 0.8, ease: 'power2.inOut' }, 1.7)
+      const slot = document.querySelector('.hero-end-slot')
+      if (slot) {
+        const from = mark.getBoundingClientRect()
+        const to = slot.getBoundingClientRect()
+        gsap.set(mark, {
+          position: 'fixed',
+          left: from.left,
+          top: from.top,
+          width: from.width,
+          height: from.height,
+          margin: 0,
+          zIndex: 6,
+          opacity: 1,
+          /* The stylesheet centres the mark with `translateX(-50%)`, and the
+             measured rect already includes that shift — so the transform must
+             be zeroed here or it applies again on top of the pinned position,
+             throwing the mark left by half its width the moment the travel
+             starts. That was the "second logo appearing on the left". */
+          x: 0,
+          y: 0,
+        })
+        tweens.push(
+          gsap.to(mark, {
+            left: to.left,
+            top: to.top,
+            width: to.width,
+            height: to.height,
+            duration: 1.2,
+            ease: 'power2.inOut',
+          }),
+        )
+      }
+    }
 
-    }, root)
-
-  }, [play, reduced])
-
-  /* The hand-off, and the reason there is only one mark on this page.
-     The end block renders an empty `.hero-end-slot` rather than a second mark;
-     this measures it, pins the mark that is already on the horns at its current
-     viewport rect, and tweens it into that slot. One element travels, so the
-     logo never blinks out and back — which is what makes it read as the same
-     object arriving rather than a cut between two frames that both happen to
-     have a logo in them.
-
-     `position: fixed` is safe here specifically because nothing between this
-     element and the viewport carries a transform, filter or `will-change`
-     other than the mark's own — a transformed ancestor would make `fixed`
-     resolve against *it* and throw the mark somewhere unintended. The grade
-     and camera filters live on the sibling `.origin-photo`, not on any
-     ancestor of the mark. */
-  useEffect(() => {
-    if (phase !== 'travel' || reduced) return
-    const mark = root.current?.querySelector('.origin-mark')
-    const slot = document.querySelector('.hero-end-slot')
-    if (!mark || !slot) return
-
-    const from = mark.getBoundingClientRect()
-    const to = slot.getBoundingClientRect()
-
-    const ctx = gsap.context(() => {
-      gsap.set(mark, {
-        position: 'fixed',
-        left: from.left,
-        top: from.top,
-        width: from.width,
-        height: from.height,
-        margin: 0,
-        zIndex: 6,
-      })
-      gsap.to(mark, {
-        left: to.left,
-        top: to.top,
-        width: to.width,
-        height: to.height,
-        duration: 1.2,
-        ease: 'power2.inOut',
-      })
-      /* The picture goes, the mark stays. */
-      gsap.to(['.origin-photo', '.origin-grade'], {
-        opacity: 0,
-        duration: 1.1,
-        ease: 'power2.inOut',
-      })
-    }, root)
-    return () => ctx.revert()
   }, [phase, reduced])
+
+  /* Unmount only — skip and dismiss land here. */
+  useEffect(() => () => running.current.forEach((t) => t.kill()), [])
 
   return (
     <div className="origin origin--sunset" ref={root} aria-hidden="true">

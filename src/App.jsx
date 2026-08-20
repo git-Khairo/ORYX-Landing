@@ -78,7 +78,12 @@ export default function App() {
           film rather than starting after it. Ambience handles the case where
           the browser refuses to autoplay. */}
       <Ambience />
-      <Work onOpenService={open} />
+      {/* `warm` gates the door films. The gateway itself stays mounted under
+          the intro so the page is there the instant the wipe clears — but its
+          three 1080p door clips were mounting with `autoPlay` too, decoding
+          underneath the film for its whole runtime. That was the intro's
+          stutter. The films arrive when the intro goes. */}
+      <Work onOpenService={open} warm={introDone} />
       <Footer onOpenService={open} />
 
       {!introDone && <Hero onFinish={() => setIntroDone(true)} />}

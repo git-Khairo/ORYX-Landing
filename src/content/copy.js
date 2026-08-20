@@ -54,49 +54,54 @@ export const brand = {
  */
 export const acts = [
   {
-    /* Establishing. The animal small in the dunes, camera creeping in. */
+    /* Establishing. No copy at all — the film earns its title by showing the
+       animal first. `line`/`sub` feed the screen-reader announcement only;
+       `text` is what decides whether anything is drawn, and here it is
+       nothing. */
     id: 'wild',
     kind: 'plate',
     film: 'oryxWide',
     hold: 2.06,
     enter: 'up',
     cam: 'none',
+    text: null,
     line: 'ORYX',
-    sub: 'An oryx in the Namib.',
+    sub: 'An oryx in the Namib desert.',
   },
   {
-    /* The push onto the head, carrying what the name stands for. This one cuts
-       hard: it shares its opening frame with the shot before it. */
+    /* The push onto the head, carrying the name itself: O·R·Y·X unfolding
+       into the slogan it abbreviates. This shot is where the word is
+       explained, so the letters live here rather than over the finale, which
+       has its own work to do. */
     id: 'push',
     kind: 'plate',
     film: 'oryxPush',
     hold: 4.06,
     enter: 'cut',
     cam: 'none',
+    text: 'letters',
     line: 'ORYX',
-    sub: 'Strength · Focus · Resilience',
+    sub: brand.slogan,
   },
   {
-    /* The finale, and it is one shot rather than a shot and then a card.
-       The clip runs day into sunset with the sun coming up inside the V the
-       horns make. The mark fades onto those horns, the letters unfold into the
-       promise, and then the same mark — one element, never swapped — shrinks
-       into its place while the footage gives out beneath it and the way in
-       appears under it.
+    /* The finale. The sun comes up inside the V the horns make, the mark
+       fades onto them, a short brief about the company reads over the held
+       frame — and then the same mark, one element, never swapped, shrinks
+       into its place while the footage gives out and the way in appears
+       under it.
 
        `enter: 'dissolve'` because this is the one edit whose two shots were
-       generated separately and do not share the frame they should cut on.
-
-       No `hold`: the timeline stops here and the film waits to be dismissed
-       rather than dismissing itself. */
+       generated separately. No `hold`: the timeline stops here and the film
+       waits to be dismissed rather than dismissing itself. */
     id: 'finale',
     kind: 'finale',
     film: 'oryxSun',
     hold: 0,
     enter: 'dissolve',
     cam: 'none',
+    text: 'brief',
     line: 'ORYX GROUP',
-    sub: 'ORYX GROUP · Netherlands',
+    sub: 'One group for transport, workforce and renovation — reliable people and services, delivered across the Netherlands.',
   },
 ]
 
