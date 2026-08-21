@@ -110,13 +110,17 @@ export default function OryxOrigin({ play, phase, reduced }) {
           margin: 0,
           zIndex: 6,
           opacity: 1,
-          /* The stylesheet centres the mark with `translateX(-50%)`, and the
-             measured rect already includes that shift — so the transform must
-             be zeroed here or it applies again on top of the pinned position,
-             throwing the mark left by half its width the moment the travel
-             starts. That was the "second logo appearing on the left". */
+          /* Every transform channel zeroed, and belt-and-braces on purpose.
+             The stylesheet no longer puts any transform on the mark — it is
+             centred with a calc — but GSAP keeps percentage translates in
+             `xPercent`, a separate channel from `x`, and zeroing only `x`
+             against a `translateX(-50%)` is exactly the bug that had the mark
+             jumping left and landing left of its slot. If a transform ever
+             returns to this element, all four channels are already handled. */
           x: 0,
           y: 0,
+          xPercent: 0,
+          yPercent: 0,
         })
         tweens.push(
           gsap.to(mark, {

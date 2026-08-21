@@ -319,7 +319,14 @@
      so the mark had to be nudged by hand to compensate. Derived, it follows
      `--mark-w` and the plate on its own. */
   position: absolute;
-  left: var(--horn-x);
+  /* Centred by arithmetic, not by `translateX(-50%)`. The translate looked
+     equivalent but poisoned the closing travel: GSAP parses a percentage
+     translate into its separate `xPercent` channel, so pinning the mark with
+     `x: 0` cleared a channel that was already zero and the -50% rode along —
+     the mark jumped left by half its width at the start of the travel and
+     landed half a width left of its slot. With no transform on the element
+     there is no channel to mis-clear, whatever drives it. */
+  left: calc(var(--horn-x) - var(--mark-w) / 2);
   top: calc(var(--horn-y) - var(--mark-w) * 3.0271);
   width: var(--mark-w);
   aspect-ratio: 0.4161;
@@ -334,7 +341,6 @@
      of the frame, which spent the idea in the same second it made it — the shot
      is about the two things being one thing, and that reads better held than
      animated apart. All the measuring that move needed went with it. */
-  transform: translateX(-50%);
   background: var(--sand);
 }
 
@@ -603,7 +609,10 @@
 }
 
 @media (max-width: 640px) {
-  .origin-mark { width: 20%; }
+  /* Through the variable, never `width` directly: the centring is
+     `left: calc(--horn-x - --mark-w / 2)`, so a width set behind the
+     variable's back would shift the mark off-centre by the difference. */
+  .origin-mark { --mark-w: 20%; }
   .hero-copy { gap: 0.7rem; }
 }
 
