@@ -44,9 +44,13 @@ export default function TransportWorld({ service, onClose, onRequest }) {
             <a href="#t-coverage">Coverage</a>
           </nav>
 
+          {/* Was "Live · 24/7", which is a staffed-cover claim and blocked by
+              the publication gate — see the note on `figures` in copy.js. The
+              badge describes the consignment instead, which is what the dot
+              beside it is actually reporting. */}
           <span className="t-nav-status">
             <i aria-hidden="true" />
-            Live · 24/7
+            Tracked · End to end
           </span>
         </div>
         <span className="t-nav-progress" aria-hidden="true" />
@@ -257,8 +261,10 @@ function TransportFooter({ service, onClose, onRequest }) {
         <div>
           <h4>Dispatch</h4>
           <ul className="t-foot-mono">
-            <li>Mon–Sun · 24 hours</li>
-            <li>Exception cover · always</li>
+            {/* The one cleared 24/7 wording. "Mon–Sun · 24 hours" and
+                "Exception cover · always" both promised a person on the end of
+                it, which the gate blocks until it is evidenced. */}
+            <li>Requests may be submitted 24/7</li>
             <li>dispatch@oryx.example</li>
           </ul>
         </div>

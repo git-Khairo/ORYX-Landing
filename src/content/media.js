@@ -10,37 +10,57 @@
  * downloaded into `public/film/`. Every URL verified in session: 200, video/mp4.
  */
 export const film = {
-  /* ── The opening film, generated ─────────────────────────────────────
-     Three clips that chain: each one ends on the frame the next begins with,
-     because they were made as first/last-frame interpolations off a single
-     chain of keyframes. That is what lets them cut together without a
-     dissolve — the edit lands on an identical frame.
+  /* ── The opening film, a montage ──────────────────────────────────────
+     Four clips from two generations, cut together with dissolves. About
+     sixteen seconds to the end card: 3 + 3 + 4.06 + the finale's 6.1.
 
-     Note the order is not the filename order they arrived in. Read by content:
-     the wide push came first, the mid-to-head push third, and the sunset
-     second. Renamed on the way in so the sequence is legible on disk.
+     01  744×496 · 30 fps · 5.03 s — a first/last-frame interpolation off a
+         photograph. ⚠ PLACEHOLDER, MUST NOT SHIP: the photograph carries a
+         "© Thomas Vijayan" credit and it is baked into the bottom-left of
+         every frame. `scripts/check-claims.mjs` warns on every build for as
+         long as this exact file is here. The site's own crop hides most of
+         it, which makes it worse, not better. Replace with a clip made from
+         a photograph ORYX holds the rights to.
+     02  744×496 · 30 fps · 5.03 s — a first/last-frame interpolation off a
+         photograph of an oryx beside a dune shrub, facing camera. Nearly
+         static; the act runs the site's `closeIn` camera over it.
+     03  848×480 · 16 fps · 4.06 s — the original generated push, mid-shot
+         to the head, from the keyframe chain that also made 04.
+     04  848×480 · 16 fps · 3.56 s — the original generated sunset: head
+         square to camera, horns in a narrow V, the sun rising into the gap.
 
-     ⚠ 848×480. That is the Wan "Fast" output, and full-bleed on a 1440p screen
-     it is roughly a 3× upscale — soft, and visibly so on the wide shot where
-     the dune edges are. The grade and the scrim hide a good deal of it, but
-     this wants regenerating at a higher resolution, or upscaling, before
-     launch. Everything else about them is right. */
+     Why 03 and 04 are the originals: the replacement finale came back
+     SQUARE, and on a widescreen no crop of a square keeps both the horn tips
+     and the face. It played for an afternoon contained by height with
+     blurred sides, and was taken out on request. It is parked in `frames/`
+     as `unused-*` — not under `public/`, so it does not ship.
+
+     ⚠ Resolution. All three are below the 1080p a full-bleed hero wants;
+     848×480 was already flagged as soft. The grade and the scrim carry a
+     good deal of it. The real fix is regeneration at 720p+ (a 16:9 finale
+     from the first/last-frame Space, wide keyframes) or an upscale pass. */
   oryxWide: {
     src: '/film/01-wide.mp4',
-    /* Where the animal stands, as a fraction of the plate — the push targets
-       this point. */
-    subject: { x: 0.34, y: 0.62 },
+    /* Where the animal stands on the first frame, as a fraction of the plate —
+       it walks left to right across the shot. Documentation for the `stalk`
+       camera; this act runs `cam: 'none'`. */
+    subject: { x: 0.36, y: 0.52 },
+  },
+  oryxBush: {
+    src: '/film/02-bush.mp4',
   },
   oryxPush: {
-    src: '/film/02-push.mp4',
+    src: '/film/03-push.mp4',
   },
   /* Ends on the shot the whole identity rests on: the head square to camera,
      the horns rising in a narrow V, and the sun sitting exactly in the gap
-     between them. The mark goes here. */
+     between them. The mark goes here. The clip holds its last frame; the
+     mark lands after it has stopped — see the phase timers in Hero.jsx. */
   oryxSun: {
-    src: '/film/03-sun.mp4',
-    /* Where the horns converge in this clip, as fractions of the frame. The
-       mark overlay is positioned from these two numbers and nothing else. */
+    src: '/film/04-sun.mp4',
+    /* Where the horns converge in this clip, as fractions of the frame.
+       Documentation — the live numbers are `--horn-x` / `--horn-y` /
+       `--mark-w` on `.origin-mark` in hero.css. */
     horn: { x: 0.5, y: 0.30, spread: 0.15 },
   },
 
@@ -59,28 +79,31 @@ export const film = {
     src: 'https://videos.pexels.com/video-files/6195153/6195153-hd_1920_1080_25fps.mp4',
     credit: 'https://www.pexels.com/video/cleaners-carrying-working-tools-6195153/',
   },
-  /* A building going up, sped up — a genuine time-lapse of a concrete frame
-     rising, scaffolded, with a tower crane behind it.
+  /* A room mid-renovation in an existing building: plaster, dust sheets, a
+     sprayer, daylight from one window.
 
-     Chosen on two constraints beyond the subject. No writing anywhere in
-     frame: every other free construction time-lapse is a Hong Kong or
-     Singapore shoot with Chinese signage on the hoardings, and 6164052 — the
-     one that best matched otherwise — carries a banner across the building.
-     And no saturated primary: the tilt-shift family (5513059, 5513062,
-     8598730, 8598739, 9425993) is all cobalt netting and orange barriers,
-     which is four colours this palette does not have. This one is concrete,
-     haze and grey sky, which is the Renovation page's own range.
+     This replaced a time-lapse of a concrete frame going up. Two things were
+     wrong with that. It was NEW CONSTRUCTION, and the source document for this
+     page is entirely about existing property — its differentiator is
+     "conserve what has value, repair what is necessary, replace only as a last
+     resort", which a building rising from nothing directly contradicts. And it
+     was 64 MB, the heaviest thing on the site by a wide margin, because 1080p60
+     was the only rendition offered.
 
-     ⚠ 64 MB — the only rendition Pexels offers for it is 1080p60. Fine while
-     it is a placeholder; re-encode to ~1080p30 when these move into
-     `public/film/`, or it is the heaviest thing on the site by a wide margin. */
+     Verified before use, which is the rule here after three clips turned out
+     not to be what their titles said: poster frame read as an image, HTTP 200,
+     video/mp4, H.264 (avc1), 1920×1080 25fps, 5.8 MB. Two earlier candidates
+     were rejected on the same check — a "time-lapse of two men plastering a
+     house facade" is a brick shell going up on bamboo scaffolding in saturated
+     pink and cobalt, and a "man painting facade on ladder" is unprotected
+     ladder work, which is the wrong message for a page whose catalogue marks
+     access at height as a project-basis condition. */
   renovation: {
-    src: 'https://videos.pexels.com/video-files/29794133/12800975_1920_1080_60fps.mp4',
-    /* First frame as a still, so the section paints the moment it opens rather
-       than sitting black while 64 MB starts arriving. */
+    src: 'https://videos.pexels.com/video-files/6473920/6473920-hd_1920_1080_25fps.mp4',
+    /* First frame as a still, so the section paints the moment it opens. */
     poster:
-      'https://images.pexels.com/videos/29794133/architecture-building-building-construction-construction-work-29794133.jpeg?auto=compress&cs=tinysrgb&w=1600',
-    credit: 'https://www.pexels.com/video/urban-building-construction-progress-timelapse-29794133/',
+      'https://images.pexels.com/videos/6473920/pexels-photo-6473920.jpeg?auto=compress&cs=tinysrgb&w=1600',
+    credit: 'https://www.pexels.com/video/a-footage-of-a-room-under-renovation-6473920/',
   },
 
 
@@ -134,9 +157,17 @@ export const portal = {
     src: 'https://videos.pexels.com/video-files/13422071/13422071-hd_1920_1080_30fps.mp4',
     credit: 'https://www.pexels.com/video/workers-cleaning-warehouse-13422071/',
   },
+  /* From the same shoot as the opening clip, so the two cut together: an
+     empty room being sprayed, daylight blown out through the one window.
+     Verified: 200, video/mp4, H.264, 1920×1080 25fps, 4.4 MB. */
   renovation: {
-    src: 'https://videos.pexels.com/video-files/8488112/8488112-hd_1920_1080_30fps.mp4',
-    credit: 'https://www.pexels.com/video/handyman-hammering-the-nail-on-wooden-flooring-8488112/',
+    src: 'https://videos.pexels.com/video-files/6474085/6474085-hd_1920_1080_25fps.mp4',
+    /* A poster, like the opening clip has. Without one the interlude sits
+       blank until enough of the file has arrived, and it is a full-bleed band
+       with a line of display type over it. */
+    poster:
+      'https://images.pexels.com/videos/6474085/pexels-photo-6474085.jpeg?auto=compress&cs=tinysrgb&w=1600',
+    credit: 'https://www.pexels.com/video/man-painting-a-wall-6474085/',
   },
 }
 
@@ -189,8 +220,8 @@ export const gallery = {
      JPEG, not the source PNG: 5.1 MB of lossless photograph became 644 KB with
      nothing visible lost. The PNGs stay beside them as the masters. */
   renovation: [
-    { src: '/renovation/before.jpg', alt: 'Commercial floor stripped back before refurbishment: bare concrete, services exposed overhead, walls back to substrate' },
-    { src: shot(12526862), alt: 'Commercial floor part-cleared during fit-out' },
-    { src: '/renovation/after.jpg', alt: 'The same floor completed: oak flooring, suspended ceiling with linear lighting, desks in place' },
+    { src: '/renovation/before.jpg', alt: 'Illustration: a commercial floor stripped back before refurbishment — bare concrete, services exposed overhead, walls back to substrate' },
+    { src: shot(12526862), alt: 'A commercial floor part-cleared during works' },
+    { src: '/renovation/after.jpg', alt: 'Illustration: the same floor completed — oak flooring, suspended ceiling with linear lighting, desks in place' },
   ],
 }

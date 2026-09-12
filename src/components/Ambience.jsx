@@ -43,16 +43,30 @@ export default function Ambience({ armed = true }) {
   const el = useRef(null)
   const fade = useRef(0)
 
-  /* Off is remembered; on is not assumed. A visitor who has never expressed a
-     preference gets music from the opening film, because that is what was
-     asked for — but the moment they say no, that sticks. */
+  /* Off by default; on is remembered. It used to autoplay for anyone who had
+     not said no, and was turned off on request — three times. A visitor who
+     wants the music turns it on with the control, and that sticks.
+
+     A new key on purpose. The old `oryx.sound` was written on every mount,
+     so every browser that ever opened the site holds an "on" it never chose;
+     reading it would bring the music straight back for exactly the people
+     who asked for it to stop. Only an explicit toggle writes this one. */
   const [on, setOn] = useState(() => {
     try {
-      return localStorage.getItem('oryx.sound') !== 'off'
+      return localStorage.getItem('oryx.music') === 'on'
     } catch {
-      return true
+      return false
     }
   })
+  const toggle = () => {
+    const next = !on
+    setOn(next)
+    try {
+      localStorage.setItem('oryx.music', next ? 'on' : 'off')
+    } catch {
+      /* Private browsing. The preference is lost on reload; the site is not. */
+    }
+  }
   const [missing, setMissing] = useState(false)
 
   /* Where the ramp is headed. Held in a ref because the fade runs outside
@@ -143,14 +157,6 @@ export default function Ambience({ armed = true }) {
     }
   }, [armed, on, reduced])
 
-  useEffect(() => {
-    try {
-      localStorage.setItem('oryx.sound', on ? 'on' : 'off')
-    } catch {
-      /* Private browsing. The preference is lost on reload; the site is not. */
-    }
-  }, [on])
-
   /* Nothing to control if the track is not there, and nothing to control if the
      visitor has asked the system for reduced motion — that preference is set by
      people who do not want media starting on its own. */
@@ -169,7 +175,7 @@ export default function Ambience({ armed = true }) {
       <button
         type="button"
         className={`sound ${on ? 'is-on' : ''}`}
-        onClick={() => setOn((v) => !v)}
+        onClick={toggle}
         aria-pressed={on}
         aria-label={on ? 'Turn background music off' : 'Turn background music on'}
       >

@@ -187,7 +187,11 @@ function PlayedSequence({ onFinish }) {
     /* Two moments, not five. The horns beat stands alone — the logo IS the
        horns for a breath — and then the entire transform happens at once:
        dark, shrink, copy. `door` follows travel by only the beat the end
-       copy's own entrance needs to start under the still-moving mark. */
+       copy's own entrance needs to start under the still-moving mark.
+
+       Timed to the clip, which runs 3.56 s and holds its last frame: the
+       brief reads over the sun rising, and the mark lands at 4.0, after the
+       freeze, onto a head that has stopped moving. */
     const t = [
       setTimeout(() => setPhase('brief'), 2600),
       setTimeout(() => setPhase('horns'), 4000),
@@ -289,8 +293,13 @@ function PlayedSequence({ onFinish }) {
       </p>
 
       <div className="hero-copy shell" ref={root} key={act.id}>
-        {/* The opening shot carries nothing — the film earns its title by
-            showing the animal before it says a word. */}
+        {/* A single line under a shot. `aria-hidden` because the live region
+            above has already announced it — a sighted reader sees it once and
+            a screen reader should hear it once. Remounts with `.hero-copy`
+            (keyed on the act), so the entrance plays per shot. */}
+        {act.kind === 'plate' && act.text === 'line' && (
+          <p className="hero-line" aria-hidden="true">{act.line}</p>
+        )}
 
         {/* The push carries the name itself: O·R·Y·X unfolding into the
             slogan. Not wrapped in `data-act-in` — InitialsReveal runs its own

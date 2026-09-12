@@ -244,13 +244,23 @@
    purpose: a transform here would become the containing block for the mark's
    `position: fixed`, and the closing travel would fly off to the wrong place. */
 .origin-plate {
+  /* `--vid-r` is the clip's own aspect, and everything else follows from it:
+     the plate covers the viewport at that ratio, and the mark's vertical
+     offset is converted through it. A footage swap changes this one number.
+
+     Covering assumes a landscape clip. A square finale was tried here for an
+     afternoon: on a widescreen no crop of a square keeps both the horn tips
+     and the face, so it needed the plate contained by height and a blurred
+     copy of the clip filling the sides — see git history if that ever comes
+     back. A 16:9 clip never exposes the sides, so none of that is here. */
   --vid-r: 1.76667;
   --plate-w: calc(max(100vw, 100svh * var(--vid-r)) * 1.06);
+  --plate-h: calc(var(--plate-w) / var(--vid-r));
   position: absolute;
   width: var(--plate-w);
   aspect-ratio: var(--vid-r);
   left: calc((100vw - var(--plate-w)) / 2);
-  top: calc((100svh - var(--plate-w) / var(--vid-r)) / 2);
+  top: calc((100svh - var(--plate-h)) / 2);
 }
 
 .origin-photo {
@@ -301,10 +311,10 @@
      Where the animal's horns converge in the plate. Re-aim the mark after a
      footage swap by changing these and nothing else — the vertical offset is
      derived below rather than measured again. */
+  /* For the 848×480 generated sunset clip: head centred, horns meeting the
+     skull 41.5% of the way down. These were checked in the page against the
+     rendered horns when the clip first went in. */
   --horn-x: 50%;
-  /* Re-tuned against the corrected plate. The old pair were fitted to a plate
-     that cropped and magnified the shot differently, so they no longer meant
-     what they used to once the geometry was fixed. */
   --horn-y: 41.5%;
   --mark-w: 23.5%; /* of plate width; height follows from the mark's own ratio */
 
@@ -312,12 +322,14 @@
      its height, giving a 0.4161 width-to-height ratio.
 
      `top` puts that merge point exactly on the skull. The factor is
-     `0.713 ÷ 0.4161 × 1.76667` — the merge fraction, converted from the mark's
+     `0.713 ÷ 0.4161 × --vid-r` — the merge fraction, converted from the mark's
      own height into plate widths, then into plate *heights* via the video
      aspect. It was a hard-coded 42.4%, which was correct only for a 16.5% mark
-     on a 3:2 plate; both of those have since changed and the constant did not,
-     so the mark had to be nudged by hand to compensate. Derived, it follows
-     `--mark-w` and the plate on its own. */
+     on a 3:2 plate; then it was 3.0271, which had the 1.76667 aspect of the
+     848×480 clip frozen into it — so the first square clip put the merge point
+     at 19% of the frame while `--horn-y` said 60%. The aspect is now read from
+     the plate, so a footage swap changes `--vid-r` in one place and the mark
+     follows. */
   position: absolute;
   /* Centred by arithmetic, not by `translateX(-50%)`. The translate looked
      equivalent but poisoned the closing travel: GSAP parses a percentage
@@ -327,7 +339,7 @@
      landed half a width left of its slot. With no transform on the element
      there is no channel to mis-clear, whatever drives it. */
   left: calc(var(--horn-x) - var(--mark-w) / 2);
-  top: calc(var(--horn-y) - var(--mark-w) * 3.0271);
+  top: calc(var(--horn-y) - var(--mark-w) * 1.7135 * var(--vid-r));
   width: var(--mark-w);
   aspect-ratio: 0.4161;
 
@@ -643,6 +655,24 @@
   display: block;
 }
 
+/* One line under a shot — the establishing shot and the one after it. Set as
+   hero type, not as a caption: the film is full-bleed and the type under it
+   has to hold its own. Montserrat light at display size is the treatment the
+   purpose line and the footer line already use; Cinzel's lowercase is small
+   caps and would set a sentence as a block. Delayed a beat so the picture
+   lands first; the scrim under `.hero-copy` carries legibility. */
+.hero-line {
+  font-family: var(--font);
+  font-size: var(--step-3);
+  font-weight: 300;
+  line-height: 1.08;
+  letter-spacing: -0.005em;
+  color: var(--oryx-white);
+  max-width: 20ch;
+  text-wrap: balance;
+  animation: letters-in 0.9s var(--ease-out) 0.45s both;
+}
+
 /* The letters, riding the closing shot's held frame. They come in after the
    mark has settled on the horns, so they fade up as a block rather than
    competing with it for the same two seconds. */
@@ -681,5 +711,6 @@
   to   { opacity: 1; transform: none; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .hero-letters { animation: none; }
+  .hero-letters,
+  .hero-line { animation: none; }
 }

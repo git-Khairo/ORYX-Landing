@@ -75,7 +75,10 @@
   font-weight: 600;
   letter-spacing: var(--track-label);
   text-transform: uppercase;
-  color: var(--text-3);
+  /* `--text-3` is 4.73:1 on the flat tone and less than that over the opening
+     film, which shows through this bar at the top of the page. `--text-2` is
+     8.62:1 and holds over both. */
+  color: var(--text-2);
   transition: color 0.2s var(--ease-out);
 }
 .w-nav-links a:hover { color: var(--text); }
@@ -97,7 +100,9 @@
 
 @media (max-width: 720px) {
   .w-nav-links { display: none; }
-  .w-nav-cta { margin-left: auto; }
+  /* `nowrap` is not cosmetic: wrapped, the button took the bar from 54px to
+     82px, and everything sticky below it is positioned from that height. */
+  .w-nav-cta { margin-left: auto; white-space: nowrap; }
 }
 
 /* ── Its own footer ───────────────────────────────────────────────────
@@ -156,7 +161,15 @@
   color: var(--sand-text);
   margin-bottom: 0.9rem;
 }
-.w-foot-cols li { font-size: var(--step--1); color: var(--text-2); padding: 0.22rem 0; }
+.w-foot-cols li {
+  font-size: var(--step--1);
+  color: var(--text-2);
+  padding: 0.22rem 0;
+  /* An address is a single unbreakable token — `people@oryx.example` is 19
+     characters with nowhere to wrap, and in a third of a phone screen it hung
+     31px off the edge and scrolled the whole world sideways. */
+  overflow-wrap: anywhere;
+}
 .w-foot-cols a { border-bottom: 1px solid var(--line-sand); }
 
 .w-foot-base {
@@ -177,17 +190,42 @@
 @media (max-width: 860px) {
   .w-foot-main { grid-template-columns: 1fr; }
 }
+@media (max-width: 560px) {
+  /* Three directory columns on a phone give each about 90px, which is narrower
+     than several sector names. */
+  .w-foot-cols { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* This world's opening carries four blocks where the other two carry two —
+   headline, promise, north star and lede — so its copy column reaches much
+   further up the frame, into the part of the shared scrim that is only 28%
+   opaque. The shared rule in world-shell.css is right for Transport and
+   Renovation and is left alone; this deepens the middle of the gradient for
+   Workforce only, where the sand north star and the grey lede sit. */
+.w-open .world-film::after {
+  background: linear-gradient(
+    to top,
+    rgba(13, 13, 12, 0.95) 0%,
+    rgba(13, 13, 12, 0.86) 38%,
+    rgba(13, 13, 12, 0.62) 68%,
+    rgba(13, 13, 12, 0.4) 100%
+  );
+}
 
 /* ── The opening strip ────────────────────────────────────────────────
-   Four facts under the headline, before any prose. Transport does the same
-   with its manifest — same job, and the shared instinct is deliberate: both
-   pages are bought by someone checking whether you can cover a date. */
+   The size of the catalogue, before any prose. It used to be four claims about
+   service — notice, cover, levels — of which three were unevidenced and one
+   described a five-grade ladder that no longer exists. It is now three counts
+   read straight off the data, and the sentence under it is not optional
+   garnish: the source states plainly that these counts are pre-review and
+   expected to fall, so the note is the condition on which printing them is
+   honest at all. */
 .w-strip {
   max-width: var(--maxw);
   margin: 0 auto;
-  padding: 0 var(--gutter) clamp(2.5rem, 7vh, 4rem);
+  padding: 0 var(--gutter);
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1px;
   background: var(--line);
   border: 1px solid var(--line);
@@ -209,7 +247,8 @@
 }
 .w-strip dd {
   font-family: var(--font-display);
-  font-size: var(--step-0);
+  font-size: var(--step-2);
+  font-variant-numeric: tabular-nums;
   font-weight: 800;
   letter-spacing: var(--track-display);
   text-transform: uppercase;
@@ -220,440 +259,53 @@
 /* The strip is a bordered grid, so it cannot sit inside the gutter padding of
    `.w-open` and also stretch edge to edge. Pull it out of the flow padding
    instead of nesting a second container. */
-@media (max-width: 860px) {
-  .w-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+/* The note sits under the strip and carries the source's governing rule
+   verbatim. `--text-2`, not `--text-3`: it is a qualification on three large
+   numbers and has to be readable, not whispered. */
+.w-strip-note {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 0.9rem var(--gutter) clamp(2.5rem, 7vh, 4rem);
+  font-size: var(--step--1);
+  line-height: 1.5;
+  color: var(--text-2);
 }
-@media (max-width: 520px) {
+/* The north star. A statement, so it is set as one — sand, display face, and
+   no quotation marks anywhere near it. */
+.w-north {
+  margin-top: 1.1rem;
+  font-family: var(--font-display);
+  font-size: var(--step-1);
+  font-weight: 800;
+  letter-spacing: var(--track-display);
+  text-transform: uppercase;
+  line-height: 1.12;
+  color: var(--sand);
+  max-width: 18ch;
+}
+
+.w-open-lede {
+  font-size: var(--step-0);
+  line-height: 1.6;
+  color: var(--text-2);
+  max-width: 54ch;
+  margin-top: 0.9rem;
+}
+
+@media (max-width: 640px) {
   .w-strip { grid-template-columns: 1fr; }
 }
 
-/* ── The domains ──────────────────────────────────────────────────────
-   The page's signature. Four trades that share one agreement but not much
-   else, so the differences get a switch rather than four stacked sections
-   the reader scrolls past.
-
-   The panel is one element that swaps content, not four panels with three
-   hidden: hidden panels would put every domain's kit list into the document
-   at once, and a screen reader would read all four. */
-.w-sectors {
-  max-width: var(--maxw);
-  margin: 0 auto;
-  padding: clamp(4rem, 11vh, 7rem) var(--gutter);
-  display: grid;
-  gap: clamp(1.6rem, 4vh, 2.4rem);
-}
-.w-sectors-head { display: grid; gap: 0.9rem; }
-
-/* An index, not a grid of buttons.
-   Nine equal boxes in a 3×3 block gave every sector the same weight and turned
-   the most important part of the page into a wall — you read all nine before
-   you could look at any one of them. A vertical index is what nine of anything
-   wants: it scans top to bottom in one movement, the names set flush left at a
-   readable size instead of being fitted into a box, and the panel gets the
-   width it needs rather than what a third of the row left over.
-
-   It also stops the section fighting Transport, whose manifest is the only
-   other tabbed thing on the site and is horizontal. */
-.w-sector-body {
-  display: grid;
-  grid-template-columns: minmax(15rem, 21rem) minmax(0, 1fr);
-  gap: clamp(1.5rem, 4vw, 3rem);
-  align-items: start;
-}
-
-.w-tabs {
-  display: grid;
-  align-content: start;
-  border-top: 1px solid var(--line);
-}
-
-/* A row, not a plate. The live state is a sand rule down the leading edge and
-   the name coming up to full strength — the same grammar as the gateway's open
-   door, which is the other place on the site where one of several is chosen. */
-.w-tab {
-  position: relative;
-  padding: clamp(0.7rem, 1.9vh, 1rem) 0 clamp(0.7rem, 1.9vh, 1rem) 1.1rem;
-  border-bottom: 1px solid var(--line);
-  display: grid;
-  grid-template-columns: 2.1rem minmax(0, 1fr);
-  gap: 0.8rem;
-  align-items: baseline;
-  text-align: left;
-  color: var(--text-3);
-  transition: color 0.22s var(--ease-out), padding-left 0.22s var(--ease-out);
-}
-.w-tab::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 2px;
-  background: var(--sand);
-  transform: scaleY(0);
-  transform-origin: center;
-  transition: transform 0.28s var(--ease-out);
-}
-.w-tab:hover { color: var(--text-2); padding-left: 1.4rem; }
-
-.w-tab-n {
-  font-family: var(--font);
-  font-size: var(--step--2);
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  font-variant-numeric: tabular-nums;
-  color: var(--text-3);
-  transition: color 0.22s var(--ease-out);
-}
-.w-tab-k {
-  font-family: var(--font-display);
-  font-size: var(--step-0);
-  font-weight: 800;
-  letter-spacing: var(--track-display);
-  text-transform: uppercase;
-  line-height: 1.15;
-  text-wrap: balance;
-}
-
-.w-tab.is-live { color: var(--text); padding-left: 1.4rem; }
-.w-tab.is-live::before { transform: scaleY(1); }
-.w-tab.is-live .w-tab-n { color: var(--sand); }
-
-/* The panel is a field beside the index, not a drawer under a row of buttons,
-   so it carries a ground of its own and no top rule joining it to anything. */
-.w-panel {
-  border: 1px solid var(--line);
-  background: var(--raise);
-  padding: clamp(1.6rem, 4vh, 2.6rem);
-  display: grid;
-  gap: clamp(1.4rem, 4vh, 2rem);
-  animation: w-panel-in 0.5s var(--ease-out) both;
-}
-@keyframes w-panel-in {
-  from { opacity: 0; transform: translateY(10px); }
-  to   { opacity: 1; transform: none; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .w-panel { animation: none; }
-}
-
-.w-panel-lead { display: grid; gap: 0.7rem; align-content: start; }
-.w-domain-name {
-  font-size: var(--step-3);
-  color: var(--text);
-  line-height: 1;
-  text-wrap: balance;
-}
-.w-domain-n {
-  font-family: var(--font);
-  font-size: var(--step--1);
-  font-weight: 600;
-  letter-spacing: var(--track-label);
-  text-transform: uppercase;
-  color: var(--sand-text);
-}
-.w-domain-d {
-  font-size: var(--step-0);
-  color: var(--text-2);
-  max-width: 58ch;
-  line-height: 1.55;
-}
-.w-domain-who {
-  margin-top: 0.2rem;
-  padding-top: 0.9rem;
-  border-top: 1px solid var(--line);
-  font-size: var(--step--1);
-  color: var(--text-2);
-}
-.w-domain-who span {
-  font-weight: 700;
-  letter-spacing: var(--track-label);
-  text-transform: uppercase;
-  font-size: var(--step--2);
-  color: var(--text-3);
-  margin-right: 0.5rem;
-}
-
-.w-panel-cols {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: clamp(1.4rem, 3vw, 2.4rem);
-  align-content: start;
-}
-.w-panel-cols h4 {
-  font-family: var(--font);
-  font-size: var(--step--2);
-  font-weight: 700;
-  letter-spacing: var(--track-label);
-  text-transform: uppercase;
-  color: var(--text-3);
-  padding-bottom: 0.7rem;
-  border-bottom: 1px solid var(--line);
-}
-
-@media (max-width: 900px) {
-  /* The index goes back to a row of chips above the panel — a 21rem rail on a
-     narrow screen would leave the panel unreadable. */
-  .w-sector-body { grid-template-columns: 1fr; }
-  .w-tabs {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1px;
-    background: var(--line);
-    border: 1px solid var(--line);
-  }
-  .w-tab { background: var(--tone); border-bottom: 0; padding: 0.9rem 1rem; }
-  .w-tab:hover, .w-tab.is-live { padding-left: 1rem; }
-  .w-tab.is-live { background: var(--raise-2); }
-}
-@media (max-width: 560px) {
-  .w-tabs { grid-template-columns: 1fr; }
-  .w-panel-cols { grid-template-columns: 1fr; }
-}
-
-/* Chevrons, not bullets or ticks. The mark is a pair of horns; a list marker
-   drawn from the same angle is the cheapest way for a component this small to
-   still belong to the brand. */
-.w-ticks { display: grid; gap: 0.55rem; margin-top: 0.9rem; }
-.w-ticks li {
-  position: relative;
-  padding-left: 1.3rem;
-  font-size: var(--step--1);
-  color: var(--text-2);
-  line-height: 1.45;
-}
-.w-ticks li::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0.52em;
-  width: 6px;
-  height: 6px;
-  border-right: 1.5px solid var(--sand);
-  border-bottom: 1.5px solid var(--sand);
-  transform: translateY(-50%) rotate(-45deg);
-}
-
-@media (max-width: 860px) {
-  .w-tabs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .w-panel { grid-template-columns: 1fr; }
-}
-@media (max-width: 520px) {
-  .w-tabs { grid-template-columns: 1fr; }
-}
-@media (max-width: 520px) {
-  .w-panel-cols { grid-template-columns: 1fr; }
-}
-
-/* ── The shift ────────────────────────────────────────────────────────── */
-.w-shift {
-  max-width: var(--maxw);
-  margin: 0 auto;
-  padding: clamp(4rem, 11vh, 7rem) var(--gutter);
-  display: grid;
-  grid-template-columns: 0.95fr 1.2fr;
-  gap: clamp(2.5rem, 6vw, 6rem);
-  /* Not `align-items: start`. The heading has to stay on screen while its own
-     list scrolls past, and that needs the grid item stretched to the row so the
-     sticky wrapper inside it has somewhere to travel. */
-}
-.w-shift-intro { min-width: 0; }
-
-.w-blocks { display: grid; }
-
-/* Each block hangs off its own time, the way a rota is read. The rule is on
-   the left of the body rather than under the row, so the column of times reads
-   as a gutter and not as a first table column. */
-.w-block {
-  display: grid;
-  grid-template-columns: 5.2rem 1fr;
-  gap: 1.4rem;
-  padding: clamp(1.2rem, 3vh, 1.8rem) 0;
-  border-top: 1px solid var(--line);
-}
-.w-block:last-child { border-bottom: 1px solid var(--line); }
-
-.w-block-t {
-  font-size: var(--step-1);
-  font-weight: 600;
-  color: var(--sand-text);
-  font-variant-numeric: tabular-nums;
-  letter-spacing: 0.01em;
-  line-height: 1.3;
-}
-.w-block-body {
-  display: grid;
-  gap: 0.35rem;
-  padding-left: 1.4rem;
-  border-left: 1px solid var(--line-sand);
-}
-.w-block-k {
-  font-family: var(--font-display);
-  font-size: var(--step-2);
-  text-transform: uppercase;
-  letter-spacing: var(--track-display);
-  color: var(--text);
-  line-height: 1.1;
-}
-.w-block-d { font-size: var(--step-0); color: var(--text-2); max-width: 42ch; }
-
-/* ── The deployment ───────────────────────────────────────────────────
-   A venue in plan with the whole shift posted on it. Third attempt at
-   Workforce's counterpart to Transport's lorry: an elevation filling with
-   light drew the architecture, a muster of figures drew the headcount, and
-   only a plan draws the thing being sold — positions, held at once, on one
-   site.
-
-   Same mechanism as the other two scroll scenes: a tall section, a sticky
-   stage, one `--p` from `useSmoothProgress`, and every post slicing its own
-   window out of it with clamp(). No per-element JavaScript, nothing measured. */
-.w-deploy {
-  height: 300svh;
-  background: var(--sunk);
-  border-block: 1px solid var(--line);
-}
-/* Wider than the page's own measure, and tighter vertically. The drawing is
-   height-constrained in a sticky viewport, so every millimetre spent on
-   padding, on the gap, or on a third line of intro copy comes straight off the
-   plan. `--maxw` was leaving it about a third smaller than the row allowed. */
-.w-deploy-sticky {
-  position: sticky;
-  top: 0;
-  height: 100svh;
-  max-width: min(1560px, 96vw);
-  margin: 0 auto;
-  padding: clamp(0.9rem, 2.4vh, 1.6rem) clamp(1rem, 2.4vw, 2rem);
-  display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
-  align-content: stretch;
-  gap: clamp(0.6rem, 1.6vh, 1rem);
-}
-.w-deploy-head { display: grid; gap: 0.5rem; max-width: 64ch; }
-
-.w-deploy-scene {
-  display: grid;
-  grid-template-rows: minmax(0, 1fr) auto;
-  gap: clamp(0.4rem, 1.2vh, 0.8rem);
-  min-height: 0;
-}
-/* `height: 100%` plus `min-height: 0` lets the SVG shrink inside the grid row
-   instead of forcing it open; the viewBox then scales the drawing to whichever
-   of the two dimensions runs out first. */
-.w-deploy-scene svg { width: 100%; height: 100%; min-height: 0; display: block; }
-
-/* The building. Drawn as a hairline outline on a barely-lifted ground, the way
-   a plan sits on a sheet — filled, it would compete with the posts, which are
-   the only thing on this drawing that changes. */
-.w-plan-shell {
-  fill: color-mix(in srgb, var(--sand) 4%, transparent);
-  stroke: var(--line-sand);
-  stroke-width: 2;
-}
-.w-plan-wall path {
-  fill: none;
-  stroke: var(--line-sand);
-  stroke-width: 2;
-}
-/* Doorways read as openings because the wall stops; the sand stub is the leaf,
-   which is what tells you it is a door and not a missing wall. */
-.w-plan-door path {
-  fill: none;
-  stroke: var(--sand);
-  stroke-width: 3;
-  opacity: 0.55;
-}
-.w-plan-zone text {
-  fill: var(--text-3);
-  font-family: var(--font);
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: 0.18em;
-}
-
-/* Each post lands on its own slice of `--p`, in the order the array is
-   written — which is deliberately not left-to-right but control point first,
-   then outward, because that is the order a venue is actually staffed. */
-.w-post {
-  --in: clamp(0, calc(var(--p, 0) * var(--of) - var(--i)), 1);
-  opacity: var(--in);
-}
-.w-post-ring {
-  fill: none;
-  stroke: var(--sand);
-  stroke-width: 1.5;
-  opacity: 0.4;
-  /* Opens out as the post fills, so a post arriving reads as ground being
-     taken rather than as a dot appearing. */
-  transform-box: fill-box;
-  transform-origin: center;
-  transform: scale(calc(0.4 + var(--in) * 0.6));
-}
-.w-post-dot { fill: var(--text-2); }
-
-.w-post.is-lead .w-post-dot { fill: var(--sand); }
-.w-post.is-lead .w-post-ring { opacity: 0.85; stroke-width: 2.5; }
-.w-post.is-lead .w-post-k { fill: var(--sand); }
-
-/* The roving pair are the one post that is not a position, so their ground is
-   dashed — the only broken line in the drawing. */
-.w-post.is-rove .w-post-ring { stroke-dasharray: 5 5; opacity: 0.5; }
-.w-post.is-rove .w-post-dot { fill: var(--text-3); }
-
-.w-post-k {
-  fill: var(--text);
-  font-family: var(--font-display);
-  font-size: 19px;
-  font-weight: 800;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-}
-.w-post-n {
-  fill: var(--text-3);
-  font-family: var(--font);
-  font-size: 13.5px;
-  letter-spacing: 0.04em;
-}
-
-.w-deploy-total {
-  justify-self: end;
-  display: flex;
-  align-items: baseline;
-  gap: 0.6rem;
-}
-.w-deploy-n {
-  font-family: var(--font-display);
-  font-size: var(--step-4);
-  font-weight: 800;
-  color: var(--sand);
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
-  /* Lands once the last post is filled — it is the answer to the drawing, not
-     a heading above it. */
-  opacity: clamp(0, calc(var(--p, 0) * var(--of) - var(--of) + 1.6), 1);
-}
-.w-deploy-l {
-  font-size: var(--step--2);
-  font-weight: 600;
-  letter-spacing: var(--track-label);
-  text-transform: uppercase;
-  color: var(--text-3);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .w-post { opacity: 1; }
-  .w-post-ring { transform: none; }
-  .w-deploy-n { opacity: 1; }
-}
-
-@media (max-width: 720px) {
-  .w-deploy { height: 240svh; }
-  .w-deploy-scene svg { max-height: 52svh; }
-}
-
-/* ── How we place people ─────────────────────────────────────────────
+/* ── Method ──────────────────────────────────────────────────────────
    Numbered entries down a single column, generously spaced. Transport lays
    its four steps out as a rail because a rail is how a route reads; this page
-   reads top to bottom, so its steps do too. */
-.w-process {
+   reads top to bottom, so its steps do too.
+
+   Three entries now, not seven. The seven-step journey this held before was
+   written for the earlier proposal and appears nowhere in the source; what the
+   source has is three triplets of cadence, which is a smaller and truer
+   claim. */
+.w-method {
   max-width: var(--maxw);
   margin: 0 auto;
   padding: clamp(3.5rem, 9vh, 6rem) var(--gutter);
@@ -661,8 +313,8 @@
   grid-template-columns: 0.9fr 1.1fr;
   gap: clamp(2rem, 5vw, 4rem);
 }
-.w-process-head { min-width: 0; }
-.w-process-head h3 { font-size: var(--step-3); color: var(--text); max-width: 14ch; }
+.w-method-head { min-width: 0; }
+.w-method-head h3 { font-size: var(--step-3); color: var(--text); max-width: 14ch; }
 
 /* The sticky wrapper both sections share. `top` clears the navigation, which
    is itself sticky — at `top: 2rem` the heading parked underneath the bar and
@@ -670,15 +322,20 @@
    job. */
 .w-stick {
   position: sticky;
-  top: calc(3.4rem + 1.6rem);
+  top: calc(var(--w-nav-h, 3.4rem) + 1.6rem);
   display: grid;
   gap: 1rem;
   align-content: start;
 }
 
 @media (max-width: 900px) {
-  /* One column: the heading is directly above its list and has nothing to
-     stay in view for. */
+  /* One column, and the heading unsticks — it is directly above its list now
+     and has nothing left to stay in view for.
+     Collapsing the columns is not optional: `0.9fr 1.1fr` held at every width,
+     so on a 375px phone the steps were laid out in a 155px column and the
+     display-size step titles pushed nineteen pixels off the side of the
+     page. */
+  .w-method { grid-template-columns: 1fr; }
   .w-stick { position: static; }
 }
 
@@ -703,270 +360,12 @@
 .w-step-body { display: grid; gap: 0.35rem; }
 .w-step-k {
   font-family: var(--font-display);
-  font-variation-settings: 'opsz' 72, 'SOFT' 40;
   font-size: var(--step-2);
   font-weight: 500;
   line-height: 1.05;
   color: var(--text);
 }
 .w-step-d { font-size: var(--step-0); line-height: 1.6; color: var(--text-2); max-width: 46ch; }
-
-/* ── The quote ────────────────────────────────────────────────────────
-   Set at display size with no quotation marks drawn around it — the measure,
-   the indent and the attribution do that work. A pull quote in a box would be
-   a testimonial widget; this is a page turning to speak. */
-.w-quote {
-  max-width: var(--maxw);
-  margin: 0 auto;
-  padding: clamp(4rem, 12vh, 8rem) var(--gutter);
-  display: grid;
-  gap: clamp(1.4rem, 3vh, 2rem);
-  justify-items: start;
-}
-.w-quote blockquote p {
-  font-family: var(--font-display);
-  font-variation-settings: 'opsz' 144, 'SOFT' 20;
-  font-size: clamp(1.8rem, 4.6vw, 3.6rem);
-  font-weight: 400;
-  line-height: 1.12;
-  letter-spacing: -0.018em;
-  color: var(--text);
-  max-width: 20ch;
-  text-wrap: balance;
-}
-/* Hanging quote mark in the margin, so the first line still starts on the
-   text axis — a quote mark in the flow pushes the whole opening word out of
-   alignment with everything above it. */
-.w-quote blockquote { position: relative; }
-.w-quote blockquote::before {
-  content: '\201C';
-  position: absolute;
-  left: -0.5em;
-  top: -0.12em;
-  font-family: var(--font-display);
-  font-size: clamp(2.6rem, 7vw, 5.5rem);
-  line-height: 1;
-  color: var(--line-sand);
-}
-.w-quote figcaption {
-  display: grid;
-  gap: 0.2rem;
-  padding-left: 1rem;
-  border-left: 2px solid var(--deep-brown);
-}
-.w-quote-who {
-  font-size: var(--step--1);
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  color: var(--text);
-}
-.w-quote-where { font-size: var(--step--2); color: var(--text-3); }
-
-/* ── The day, as a dial ───────────────────────────────────────────────
-   Concentric arcs on a 24-hour clock. Each ring is one crew; overlaps at
-   handover are visible as rings sitting alongside each other, and night cover
-   simply carries on past the top of the dial — the one shift a rectangular
-   rota has to cut in half.
-
-   `pathLength="24"` on every circle makes one dash unit equal one hour, so the
-   arcs are authored in the data's own units with no trigonometry anywhere. */
-
-/* Registered so it can be transitioned. An unregistered custom property is a
-   token stream and jumps from one value to the next; typed as a number, the
-   browser interpolates it and the arcs sweep. */
-@property --h {
-  syntax: '<number>';
-  initial-value: 0;
-  inherits: false;
-}
-
-.w-cover {
-  max-width: var(--maxw);
-  margin: 0 auto;
-  padding: clamp(3.5rem, 9vh, 6rem) var(--gutter);
-  display: grid;
-  gap: clamp(1.8rem, 4vh, 2.6rem);
-  border-top: 1px solid var(--line);
-}
-.w-cover-head { display: grid; gap: 1rem; max-width: 62ch; }
-
-/* Dial left, week and figures right. The two were separate sections and both
-   were answering "when" — a day drawn round beside a week drawn square says
-   one thing at two scales, which is an argument, where the same two stacked
-   were just repetition. */
-.w-cover-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
-  gap: clamp(2rem, 5vw, 4rem);
-  align-items: start;
-}
-.w-cover-side { display: grid; gap: clamp(1.6rem, 4vh, 2.4rem); align-content: start; }
-
-.w-dial {
-  margin: 0;
-  display: grid;
-  gap: clamp(1.2rem, 3vh, 1.8rem);
-  align-content: start;
-}
-.w-dial svg { width: 100%; max-width: 460px; height: auto; justify-self: center; }
-
-.w-dial-rail {
-  fill: none;
-  stroke: var(--line);
-  stroke-width: 12;
-}
-
-.w-dial-arc {
-  --h: 0;
-  fill: none;
-  stroke: var(--fill-strong);
-  stroke-width: 12;
-  stroke-linecap: butt;
-  /* One hour per unit: the visible run, then the rest of the day as gap. */
-  stroke-dasharray: var(--h) calc(24 - var(--h));
-  stroke-dashoffset: var(--from);
-  transition: --h 1.1s var(--ease-out);
-  transition-delay: calc(var(--i) * 0.14s);
-}
-.w-dial.is-in .w-dial-arc { --h: var(--hours); }
-
-/* The innermost rings are the busiest hours; stepping the opacity outward
-   keeps five sand arcs from flattening into one solid disc. */
-.w-dial-arc { opacity: calc(0.55 + var(--i) * 0.11); }
-
-.w-dial-h {
-  fill: var(--text-3);
-  font-family: var(--font);
-  font-size: 15px;
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  text-anchor: middle;
-  font-variant-numeric: tabular-nums;
-}
-.w-dial-c {
-  fill: var(--text);
-  font-family: var(--font-display);
-  font-size: 44px;
-  text-anchor: middle;
-}
-.w-dial-s {
-  fill: var(--sand-text);
-  font-family: var(--font);
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.24em;
-  text-anchor: middle;
-}
-
-.w-dial-key { display: grid; gap: 1px; background: var(--line); border: 1px solid var(--line); }
-.w-dial-key li {
-  background: var(--tone);
-  padding: 0.85rem 1rem;
-  display: grid;
-  grid-template-columns: 14px 1fr auto;
-  gap: 0.8rem;
-  align-items: center;
-}
-.w-dial-swatch {
-  width: 14px;
-  height: 14px;
-  background: var(--fill-strong);
-  opacity: calc(0.55 + var(--i) * 0.11);
-}
-.w-dial-k { font-size: var(--step--1); color: var(--text); }
-.w-dial-t {
-  font-size: var(--step--2);
-  color: var(--text-3);
-  font-variant-numeric: tabular-nums;
-  letter-spacing: 0.04em;
-}
-
-@media (max-width: 1000px) {
-  .w-cover-grid { grid-template-columns: 1fr; }
-}
-
-/* The rota grid. Seven fixed columns against a label — never `auto-fit`, since
-   a week that reflows to five columns on a narrow screen is not a week. */
-.w-grid { display: grid; gap: 4px; }
-
-.w-grid-days,
-.w-grid-row {
-  display: grid;
-  grid-template-columns: minmax(7rem, 12rem) repeat(7, minmax(0, 1fr));
-  gap: 4px;
-  align-items: center;
-}
-
-.w-day {
-  font-size: var(--step--2);
-  font-weight: 600;
-  letter-spacing: var(--track-label);
-  color: var(--text-3);
-  text-align: center;
-}
-
-.w-grid-r {
-  font-size: var(--step--1);
-  font-weight: 500;
-  color: var(--text-2);
-  padding-right: 0.6rem;
-}
-
-/* Height, not colour, is doing most of the work — a cell you can read at a
-   glance from its silhouette survives being looked at on a phone. */
-.w-cell {
-  display: block;
-  height: clamp(28px, 4.4vh, 40px);
-  background: var(--raise-2);
-  border: 1px solid transparent;
-  transition: opacity 0.5s var(--ease-out), transform 0.5s var(--ease-out);
-  transition-delay: calc(var(--i, 0) * 45ms);
-}
-.w-cell--2 { background: var(--fill-strong); }
-.w-cell--1 { background: var(--fill-soft); }
-.w-cell--0 {
-  background: transparent;
-  border-color: var(--line);
-}
-
-.w-key {
-  margin-top: 0.8rem;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem 1.6rem;
-  font-size: var(--step--2);
-  letter-spacing: 0.04em;
-  color: var(--text-3);
-}
-.w-key li { display: inline-flex; align-items: center; gap: 0.55rem; }
-.w-key .w-cell { width: 26px; height: 14px; }
-
-@media (max-width: 700px) {
-  .w-grid-days,
-  .w-grid-row { grid-template-columns: minmax(5.5rem, 8rem) repeat(7, minmax(0, 1fr)); }
-  .w-grid-r { font-size: var(--step--2); }
-}
-
-/* The figures sit under the week rather than in a section of their own: they
-   are the numbers behind the coverage claim, and they were being asked to
-   carry a whole section on nothing but four short strings. */
-.w-figs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); }
-.w-figs li {
-  background: var(--tone);
-  padding: clamp(0.9rem, 2.4vh, 1.3rem) clamp(0.8rem, 2vw, 1.2rem);
-  display: grid;
-  gap: 0.3rem;
-}
-.w-fig-n {
-  font-family: var(--font-display);
-  font-size: var(--step-2);
-  font-weight: 800;
-  letter-spacing: var(--track-display);
-  color: var(--sand-text);
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
-}
-.w-fig-l { font-size: var(--step--2); color: var(--text-3); }
 
 /* ── Interlude ────────────────────────────────────────────────────────── */
 .w-interlude {
@@ -996,84 +395,32 @@
   color: var(--oryx-white);
 }
 
-/* ── The levels ───────────────────────────────────────────────────────
-   A ladder, not a table. Each rung is inset a little further than the one
-   below it, so the eye climbs — the proposal's claim is that a worker moves up
-   through these, and five equal rows in a grid would say the opposite. */
-.w-levels {
+/* ── Axis two, the service lines ──────────────────────────────────────
+   Four ways to take on the same people. Not a fourth level of the register
+   above — the figure directly before this section exists to say so.
+
+   Four, not the five this held before: those five engagement models were
+   written for the earlier proposal and the source has four. Four is also the
+   better grid. Five never divided into any of this page's breakpoints without
+   widowing one card. */
+.w-lines {
   max-width: var(--maxw);
   margin: 0 auto;
   padding: clamp(4rem, 11vh, 7rem) var(--gutter);
   display: grid;
   gap: clamp(1.6rem, 4vh, 2.4rem);
 }
-.w-levels-head { display: grid; gap: 0.9rem; max-width: 62ch; }
+.w-lines-head { display: grid; gap: 0.9rem; max-width: 56ch; }
 
-.w-ladder { display: grid; gap: 1px; background: var(--line); border: 1px solid var(--line); }
-.w-rung {
-  background: var(--tone);
-  padding: clamp(1rem, 2.6vh, 1.5rem) clamp(1rem, 2vw, 1.6rem);
-  /* The step. Small — 1.6rem across the whole ladder — because the rungs still
-     have to read as one column of text, not as a staircase of cards. */
-  padding-left: calc(clamp(1rem, 2vw, 1.6rem) + var(--i) * 1.6rem);
-  display: grid;
-  grid-template-columns: 3.2rem minmax(0, 1fr);
-  gap: 0.3rem 1.4rem;
-  align-items: baseline;
-  transition: background 0.25s var(--ease-out);
-}
-.w-rung:hover { background: var(--raise); }
-.w-rung-n {
-  font-family: var(--font);
-  font-size: var(--step--1);
-  font-weight: 700;
-  color: var(--text-3);
-  font-variant-numeric: tabular-nums;
-  letter-spacing: 0.1em;
-}
-.w-rung-body { display: grid; gap: 0.3rem; }
-.w-rung-k {
-  font-family: var(--font-display);
-  font-size: var(--step-1);
-  font-weight: 800;
-  letter-spacing: var(--track-display);
-  text-transform: uppercase;
-  color: var(--text);
-  line-height: 1.1;
-}
-.w-rung-d { font-size: var(--step-0); color: var(--text-2); max-width: 52ch; }
-.w-rung-ex {
-  font-size: var(--step--2);
-  letter-spacing: 0.04em;
-  color: var(--sand-text);
-}
-
-@media (max-width: 720px) {
-  /* The inset is the first thing to go: at phone widths it eats the measure
-     and the ladder stops being readable before it stops being a ladder. */
-  .w-rung { padding-left: clamp(1rem, 2vw, 1.6rem); }
-  .w-rung { grid-template-columns: 2.6rem minmax(0, 1fr); }
-}
-
-/* ── The solutions ────────────────────────────────────────────────────
-   Five ways to buy the same people. Team-Based is the differentiator the
-   proposal names, so it is the one card that carries a fill — and it sits
-   directly under the deployment plan, which draws exactly that model. */
-.w-solutions {
-  max-width: var(--maxw);
-  margin: 0 auto;
-  padding: clamp(4rem, 11vh, 7rem) var(--gutter);
-  display: grid;
-  gap: clamp(1.6rem, 4vh, 2.4rem);
-}
-.w-solutions-head { display: grid; gap: 0.9rem; max-width: 56ch; }
-
-/* Five explicit columns, not `auto-fit`. Auto-fit fitted four and wrapped the
-   fifth onto a row of its own beside an empty cell — five models are a set,
-   and a set should not have a widow. */
+/* One column per service line, explicitly. The count is not decorative: this
+   is a bordered grid whose cell walls are 1px gaps showing the background
+   through, so a track with no item in it does not collapse — it renders as an
+   empty box. That is exactly what a leftover `repeat(5)` produced here after
+   the fifth model was removed. If a service line is ever added or dropped,
+   this number changes with it. */
 .w-models {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 1px;
   background: var(--line);
   border: 1px solid var(--line);
@@ -1082,8 +429,13 @@
   background: var(--tone);
   padding: clamp(1.2rem, 3vh, 1.8rem) clamp(1rem, 2vw, 1.4rem);
   display: grid;
+  /* Four children — ordinal, name, description, best-fit — and the `1fr` on
+     the description absorbs each card's slack so the four best-fit rules land
+     on one line. `align-content: start` would collapse every track to the top
+     and stagger them by the length of the description above, which is the
+     length of somebody else's sentence. */
+  grid-template-rows: auto auto 1fr auto;
   gap: 0.5rem;
-  align-content: start;
   transition: background 0.25s var(--ease-out);
 }
 .w-model:hover { background: var(--raise); }
@@ -1112,16 +464,32 @@
   padding-top: 0.7rem;
   border-top: 1px solid var(--line);
   font-size: var(--step--2);
-  font-weight: 600;
+  color: var(--text-2);
+}
+/* The source frames each of these as "Best fit — …", which is the difference
+   between a description and a recommendation for a particular situation. */
+.w-model-ex b {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-weight: 700;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
   color: var(--sand-text);
 }
-.w-model.is-lead { background: var(--raise-2); }
-.w-model.is-lead .w-model-k { color: var(--sand); }
+/* No lead card. The source presents the four as genuine alternatives chosen on
+   the assignment, and singling one out with a fill would make it the
+   recommended option — a claim the document does not make. */
 
-/* ── The principle ────────────────────────────────────────────────────
-   Set like the quote band, because that is what it is: a statement the company
-   is making about itself, not another table of data. */
-.w-compliance {
+/* ── Trust ───────────────────────────────────────────────────────────
+   Set like a statement band, because that is what it is: something the company
+   is saying about itself, not another table of data.
+
+   This replaced a compliance section that named VCA, Code 95, ADR, IPAF, TCVT
+   and NEN 3140. Every one of those is a compliance claim, and the source's
+   closing sentence — that the final lending legal entity is not yet fixed —
+   blocks every legal and compliance claim on the site. The certificates are
+   gone; the principle is what is left, and it is the stronger half anyway. */
+.w-trust {
   border-block: 1px solid var(--line);
   background: var(--sunk);
   padding: clamp(3rem, 9vh, 5rem) var(--gutter);
@@ -1132,8 +500,8 @@
   max-width: var(--maxw);
   margin: 0 auto;
 }
-.w-compliance-say { display: grid; gap: 1rem; }
-.w-compliance-line {
+.w-trust-say { display: grid; gap: 1rem; }
+.w-trust-line {
   font-family: var(--font-display);
   font-size: var(--step-3);
   font-weight: 800;
@@ -1143,18 +511,88 @@
   color: var(--sand);
   max-width: 14ch;
 }
-.w-compliance-d { font-size: var(--step-0); color: var(--text-2); max-width: 46ch; line-height: 1.55; }
+.w-trust-d { font-size: var(--step-0); color: var(--text-2); max-width: 46ch; line-height: 1.55; }
 
-.w-checks { display: grid; gap: 1px; background: var(--line); border: 1px solid var(--line); }
-.w-checks li {
+.w-holds { display: grid; gap: 1px; background: var(--line); border: 1px solid var(--line); }
+.w-holds li {
   background: var(--tone);
-  padding: clamp(0.9rem, 2.4vh, 1.2rem) clamp(0.9rem, 2vw, 1.3rem);
-  display: grid;
-  grid-template-columns: minmax(6rem, 8rem) minmax(0, 1fr);
-  gap: 1rem;
-  align-items: baseline;
+  padding: clamp(0.9rem, 2.4vh, 1.2rem) clamp(0.9rem, 2vw, 1.3rem)
+           clamp(0.9rem, 2.4vh, 1.2rem) clamp(1.8rem, 3vw, 2.3rem);
+  position: relative;
+  font-size: var(--step--1);
+  line-height: 1.55;
+  color: var(--text-2);
 }
-.w-check-k {
+/* A sand tick down the left of each hold. These are restraints, so they are
+   marked rather than bulleted — the mark says "this is a condition", where a
+   bullet would say "this is a feature". */
+.w-holds li::before {
+  content: '';
+  position: absolute;
+  left: clamp(0.9rem, 2vw, 1.3rem);
+  top: calc(clamp(0.9rem, 2.4vh, 1.2rem) + 0.55em);
+  width: 5px;
+  height: 5px;
+  border-right: 1.5px solid var(--sand);
+  border-bottom: 1.5px solid var(--sand);
+  transform: rotate(-45deg);
+}
+
+/* 4 → 2 → 1. Never three: three columns leave one of four cards alone on a
+   second row, and an empty track beside it. */
+@media (max-width: 1100px) {
+  .w-models { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 560px) {
+  .w-models { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 860px) {
+  .w-trust { grid-template-columns: 1fr; }
+
+}
+
+/* ══ The register ═══════════════════════════════════════════════════════
+   Twelve sectors as twelve tabs, one panel, and one field to search them.
+
+   ── What this replaced, three times ──────────────────────────────────
+   A fixed-height frame with a rail, a strip and an inner scroller; a grid of
+   twelve cards; twelve accordion rows. The rows worked and read as a dropdown
+   to the person paying for it — tabs were asked for by name.
+
+   ── The bar ──────────────────────────────────────────────────────────
+   A regular grid of equal cells — four across, three on narrower screens —
+   with the number, the name and the count each in their own column, so the
+   twelve line up rather than sitting as ragged chips. On a phone it becomes
+   one scrolling row: chips at their natural width, snap-to-start, the
+   scrollbar hidden and the right edge feathered so the row reads as
+   continuing. The count drops there so more names fit a screen. The chosen
+   tab is scrolled into view whenever it changes by other means than a tap
+   (a search crumb, the arrow keys). */
+.w-reg-wrap {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: clamp(3.5rem, 9vh, 6rem) var(--gutter);
+  display: grid;
+  gap: clamp(1.2rem, 3vh, 1.8rem);
+}
+.w-reg-head { display: grid; gap: 0.9rem; max-width: 64ch; }
+.w-reg-head h3 { font-size: var(--step-3); color: var(--text); }
+
+/* ── Find ─────────────────────────────────────────────────────────────
+   Tracked caps, not a magnifier: there is no magnifier anywhere in this brand
+   kit and there are tracked caps on every page of it. */
+.w-find {
+  display: flex;
+  align-items: stretch;
+  border: 1px solid var(--line);
+  background: var(--raise);
+}
+.w-find-tag {
+  display: flex;
+  align-items: center;
+  padding: 0 clamp(0.9rem, 2vw, 1.2rem);
+  border-right: 1px solid var(--line);
   font-family: var(--font);
   font-size: var(--step--2);
   font-weight: 700;
@@ -1162,19 +600,553 @@
   text-transform: uppercase;
   color: var(--sand-text);
 }
-.w-check-d { font-size: var(--step--1); color: var(--text-2); }
+.w-find-in {
+  flex: 1;
+  min-width: 0;
+  font: inherit;
+  font-size: var(--step-0);
+  color: var(--text);
+  background: none;
+  border: 0;
+  padding: 0.9rem clamp(0.9rem, 2vw, 1.2rem);
+}
+.w-find-in::placeholder { color: var(--text-2); opacity: 0.75; }
+.w-find-in::-webkit-search-cancel-button { display: none; }
+.w-find:focus-within { outline: 2px solid var(--sand); outline-offset: 2px; }
+.w-find-in:focus { outline: none; }
+.w-find-clear {
+  font-family: var(--font);
+  font-size: var(--step--2);
+  font-weight: 700;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--text-2);
+  padding: 0 clamp(0.9rem, 2vw, 1.2rem);
+  border-left: 1px solid var(--line);
+  transition: color 0.2s var(--ease-out);
+}
+.w-find-clear:hover { color: var(--text); }
+
+/* ── The tab bar ──────────────────────────────────────────────────────── */
+.w-tabs {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.45rem;
+  padding-bottom: clamp(0.9rem, 2vh, 1.2rem);
+  border-bottom: 1px solid var(--line);
+}
+.w-tab {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 0.6rem;
+  min-width: 0;
+  padding: 0.55rem 0.85rem 0.5rem;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--text-2);
+  text-align: left;
+  transition: color 0.2s var(--ease-out), border-color 0.2s var(--ease-out), background 0.2s var(--ease-out);
+}
+.w-tab:hover { color: var(--text); border-color: var(--line-sand); }
+.w-tab.is-on { color: var(--text); background: var(--raise); border-color: var(--sand); }
+.w-tab:focus-visible { outline: 2px solid var(--sand); outline-offset: 2px; }
+.w-tab-n {
+  font-family: var(--font);
+  font-size: var(--step--2);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--text-2);
+  font-variant-numeric: tabular-nums;
+}
+.w-tab.is-on .w-tab-n { color: var(--sand); }
+/* Archivo 800 caps comes from world-identity.css and is shared with the other
+   display spans on this page — do not restate the family here or the two can
+   drift apart. */
+.w-tab-k {
+  font-size: var(--step--1);
+  line-height: 1.2;
+  /* A cell is a fixed share of the bar; a long name wraps inside it rather
+     than pushing the count out. */
+  overflow-wrap: anywhere;
+}
+.w-tab-c {
+  font-family: var(--font);
+  font-size: var(--step--2);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  color: var(--sand-text);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+/* ── The panel ────────────────────────────────────────────────────────
+   Transform only on entry, never opacity. A document timeline is paused
+   whenever the tab is not visible, and an animation in its active phase still
+   drives the property while frozen — so `from { opacity: 0 }` would leave the
+   whole panel in the DOM and invisible for as long as the tab stayed in the
+   background. Translating means the worst case is a panel sitting four pixels
+   low and perfectly readable. */
+.w-panel {
+  display: grid;
+  gap: clamp(1.2rem, 3vh, 1.8rem);
+  padding-top: 0.2rem;
+  animation: w-panel-in 0.28s var(--ease-out);
+}
+@keyframes w-panel-in { from { transform: translateY(4px); } }
+
+.w-panel-head { display: grid; gap: 0.45rem; max-width: 70ch; }
+.w-panel-head h4 {
+  font-size: var(--step-1);
+  line-height: 1.15;
+  color: var(--text);
+}
+.w-panel-c {
+  font-family: var(--font);
+  font-size: var(--step--2);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--sand-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.w-panel-blurb {
+  font-size: var(--step--1);
+  line-height: 1.55;
+  color: var(--text-2);
+  max-width: 70ch;
+}
+
+.w-grp { display: grid; gap: 0.5rem; }
+.w-grp h4 {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--line-sand);
+  font-family: var(--font);
+  font-size: var(--step--2);
+  font-weight: 700;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--sand-text);
+  max-width: 62ch;
+}
+.w-grp h4 span { color: var(--text-2); font-variant-numeric: tabular-nums; }
+
+/* Role names in columns. Titles only: the sentence that tells two similar ones
+   apart is shown in search results, where a reader is looking at a handful,
+   rather than 307 times down a browse list. */
+.w-roles {
+  columns: 3;
+  column-gap: clamp(1.4rem, 3vw, 2.6rem);
+  max-width: 100%;
+}
+.w-roles li {
+  break-inside: avoid;
+  padding: 0.22rem 0;
+  font-size: var(--step--1);
+  line-height: 1.4;
+  color: var(--text);
+}
+/* Demoted rather than decorated: a subtraction cannot read as a badge, and
+   "less available" reading as "less present" is the right direction. */
+.w-roles li.is-q { color: var(--text-2); }
+.w-role-s {
+  display: block;
+  font-family: var(--font);
+  font-size: var(--step--2);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-2);
+}
+
+/* ── Search results ───────────────────────────────────────────────────── */
+.w-results {
+  border: 1px solid var(--line);
+  background: var(--raise);
+  padding: clamp(1rem, 2.5vh, 1.4rem) clamp(1rem, 2.5vw, 1.6rem);
+}
+.w-hits { columns: 2; column-gap: clamp(1.5rem, 4vw, 3rem); }
+.w-hit {
+  break-inside: avoid;
+  padding: 0.5rem 0 0.7rem;
+  border-bottom: 1px solid var(--line-soft);
+}
+.w-hit-t { font-size: var(--step-0); font-weight: 600; line-height: 1.3; color: var(--text); }
+.w-hit.is-q .w-hit-t { color: var(--text-2); }
+.w-hit-s {
+  display: block;
+  font-family: var(--font);
+  font-size: var(--step--2);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-2);
+}
+.w-hit-d {
+  margin-top: 0.15rem;
+  font-size: var(--step--1);
+  line-height: 1.5;
+  /* #a9a595 — 6.83:1 on --raise. `--text-3` would be 4.37:1 and fail AA. */
+  color: color-mix(in srgb, var(--text-2) 72%, var(--text-3));
+}
+.w-hit-crumb {
+  display: block;
+  margin-top: 0.35rem;
+  font-family: var(--font);
+  font-size: var(--step--2);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--sand-text);
+  border-bottom: 1px solid var(--line-sand);
+  transition: color 0.2s var(--ease-out);
+}
+.w-hit-crumb:hover { color: var(--text); }
+
+.w-reg-none,
+.w-reg-more {
+  font-size: var(--step--1);
+  line-height: 1.6;
+  color: var(--text-2);
+  max-width: 60ch;
+}
+.w-reg-more { margin-top: 1rem; }
+
+.w-reg-legend {
+  font-size: var(--step--2);
+  line-height: 1.6;
+  color: var(--text-2);
+  max-width: 78ch;
+}
+.w-reg-legend b {
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+
+/* Entrance only, off the shared `data-reveal` machinery. */
+.w-reg-wrap .w-tabs,
+.w-reg-wrap .w-panel {
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.4s var(--ease-out), transform 0.4s var(--ease-out);
+}
+.w-reg-wrap.is-in .w-tabs,
+.w-reg-wrap.is-in .w-panel { opacity: 1; transform: none; }
 
 @media (max-width: 1100px) {
-  .w-models { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .w-tabs { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
-@media (max-width: 720px) {
-  .w-models { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (max-width: 900px) {
+  .w-roles { columns: 2; }
+  .w-hits { columns: 1; }
 }
-@media (max-width: 480px) {
-  .w-models { grid-template-columns: 1fr; }
+@media (max-width: 620px) {
+  /* One scrolling row. `overflow-x: auto` makes the box clip vertically too,
+     so 3px of top padding keeps the focus ring inside it. The mask feathers
+     the right edge; the border-bottom is on the box and does not scroll. */
+  .w-tabs {
+    display: flex;
+    gap: 0.4rem;
+    overflow-x: auto;
+    padding-top: 3px;
+    /* End padding the width of the fade, so the last chip can scroll clear of
+       it rather than living under it; `scroll-padding` keeps a tab brought
+       into view by script clear of the fade as well. */
+    padding-right: 2.5rem;
+    scroll-padding-inline: 0 2.5rem;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 2.5rem), transparent);
+    mask-image: linear-gradient(to right, #000 calc(100% - 2.5rem), transparent);
+  }
+  .w-tabs::-webkit-scrollbar { display: none; }
+  .w-tab {
+    flex: 0 0 auto;
+    grid-template-columns: auto auto;
+    gap: 0.45rem;
+    padding: 0.5rem 0.7rem 0.45rem;
+    scroll-snap-align: start;
+  }
+  .w-tab-k { white-space: nowrap; overflow-wrap: normal; }
+  .w-tab-c { display: none; }
+  .w-roles { columns: 1; }
 }
 
-@media (max-width: 860px) {
-  .w-compliance { grid-template-columns: 1fr; }
-  .w-checks li { grid-template-columns: 1fr; gap: 0.3rem; }
+@media (prefers-reduced-motion: reduce) {
+  .w-panel { animation: none; }
+  .w-reg-wrap .w-tabs,
+  .w-reg-wrap .w-panel { opacity: 1; transform: none; }
+}
+
+/* ══ The two axes ═══════════════════════════════════════════════════════
+   The only illustration on this page whose job is an argument.
+
+   It has to stop a reader treating the four service lines below it as a fourth
+   level of the register above it. That is a real risk and not a theoretical
+   one: the reader has just spent a minute inside a three-level tree.
+
+   ── Everything here is HTML ───────────────────────────────────────────
+   No SVG. Every string in the figure is data whose length nobody controls —
+   48-character sector names, 45-character group names, "Project teams & flex
+   pools" — and SVG `<text>` does not wrap. An earlier attempt needed about
+   1 150 units of width for four labels inside a 1 120-unit box; that was never
+   a coordinate problem to be fixed with a bigger viewBox, it was the wrong
+   element for a label whose length is data. There is nothing to draw that is
+   not a border or a grid gap.
+
+   ── What must never be added ──────────────────────────────────────────
+   A connector. A node with four lines fanning out of it *is* the drawing of a
+   tree, which is the one reading this figure exists to prevent. The seam
+   between the halves is a divider with a cross on it, drawn in `--line` and
+   never in sand, because sand here would read as a link. */
+.w-axes {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: clamp(3.5rem, 9vh, 6rem) var(--gutter);
+  display: grid;
+  gap: clamp(1.6rem, 4vh, 2.4rem);
+  border-top: 1px solid var(--line);
+}
+.w-axes-head { display: grid; gap: 0.9rem; max-width: 62ch; }
+.w-axes-head h3 { font-size: var(--step-3); color: var(--text); }
+
+.w-axes-fig {
+  margin: 0;
+  display: grid;
+  grid-template-columns:
+    2.4rem                            /* the vertical rail          */
+    minmax(15rem, 20rem)              /* the nest                   */
+    clamp(1.4rem, 3vw, 2.6rem)        /* the seam                   */
+    minmax(0, 1fr);                   /* the four service lines     */
+  grid-template-areas:
+    '.    .    .    xcap'
+    'ycap nest seam lines';
+  row-gap: 0.85rem;
+}
+
+/* Two labelled rails at ninety degrees — identical construction, identical
+   chevron. The figure does not merely avoid looking like a tree; it asserts a
+   second dimension, in geometry and in words. */
+.w-ax-axl {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  font-family: var(--font);
+  font-size: var(--step--2);
+  font-weight: 700;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--sand-text);
+  white-space: nowrap;
+}
+.w-ax-axl::after { content: ''; flex: 1; background: var(--line-sand); }
+.w-ax-axl i {
+  width: 6px;
+  height: 6px;
+  border-right: 1.5px solid var(--sand);
+  border-bottom: 1.5px solid var(--sand);
+  flex: none;
+}
+.w-ax-axl--y {
+  grid-area: ycap;
+  align-self: stretch;
+  min-height: 8rem;
+  /* Never `sideways-lr`: Safari does not support it and falls back to
+     horizontal, which lays the label across a forty-pixel column. */
+  writing-mode: vertical-rl;
+  padding-right: 0.7rem;
+}
+.w-ax-axl--y::after { width: 1px; }
+.w-ax-axl--y i { transform: rotate(45deg); }
+.w-ax-axl--x { grid-area: xcap; padding-bottom: 0.2rem; }
+.w-ax-axl--x::after { height: 1px; }
+.w-ax-axl--x i { transform: rotate(-45deg); }
+
+.w-ax-seam { grid-area: seam; align-self: stretch; position: relative; }
+.w-ax-seam::before {
+  content: '';
+  position: absolute;
+  left: 50%; top: 0; bottom: 0;
+  width: 1px;
+  background: var(--line);
+}
+.w-ax-seam::after {
+  content: '';
+  position: absolute;
+  left: 50%; top: 50%;
+  width: 13px; height: 13px;
+  transform: translate(-50%, -50%);
+  background:
+    linear-gradient(var(--sand), var(--sand)) center / 1.5px 13px no-repeat,
+    linear-gradient(var(--sand), var(--sand)) center / 13px 1.5px no-repeat,
+    var(--tone);
+}
+
+/* The nest. Stepped left rules, used nowhere else in this stylesheet, so the
+   containment grammar cannot be confused with the peer grammar opposite. No
+   ordinals anywhere in it — the indent does the counting, so no number inside
+   the figure can be mistaken for a depth. */
+.w-ax-nest { grid-area: nest; max-width: 30rem; }
+.w-ax-lvl-h { display: grid; gap: 0.22rem; }
+.w-ax-lvl ol .w-ax-lvl {
+  margin: 0.85rem 0 0 0.9rem;
+  padding-left: 1.1rem;
+  border-left: 1px solid var(--line);
+}
+.w-ax-n {
+  font-family: var(--font);
+  font-size: var(--step--2);
+  font-weight: 700;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--text-2);
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.w-ax-n em { font-style: normal; font-variant-numeric: tabular-nums; }
+.w-ax-k {
+  font-size: var(--step-0);
+  line-height: 1.15;
+  color: var(--text-2);
+  text-wrap: balance;
+}
+
+/* The four service lines, in the page's own peer grammar — 1px gaps over
+   `--line` inside a 1px border, exactly as the strip, the models and the holds
+   are built. The reader has met that notation four times already on this page
+   and it has meant "a set of equals" every time. */
+.w-ax-lines {
+  grid-area: lines;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  /* Do NOT add `align-items: start`. The four role names bottom-align through
+     the 1fr air row below, so their four sand rules land on one shared
+     baseline — one line crossing the axis. `align-items: start` silently
+     destroys that and takes the argument with it. */
+}
+.w-ax-line {
+  background: var(--tone);
+  padding: clamp(1.1rem, 2.6vh, 1.5rem) clamp(0.9rem, 1.6vw, 1.3rem);
+  display: grid;
+  /* Four children — ordinal, name, fit, role — so four tracks. The `1fr` sits
+     on the *fit* line and absorbs every cell's slack, which pushes the role to
+     the bottom of all four cells at once. Five tracks for four children put
+     the air after the role instead of before it and left the four names
+     staggered by up to 42px, which quietly cost the figure its argument. */
+  grid-template-rows: auto auto 1fr auto;
+  gap: 0.45rem;
+}
+.w-ax-ln {
+  font-family: var(--font);
+  font-size: var(--step--2);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--text-2);
+  font-variant-numeric: tabular-nums;
+}
+.w-ax-lk {
+  font-size: var(--step-0);
+  line-height: 1.1;
+  color: var(--text);
+  text-wrap: balance;
+}
+.w-ax-ld { font-size: var(--step--1); line-height: 1.5; color: var(--text-2); }
+
+/* THE RULE THAT CARRIES THE ARGUMENT.
+   The role name appears five times — once at the foot of the nest, once in
+   each of the four service lines — and the eye has to read them as one object
+   seen five times. It will not if the type differs by so much as a step. One
+   selector list, deliberately: do not split it. */
+.w-ax-lvl.is-leaf .w-ax-k,
+.w-ax-role {
+  font-family: var(--font-display);
+  font-size: var(--step-0);
+  font-weight: 800;
+  letter-spacing: var(--track-display);
+  text-transform: uppercase;
+  color: var(--sand);
+  line-height: 1.15;
+}
+.w-ax-role {
+  margin-top: 0.9rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--line-sand);
+}
+
+.w-ax-cap {
+  grid-column: 1 / -1;
+  margin-top: 0.4rem;
+  font-size: var(--step--1);
+  line-height: 1.6;
+  color: var(--text-2);
+  max-width: 76ch;
+}
+.w-ax-cap b { color: var(--text); font-weight: 700; }
+
+@media (max-width: 1180px) {
+  /* Stepped together, never separately — the five instances of the role have
+     to stay the same size as each other. */
+  .w-ax-lk,
+  .w-ax-lvl.is-leaf .w-ax-k,
+  .w-ax-role { font-size: var(--step--1); }
+}
+
+@media (max-width: 719px) {
+  .w-axes-fig {
+    grid-template-columns: 2.4rem minmax(0, 1fr);
+    grid-template-areas:
+      'ycap nest'
+      'seam seam'
+      'xcap xcap'
+      'lines lines';
+    row-gap: 0;
+  }
+  .w-ax-seam {
+    height: clamp(2rem, 6vh, 3rem);
+    margin: clamp(1.1rem, 3vh, 1.6rem) 0;
+  }
+  .w-ax-seam::before { left: 0; right: 0; top: 50%; bottom: auto; width: auto; height: 1px; }
+
+}
+
+/* The swipe rail starts at 1100px, NOT at the 719px reflow.
+   `minmax(0, 1fr)` lets a track shrink below its own min-content, and
+   `.w-ax-line` paints an opaque ground, so between 720px and about 1060px each
+   cell's text ran underneath the next cell and was cut mid-word: measured at
+   768px the cells are 80px wide while "Recruitment & selection" needs 134px,
+   and CARPENTER — the one word that has to read identically five times or the
+   figure loses its argument — rendered as CARPENT in three of the four.
+   `.w-models` directly below already drops to two columns at 1100px; this is
+   the same content and needs the same breakpoint.
+
+   Never stack these into one column and never go 2×2. A single column of four
+   is the hierarchy misreading, drawn; 2×2 puts 03 and 04 below 01 and 02,
+   which is a descent. Four across, or a rail you swipe — nothing else. */
+@media (max-width: 1100px) {
+  .w-ax-lines {
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    grid-auto-columns: clamp(15rem, 74vw, 22rem);
+    gap: 0.6rem;
+    background: none;
+    border: 0;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    margin-inline: calc(var(--gutter) * -1);
+    padding-inline: var(--gutter);
+    scrollbar-width: none;
+  }
+  .w-ax-lines::-webkit-scrollbar { display: none; }
+  .w-ax-line { border: 1px solid var(--line); scroll-snap-align: start; }
 }

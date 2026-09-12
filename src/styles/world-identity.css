@@ -139,10 +139,11 @@
 /* The display spans get the same treatment. These were un-capitalised for
    Fraunces, which is exactly the setting a serif needs and exactly the wrong
    one here. */
-.world--workforce .w-block-k,
 .world--workforce .w-tab-k,
-.world--workforce .w-dial-c,
-.world--workforce .w-domain-name {
+.world--workforce .w-panel-head h4,
+.world--workforce .w-ax-k,
+.world--workforce .w-ax-lk,
+.world--workforce .w-model-k {
   font-family: var(--font-display);
   font-weight: 800;
   text-transform: uppercase;
@@ -191,24 +192,26 @@
   --line-sand: rgba(74, 56, 40, 0.32);
 }
 
+/* h4 included: the nine service headings on the schedule are h4, and without
+   it they fell back to the site's default face mid-sheet. */
 .world--renovation h1,
 .world--renovation h2,
-.world--renovation h3 {
+.world--renovation h3,
+.world--renovation h4 {
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: var(--track-display-lg);
   line-height: 1.02;
 }
 
-/* Anything that is a measurement, a week number or a reference is a mono —
+/* Anything that is a measurement, an item number or a reference is a mono —
    the annotation voice of a drawing. */
-.world--renovation .r-layer-n,
-.world--renovation .r-define-n,
-.world--renovation .r-fig-n,
-.world--renovation .r-gantt-scale,
-.world--renovation .r-axo-n,
 .world--renovation .world-eyebrow,
-.world--renovation .r-swatch-k {
+.world--renovation .r-work-n,
+.world--renovation .r-svc-n,
+.world--renovation .r-rail-n,
+.world--renovation .r-fork-on,
+.world--renovation .r-fork-ref {
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
 }
@@ -229,19 +232,24 @@
 }
 
 /* Sections that carry drawings sit on the sheet, boxed, the way a detail is
-   boxed on a real drawing. */
-.world--renovation .r-axo,
-.world--renovation .r-gantt,
+   boxed on a real drawing. The fork's plate is deliberately NOT in this list:
+   it has datum bars that sit flush to its frame, and the padding this rule
+   adds would inset them. */
 .world--renovation .r-scrub {
+  /* Published as a variable because the scrub's revealed half is positioned
+     `inset: 0`, which resolves against the PADDING box while the other half
+     sits in the content box. With a bare padding here the two images were
+     offset by exactly this value — measured 1323x743 at x=59 against
+     1259x679 at x=91 — so the before/after comparison did not register at
+     all, which is the one thing it exists to do. */
+  --scrub-pad: clamp(1rem, 2.4vw, 2rem);
   border: 1px solid var(--line-sand);
-  padding: clamp(1rem, 2.4vw, 2rem);
+  padding: var(--scrub-pad);
   background: color-mix(in srgb, var(--sunk) 72%, transparent);
 }
 
 /* Drafting annotation: tracked mono, small, never a heading. */
-.world--renovation .world-kicker,
-.world--renovation .r-gantt-k,
-.world--renovation .r-swatch-k {
+.world--renovation .world-kicker {
   font-family: var(--font-mono);
   letter-spacing: 0.14em;
   text-transform: uppercase;

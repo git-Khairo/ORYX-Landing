@@ -1,16 +1,30 @@
-/* ══ Renovation — "The Build-Up" ════════════════════════════════════════
+/* ══ Renovation — "The Sheet" ═══════════════════════════════════════════
    NOTE ON COLOUR: this world is light, so structural marks — the drawing's
-   strokes, the Gantt bars, the title-block rule, the mark — read from
+   strokes, the sheet's rules, the title-block rule, the mark — read from
    `--fill-strong`, which is Deep Brown here and sand on the two dark worlds.
-   Sand on cream is 2.1:1; the floor plan stroked in it was very nearly
-   invisible the moment the ground flipped.
+   Sand on cream is 2.1:1, and 1.77:1 on `--sunk`; the floor plan stroked in
+   it was very nearly invisible the moment the ground flipped. Sand is a fill
+   on this page and never a line, a hatch or a letterform.
 
    `--sand` itself survives in exactly one place: the scrub handle and its
    focus ring, which sit on a photograph rather than on the ground.
 
-   A before-and-after you operate by hand, and a building that goes up in the
-   order it goes up. Transport travels and Workforce fills in; this page
-   builds — every device here moves upward or gets covered over. */
+   ── What this page is now ────────────────────────────────────────────
+   It was "The Build-Up": a five-layer axonometric that assembled a fit-out on
+   scroll, a twelve-week Gantt, a materials swatch strip and a set of figures.
+   All of it was invented, and the ORYX source document *Property Care /
+   Structure* replaced the page's contents wholesale — nine services, sixty-
+   five works, and a publication gate. A building going up from nothing also
+   argued against the document's own differentiator: *conserve what has value,
+   repair what is necessary, replace only as a last resort.*
+
+   So the page is a drawing sheet rather than a construction. Its two devices
+   are a FORK — one section drawn once and marked up three ways, because the
+   decision the client actually makes is maintain, improve or transform — and
+   a SCHEDULE OF WORKS, one continuous ruled sheet of all sixty-five items.
+   Nothing on it expands, nothing has a second height, and nothing is hidden
+   behind a control. Transport travels and Workforce is operated; this page is
+   read. */
 
 /* ── Its own navigation ───────────────────────────────────────────────
    A drawing sheet's header strip: ruled cells, sheet reference on the left,
@@ -58,7 +72,7 @@
   font-size: 0.62rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--text-3);
+  color: var(--text-2);
 }
 
 .r-nav-links { gap: clamp(0.9rem, 3vw, 2.4rem); justify-content: center; }
@@ -79,7 +93,7 @@
   font-size: 0.6rem;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--text-3);
+  color: var(--text-2);
 }
 .r-nav-meta dd {
   font-family: var(--font-mono);
@@ -91,6 +105,21 @@
 @media (max-width: 820px) {
   .r-nav { grid-template-columns: auto minmax(0, 1fr); }
   .r-nav-meta { display: none; }
+}
+@media (max-width: 620px) {
+  /* Four section links do not fit beside the mark on a phone — measured, the
+     last one hung 24px off the page and scrolled the whole world sideways.
+     They become a strip you can push, which is what the schedule's own index
+     does one breakpoint further down; hiding one would make a section
+     unreachable. */
+  .r-nav-links {
+    justify-content: flex-start;
+    gap: 1rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .r-nav-links::-webkit-scrollbar { display: none; }
+  .r-nav-links a { white-space: nowrap; }
 }
 
 /* ── Its own footer — the title block ─────────────────────────────────
@@ -116,7 +145,10 @@
   gap: 0.6rem;
   padding: 0.85rem 1.5rem;
   background: var(--fill-strong);
-  color: var(--oryx-black);
+  /* Deep Brown ground, so the label is the cream. Oryx Black on Deep Brown
+     measures 1.53:1 — the primary call to action was unreadable until it was
+     hovered. */
+  color: var(--oryx-white);
   font-family: var(--font-mono);
   font-size: var(--step--2);
   letter-spacing: 0.12em;
@@ -157,7 +189,7 @@
   font-size: 0.6rem;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--text-3);
+  color: var(--text-2);
 }
 .r-tb-cell dd {
   font-family: var(--font-mono);
@@ -174,7 +206,7 @@
   font-size: var(--step--2);
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--text-3);
+  color: var(--text-2);
   transition: color 0.2s var(--ease-out);
 }
 .r-foot-back:hover { color: var(--fill-strong); }
@@ -226,7 +258,11 @@
    register by construction. */
 .r-scrub-before-wrap {
   position: absolute;
-  inset: 0;
+  /* Not `inset: 0` — see `--scrub-pad` in world-identity.css. This half is
+     absolutely positioned and so resolves against the padding box; the other
+     half is in normal flow inside the content box. They only register if this
+     one is inset by the same padding. */
+  inset: var(--scrub-pad, 0);
   clip-path: inset(0 calc(100% - var(--at, 52%)) 0 0);
 }
 
@@ -301,72 +337,6 @@
 }
 .r-scrub-input:focus-visible { outline: 2px solid var(--sand); outline-offset: -4px; }
 
-/* ── The programme ────────────────────────────────────────────────────
-   A twelve-week gantt. Bars are placed from week numbers with one grid, so the
-   overlaps between trades are real geometry rather than a drawing of overlap. */
-.r-programme {
-  max-width: var(--maxw);
-  margin: 0 auto;
-  padding: clamp(3rem, 8vh, 5rem) var(--gutter);
-  display: grid;
-  gap: clamp(1.8rem, 4vh, 2.6rem);
-}
-.r-prog-head { display: grid; gap: 1rem; }
-
-.r-gantt { display: grid; gap: 6px; }
-
-.r-gantt-scale {
-  display: grid;
-  grid-template-columns: repeat(var(--weeks), minmax(0, 1fr));
-  gap: 2px;
-  margin-left: clamp(7rem, 14vw, 12rem);
-  font-size: var(--step--2);
-  color: var(--text-3);
-  font-variant-numeric: tabular-nums;
-  text-align: center;
-}
-
-.r-gantt-row {
-  display: grid;
-  grid-template-columns: clamp(7rem, 14vw, 12rem) minmax(0, 1fr);
-  gap: 0.8rem;
-  align-items: center;
-}
-.r-gantt-k {
-  font-size: var(--step--1);
-  font-weight: 500;
-  color: var(--text-2);
-}
-.r-gantt-track {
-  position: relative;
-  display: grid;
-  grid-template-columns: repeat(var(--weeks), minmax(0, 1fr));
-  gap: 2px;
-  height: clamp(26px, 3.6vh, 34px);
-  background:
-    repeating-linear-gradient(
-      to right,
-      var(--line-soft) 0,
-      var(--line-soft) 1px,
-      transparent 1px,
-      transparent calc(100% / var(--weeks))
-    );
-}
-.r-gantt-bar {
-  align-self: stretch;
-  background: var(--fill-strong);
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.7s var(--ease-out);
-  transition-delay: calc(var(--i) * 0.13s);
-}
-.r-gantt.is-in .r-gantt-bar { transform: scaleX(1); }
-
-@media (max-width: 700px) {
-  .r-gantt-scale { display: none; }
-  .r-gantt-row { grid-template-columns: 6.5rem minmax(0, 1fr); }
-}
-
 /* ── How a job runs ──────────────────────────────────────────────────
    Numbered notes, the way a drawing carries them: an N-prefixed reference in
    a boxed cell, then the note itself. */
@@ -380,14 +350,26 @@
 .r-process-head { display: grid; gap: 0.9rem; }
 .r-process-head h3 { font-size: var(--step-3); color: var(--text); }
 
+/* Twelve columns, because the route is SEVEN steps and seven divides into no
+   column count this page has. `repeat(4, 1fr)` left the second row running 05,
+   06, 07 and then a visible empty cell — a hole inside a bordered block, which
+   on a drawing sheet reads as a missing item rather than as spare space. Flex
+   wrapping was worse: it filled the gap by stretching the last two to 661px
+   against their neighbours' 264px.
+
+   Twelve is divisible by both 4 and 3, so the first four span three columns
+   each and the last three span four. Two full rows, every cell in a row the
+   same width, nothing left over. */
 .r-steps {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(12, minmax(0, 1fr));
   gap: 1px;
   background: var(--line-sand);
   border: 1px solid var(--line-sand);
 }
 .r-steps li {
+  grid-column: span 3;
+  min-width: 0;
   background: color-mix(in srgb, var(--sunk) 62%, transparent);
   padding: clamp(1.4rem, 3.5vh, 2rem) clamp(1.1rem, 1.8vw, 1.5rem);
   display: grid;
@@ -395,6 +377,19 @@
   align-content: start;
   transition-delay: calc(var(--i, 0) * 80ms);
 }
+/* 4 + 3 at full width; 2 + 2 + 2 + 1 when the cells get tight; one column on a
+   phone. Every breakpoint keeps whole rows. */
+.r-steps li:nth-child(n + 5) { grid-column: span 4; }
+@media (max-width: 1100px) {
+  .r-steps li,
+  .r-steps li:nth-child(n + 5) { grid-column: span 6; }
+  .r-steps li:last-child { grid-column: span 12; }
+}
+@media (max-width: 620px) {
+  .r-steps li,
+  .r-steps li:nth-child(n + 5) { grid-column: span 12; }
+}
+
 .r-step-n {
   justify-self: start;
   padding: 0.25rem 0.5rem;
@@ -416,227 +411,10 @@
 }
 .r-step-d { font-size: var(--step--1); line-height: 1.55; color: var(--text-2); }
 
-@media (max-width: 820px) {
-  .r-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-}
-
-/* ── The layers ───────────────────────────────────────────────────────
-   Tall section, sticky viewport: the stack is held on screen while the scroll
-   walks through it, so the four layers are read as sequence rather than as a
-   list you pass. */
-.r-layers {
-  height: 320svh;
-  background: var(--sunk);
-  border-block: 1px solid var(--line);
-}
-.r-layers-sticky {
-  position: sticky;
-  top: 0;
-  height: 100svh;
-  display: grid;
-  align-content: center;
-  gap: clamp(1.6rem, 4vh, 2.6rem);
-  max-width: var(--maxw);
-  margin: 0 auto;
-  padding: var(--gutter);
-}
-
-.r-layers-head { display: grid; gap: 0.9rem; max-width: 64ch; }
-
-.r-build {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: clamp(1.5rem, 4vw, 3.5rem);
-  align-items: center;
-  min-height: 0;
-}
-
-.r-stack { display: grid; gap: clamp(0.4rem, 1.2vh, 0.8rem); align-content: center; }
-
-/* ── The build-up, drawn ──────────────────────────────────────────────
-   The plates separate on `--p`, which the section writes every frame. Only
-   `transform` and `opacity` animate, so the whole drawing stays on the
-   compositor while a 320svh section scrolls past it.
-
-   `--i` counts down from the top plate, so the finishes travel furthest and
-   the slab stays put — the floor does not rise off its own structure. */
-.r-axo {
-  margin: 0;
-  display: grid;
-  place-items: center;
-  min-height: 0;
-}
-.r-axo svg { width: 100%; height: auto; max-height: 68svh; overflow: visible; }
-
-.r-axo-layer {
-  --lift: calc(var(--p, 0) * 46px);
-  transform: translateY(calc(var(--i) * var(--lift) * -1));
-  opacity: 0.34;
-  transition: opacity 0.45s var(--ease-out);
-}
-.r-axo-layer.is-built { opacity: 1; }
-
-/* The plate is a tinted pane, not a solid: five opaque diamonds would hide
-   every motif but the top one the moment they overlap at rest. */
-.r-axo-plate {
-  fill: color-mix(in srgb, var(--fill-strong) 7%, transparent);
-  stroke: var(--fill-strong);
-  stroke-width: 1.5;
-  stroke-linejoin: round;
-}
-.r-axo-layer.is-live .r-axo-plate {
-  fill: color-mix(in srgb, var(--fill-strong) 15%, transparent);
-  stroke-width: 2.5;
-}
-
-.r-axo-layer path,
-.r-axo-layer polygon:not(.r-axo-plate) {
-  fill: none;
-  stroke: var(--fill-strong);
-  stroke-width: 1;
-  vector-effect: non-scaling-stroke;
-}
-.r-axo-slab path { opacity: 0.5; }
-.r-axo-slab circle { fill: var(--fill-strong); stroke: none; }
-
-/* Services are the coordinated thing on this plate, so they are the only
-   dashed run in the drawing — the convention on a real services layout. */
-.r-axo-svc path { stroke-width: 2; stroke-dasharray: 7 4; }
-.r-axo-svc .r-axo-riser { stroke-dasharray: none; opacity: 0.45; }
-
-.r-axo-part polygon { fill: color-mix(in srgb, var(--fill-strong) 22%, transparent); stroke-width: 1.25; }
-.r-axo-ceil path { opacity: 0.42; }
-.r-axo-fin polygon { fill: color-mix(in srgb, var(--fill-strong) 34%, transparent); stroke-width: 1.25; }
-
-.r-axo-n {
-  fill: var(--text-3);
-  font-size: 15px;
-  text-anchor: start;
-  dominant-baseline: middle;
-  opacity: 0;
-  transition: opacity 0.35s var(--ease-out), fill 0.35s var(--ease-out);
-}
-/* The numbers only mean anything once the plates have moved apart. Below a
-   third of the way through they sit on top of one another. */
-.r-axo-layer.is-built .r-axo-n { opacity: calc((var(--p, 0) - 0.28) * 4); }
-.r-axo-layer.is-live .r-axo-n { fill: var(--text); }
-
-@media (prefers-reduced-motion: reduce) {
-  .r-axo-layer { transition: none; }
-}
-
-/* Each layer arrives from below and settles — the direction a building is
-   assembled in. Unbuilt layers are outlined rather than filled, so the stack
-   reads as a section drawing before it reads as a list. */
-/* Number in a gutter, label over description — not three columns.
-   Three columns needed a width for the label, and there is no good one: fixed
-   at 12rem "PARTITIONS" ran straight through its own description, while `auto`
-   sizes per row (each layer is its own grid) and left the descriptions starting
-   at four different places. Subgrid would share the tracks but these are
-   bordered, padded cards, and padding on a subgrid item knocks its tracks out
-   of register with the parent's. Stacking sidesteps the whole problem and gives
-   the display type the full measure it wants. */
-.r-layer {
-  display: grid;
-  grid-template-columns: 3.4rem minmax(0, 1fr);
-  gap: 0.4rem 1.5rem;
-  align-items: baseline;
-  padding: clamp(1rem, 2.6vh, 1.5rem) clamp(1rem, 2vw, 1.6rem);
-  border: 1px solid var(--line);
-  background: transparent;
-  opacity: 0.34;
-  transform: translateY(26px);
-  transition: opacity 0.7s var(--ease-out), transform 0.7s var(--ease-out),
-    background 0.7s var(--ease-out), border-color 0.7s var(--ease-out);
-}
-.r-layer.is-built {
-  opacity: 1;
-  transform: translateY(0);
-  background: var(--raise);
-  border-color: var(--line-sand);
-}
-.r-layer.is-live { border-color: var(--fill-strong); }
-
-.r-layer-n {
-  font-size: var(--step--2);
-  font-weight: 600;
-  letter-spacing: var(--track-label);
-  color: var(--sand-text);
-  font-variant-numeric: tabular-nums;
-}
-.r-layer-k {
-  grid-column: 2;
-  font-family: var(--font-display);
-  font-size: var(--step-2);
-  text-transform: uppercase;
-  letter-spacing: var(--track-display);
-  color: var(--text);
-  line-height: 1.1;
-}
-.r-layer-d {
-  grid-column: 2;
-  font-size: var(--step-0);
-  color: var(--text-2);
-  max-width: 52ch;
-}
-
-/* ── Materials ────────────────────────────────────────────────────────── */
-.r-materials {
-  max-width: var(--maxw);
-  margin: 0 auto;
-  padding: clamp(3.5rem, 9vh, 6rem) var(--gutter);
-  display: grid;
-  gap: clamp(1.6rem, 4vh, 2.4rem);
-}
-.r-swatches {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 1px;
-  background: var(--line);
-  border: 1px solid var(--line);
-}
-.r-swatches li {
-  background: var(--tone);
-  padding: 0;
-  display: grid;
-  transition-delay: calc(var(--i, 0) * 60ms);
-}
-.r-swatch { display: block; height: clamp(90px, 13vh, 130px); }
-.r-swatch-k {
-  padding: 0.9rem 1rem;
-  font-size: var(--step--2);
-  font-weight: 600;
-  letter-spacing: 0.03em;
-  color: var(--text-2);
-}
-
-/* ── What it is ───────────────────────────────────────────────────────── */
-.r-define {
-  max-width: var(--maxw);
-  margin: 0 auto;
-  padding: 0 var(--gutter) clamp(3.5rem, 9vh, 6rem);
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-  gap: 1px;
-  background: var(--line);
-  border: 1px solid var(--line);
-}
-.r-define-card {
-  background: var(--tone);
-  padding: clamp(1.5rem, 4vh, 2.2rem) clamp(1.2rem, 2vw, 1.6rem);
-  display: grid;
-  gap: 0.55rem;
-  align-content: start;
-}
-.r-define-n {
-  font-size: var(--step--2);
-  font-weight: 600;
-  letter-spacing: var(--track-label);
-  color: var(--sand-text);
-  font-variant-numeric: tabular-nums;
-}
-.r-define-card h3 { font-size: var(--step-1); color: var(--text); }
-.r-define-card p { font-size: var(--step--1); color: var(--text-2); }
+/* The route's own breakpoints live with its grid above — this one was left
+   over from the four-step version and re-declared the track list to two
+   columns, which silently overrode the twelve-track system and put the seven
+   steps back into ragged rows. */
 
 /* ── Interlude ────────────────────────────────────────────────────────── */
 .r-interlude {
@@ -666,46 +444,904 @@
   color: var(--oryx-white);
 }
 
-/* ── Proof ────────────────────────────────────────────────────────────── */
-.r-proof {
+/* ══ The fork — maintain, improve or transform ═══════════════════════════
+   The page's signature, and the decision the source says to meet first:
+   "Start with the right decision for the property, not a long list of trades."
+
+   ── Why it is vertical, and why one drawing ──────────────────────────
+   Three panels in a row read as three stages, and this is a choice of three
+   alternatives. Two things prevent the misreading. The options run DOWN a
+   scale labelled *less intervention* to *more intervention*, and this page
+   draws process left-to-right — the numbered route does — so the vertical is
+   the one axis here that has never meant time. And the three mark-up layers
+   sit on ONE section drawing and displace one another: you cannot see two at
+   once, which is what alternative means. Steps coexist; alternatives compete
+   for a single space.
+
+   ── Why it does not sell the biggest job ─────────────────────────────
+   Each layer marks a different DEPTH — envelope, fabric, structure — rather
+   than accumulating on the last one, so "and then also" has no foothold; and
+   the note under the plate, which governs all three, is the source's own
+   *replace only as a last resort*. The figure's last word is *last resort*. */
+.r-fork {
+  background: var(--sunk);
+  border-block: 1px solid var(--line-sand);
+  padding: clamp(3.5rem, 9vh, 6rem) var(--gutter);
+}
+.r-fork-inner {
+  max-width: var(--maxw);
+  margin-inline: auto;
+  display: grid;
+  grid-template-columns: minmax(0, 19rem) minmax(0, 1fr) minmax(0, 22rem);
+  grid-template-areas:
+    'head head  head'
+    'top  top   top'
+    'rail stage read'
+    'foot foot  foot';
+  column-gap: clamp(1.4rem, 2.6vw, 2.8rem);
+  row-gap: clamp(1.6rem, 4vh, 2.6rem);
+  align-items: start;
+}
+.r-fork-head { grid-area: head; display: grid; gap: 0.9rem; max-width: 62ch; }
+.r-fork-head h3 { font-size: var(--step-3); color: var(--text); max-width: 18ch; }
+
+/* ── The two datum bars ───────────────────────────────────────────────
+   One property in at the top, one plan out at the bottom, three options
+   between. The foot bar is the load-bearing one: all three land in the same
+   place, and a sequence has no reason to re-join. */
+.r-fork-datum {
+  display: grid;
+  grid-template-columns: minmax(0, 19rem) minmax(0, 1fr) auto;
+  background: var(--raise);
+  border: 1px solid var(--line-sand);
+}
+.r-fork-datum > * { padding: 0.75rem clamp(0.9rem, 1.8vw, 1.4rem); margin: 0; }
+.r-fork-datum--top { grid-area: top; }
+.r-fork-datum--foot { grid-area: foot; }
+.r-fork-dk {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-2);
+}
+.r-fork-dv { font-size: var(--step-0); color: var(--text); }
+.r-fork-dn {
+  font-family: var(--font-mono);
+  font-size: var(--step--2);
+  color: var(--sand-text);
+  text-align: right;
+  white-space: nowrap;
+}
+
+/* ── The ballot ───────────────────────────────────────────────────────── */
+.r-fork-choose { grid-area: rail; display: grid; gap: 0.6rem; }
+.r-fork-lim {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-2);
+}
+.r-fork-rail {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 1px;
+  position: relative;
+}
+/* The magnitude scale the options are ordered against: a rule with a TERMINAL
+   AT EACH END, which is how a dimension is drawn. Without the terminals it was
+   a bare line down the side of three stacked boxes — indistinguishable from a
+   flow, which is the one reading this figure exists to prevent. Never an
+   arrow: an arrow means "goes to". */
+.r-fork-rail::before {
+  content: '';
+  position: absolute;
+  left: -4px;
+  top: 0.4rem;
+  bottom: 0.4rem;
+  width: 9px;
+  background:
+    linear-gradient(var(--fill-strong), var(--fill-strong)) center top / 9px 1px no-repeat,
+    linear-gradient(var(--fill-strong), var(--fill-strong)) center bottom / 9px 1px no-repeat,
+    linear-gradient(var(--fill-strong), var(--fill-strong)) center / 1px 100% no-repeat;
+}
+.r-fork-opt { position: relative; display: block; padding-left: 1.1rem; cursor: pointer; }
+.r-fork-opt input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+.r-fork-box {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.2rem 0.7rem;
+  align-items: baseline;
+  padding: 0.85rem clamp(0.8rem, 1.6vw, 1.1rem);
+  background: var(--tone);
+  border: 1px solid var(--line);
+  transition: border-color 0.2s var(--ease-out), background 0.2s var(--ease-out);
+}
+.r-fork-opt:hover .r-fork-box { border-color: var(--line-sand); }
+.r-fork-opt input:checked + .r-fork-box {
+  border-color: var(--fill-strong);
+  background: var(--raise);
+}
+/* The tick on the scale, at the option's own height — this is where the
+   choice sits on the magnitude rail, and it is the only thing that moves. */
+.r-fork-opt::before {
+  content: '';
+  position: absolute;
+  left: -3px;
+  top: 50%;
+  width: 7px;
+  height: 7px;
+  transform: translateY(-50%) rotate(45deg);
+  background: var(--sunk);
+  border: 1px solid var(--fill-strong);
+}
+.r-fork-opt:has(input:checked)::before { background: var(--fill-strong); }
+.r-fork-opt input:focus-visible + .r-fork-box {
+  outline: 2px solid var(--fill-strong);
+  outline-offset: 2px;
+}
+.r-fork-on {
+  font-family: var(--font-mono);
+  font-size: var(--step--2);
+  color: var(--sand-text);
+}
+.r-fork-ok {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: var(--step-0);
+  text-transform: uppercase;
+  letter-spacing: var(--track-display-lg);
+  color: var(--text);
+  line-height: 1.1;
+}
+.r-fork-od {
+  grid-column: 2;
+  font-size: var(--step--2);
+  line-height: 1.45;
+  color: var(--text-2);
+}
+.r-fork-set {
+  font-size: var(--step--2);
+  line-height: 1.5;
+  color: var(--text-2);
+  border-top: 1px solid var(--line);
+  padding-top: 0.7rem;
+}
+.r-fork-set b { color: var(--text); font-weight: 600; }
+
+/* ── The stage ───────────────────────────────────────────────────────── */
+.r-fork-stage { grid-area: stage; margin: 0; }
+.r-fork-svg { width: 100%; height: auto; display: block; }
+/* Device-pixel line weights at every width, so the 1 / 1.4 / 2.4 drafting
+   hierarchy survives the drawing being scaled. */
+.r-fork-svg * { vector-effect: non-scaling-stroke; }
+.r-fork-ctx { fill: none; stroke: var(--line); stroke-width: 1; }
+.r-fork-ctx .is-datum { stroke: var(--line-sand); }
+.r-fork-ctx text {
+  fill: var(--text-2);
+  stroke: none;
+  font-family: var(--font-mono);
+  font-size: 17px;
+  letter-spacing: 0.1em;
+}
+/* The fabric is identical in all three states and never animates. The same
+   building is being decided about. */
+.r-fork-fab { fill: none; stroke: var(--fill-strong); stroke-width: 1.4; }
+.r-fork-fab .is-solid { fill: color-mix(in srgb, var(--fill-strong) 14%, transparent); }
+.r-fork-fab .is-soft { fill: color-mix(in srgb, var(--fill-strong) 8%, transparent); }
+.r-fork-fab .is-part { stroke: var(--line); stroke-width: 1; }
+
+/* All three layers are always in the DOM; only opacity swaps. */
+.r-fork-mk { opacity: 0; pointer-events: none; transition: opacity 0.3s var(--ease-out); }
+/* The unconditional resting state. Without this the figure is blank whenever
+   the attribute is absent — before hydration, or with JS off entirely. */
+.r-fork:not([data-scenario]) .r-fork-mk--maintain,
+.r-fork[data-scenario='maintain'] .r-fork-mk--maintain,
+.r-fork[data-scenario='improve'] .r-fork-mk--improve,
+.r-fork[data-scenario='transform'] .r-fork-mk--transform { opacity: 1; }
+
+.r-fork-mk { fill: none; stroke: var(--fill-strong); }
+.r-fork-mk .is-heavy { stroke-width: 2.4; }
+.r-fork-mk .is-glass { stroke-width: 1.6; }
+.r-fork-mk .is-run { stroke-width: 2; stroke-dasharray: 7 4; }
+.r-fork-mk .is-cut { stroke-width: 2.4; stroke-dasharray: 6 5; }
+/* Added work: solid outline, light fill. Deliberately NOT the dashed-and-
+   crossed notation used for removals — on a drawing those two mean opposite
+   things, and the extension was reading as a demolition. */
+.r-fork-mk .is-add {
+  stroke-width: 2.4;
+  fill: color-mix(in srgb, var(--fill-strong) 10%, transparent);
+}
+.r-fork-mk .is-hatch { fill: url(#r-fork-hatch); stroke: none; }
+.r-fork-depth {
+  fill: var(--sand-text);
+  stroke: none;
+  font-family: var(--font-mono);
+  font-size: 17px;
+  letter-spacing: 0.14em;
+}
+
+/* ── The read column ──────────────────────────────────────────────────
+   All three panels occupy ONE grid cell, so the box is always as tall as the
+   tallest and nothing below it moves when the scenario changes. `visibility`
+   rather than the `hidden` attribute for the same reason: `hidden` collapses
+   the cell, which reflows the page — most visibly on a phone, where the read
+   column is stacked under the drawing. */
+.r-fork-read { grid-area: read; display: grid; }
+.r-fork-panel {
+  grid-area: 1 / 1;
+  display: grid;
+  gap: 0.8rem;
+  align-content: start;
+}
+.r-fork-panel[aria-hidden='true'] { visibility: hidden; pointer-events: none; }
+.r-fork-over {
+  font-family: var(--font-mono);
+  font-size: var(--step--2);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--sand-text);
+}
+.r-fork-claim { font-size: var(--step-1); line-height: 1.25; color: var(--text); max-width: 30ch; }
+.r-fork-body { font-size: var(--step-0); line-height: 1.55; color: var(--text-2); max-width: 42ch; }
+.r-fork-marks { display: grid; gap: 0.45rem; }
+.r-fork-mh {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-2);
+}
+.r-fork-marks li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.4rem 0.6rem;
+  font-size: var(--step-0);
+  font-weight: 600;
+  color: var(--text);
+}
+/* A bracketed numeral on a drawing is a detail reference — unmistakably a
+   citation, and not a rank or a status. It says only which service the work
+   is written under. */
+.r-fork-ref {
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-size: var(--step--2);
+  color: var(--sand-text);
+}
+.r-fork-st {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--sand-text);
+  border: 1px solid var(--line-sand);
+  padding: 0.18rem 0.45rem;
+}
+.r-fork-cav {
+  font-size: var(--step--1);
+  line-height: 1.5;
+  color: var(--text-2);
+  border-top: 1px solid var(--line);
+  padding-top: 0.7rem;
+}
+
+/* Outside the plate and spanning it, so it visibly governs all three. */
+.r-fork-note {
+  max-width: var(--maxw);
+  margin: clamp(1.4rem, 3vh, 2rem) auto 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 1rem 2rem;
+  align-items: end;
+  border-top: 1px solid var(--fill-strong);
+  padding-top: clamp(1.2rem, 3vh, 1.8rem);
+}
+.r-fork-note p {
+  font-family: var(--font-display);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: var(--track-display-lg);
+  line-height: 1.18;
+  font-size: var(--step-2);
+  color: var(--text);
+  max-width: 30ch;
+}
+.r-fork-nk {
+  font-family: var(--font-mono);
+  font-size: var(--step--2);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-2);
+  text-align: right;
+}
+
+@media (max-width: 1080px) {
+  .r-fork-inner {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: 'head' 'top' 'stage' 'rail' 'read' 'foot';
+  }
+  .r-fork-datum { grid-template-columns: minmax(0, 1fr); }
+  .r-fork-dn { text-align: left; }
+  /* The ballot stays VERTICAL at every width. Laying three alternatives out
+     in a row is the misreading this figure exists to prevent, and a
+     breakpoint is not a reason to re-introduce it. */
+}
+@media (max-width: 620px) {
+  .r-fork-note { grid-template-columns: minmax(0, 1fr); }
+  .r-fork-nk { text-align: left; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .r-fork-mk { transition: none; }
+}
+
+/* ══ The schedule of works ═══════════════════════════════════════════════
+   Nine services and sixty-five works as one continuous ruled sheet.
+
+   ── Nothing here has a second height ─────────────────────────────────
+   No accordion, no shelf, no tabs, no search, no filter, no "show more". No
+   state at all beyond a scroll-spy that changes one border colour. The
+   page-jump failure class — which this project has now hit twice — cannot
+   occur, because no element in the section has two heights to move between.
+
+   That is affordable because of arithmetic, not taste: 65 descriptions come
+   to about 5,400 characters, against roughly 21,000 for Workforce's 307 role
+   sentences. Workforce needed progressive disclosure; a fifth of the volume
+   does not. Everything is printed, and find-in-page works over all of it.
+
+   ── Why stacked bands and not a grid of cards ────────────────────────
+   Nine services of unequal size — 5 to 9 works — tiled 3×3 are bound by the
+   tallest card in each row: 8 + 8 + 9 = 75 slots for 65 works, ten dead cells
+   showing as holes. Stacked full-width blocks have none by construction. It
+   is also the only way the CONDITION column can exist, since a column reads
+   as a column only if it runs the full length of the sheet. */
+.r-sched {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: clamp(4rem, 10vh, 6.5rem) var(--gutter);
+}
+.r-sched-head { display: grid; gap: 0.9rem; max-width: 64ch; margin-bottom: clamp(1.6rem, 4vh, 2.4rem); }
+.r-sched-head h3 { font-size: var(--step-3); color: var(--text); }
+.r-sched-count {
+  font-family: var(--font-mono);
+  font-size: var(--step--2);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--sand-text);
+}
+.r-sched-body {
+  display: grid;
+  grid-template-columns: 14rem minmax(0, 1fr);
+  gap: clamp(1.5rem, 3vw, 2.5rem);
+  align-items: start;
+}
+
+/* One variable owns every row's geometry on the sheet. */
+.r-sched { --r-cols: 4.25rem 16rem minmax(0, 1fr) 11rem; }
+.r-work,
+.r-sched-colhead,
+.r-sched-total {
+  display: grid;
+  grid-template-columns: var(--r-cols);
+  align-items: baseline;
+}
+.r-work > *,
+.r-sched-colhead > *,
+.r-sched-total > * { padding: 0.45rem 1rem; margin: 0; }
+
+/* ── The index ────────────────────────────────────────────────────────── */
+.r-sched-rail {
+  position: sticky;
+  top: calc(var(--r-nav-h, 72px) + 1.5rem);
+  align-self: start;
+  max-height: calc(100svh - var(--r-nav-h, 72px) - 3rem);
+  overflow-y: auto;
+  border-left: 1px solid var(--line-sand);
+}
+.r-sched-rail a {
+  display: grid;
+  gap: 0.1rem;
+  padding: 0.5rem 0.9rem;
+  /* Always present, colour-only when live: a width or weight change here
+     would reflow the rail every time the reader crossed a block boundary. */
+  border-left: 2px solid transparent;
+  margin-left: -1px;
+  transition: color 0.2s var(--ease-out), border-color 0.2s var(--ease-out);
+}
+.r-rail-n {
+  font-family: var(--font-mono);
+  font-size: var(--step--2);
+  color: var(--sand-text);
+}
+.r-rail-name { font-size: var(--step--1); line-height: 1.3; color: var(--text-2); }
+.r-rail-w {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-2);
+}
+.r-sched-rail a:hover .r-rail-name { color: var(--text); }
+.r-sched-rail a[aria-current='true'] { border-left-color: var(--fill-strong); }
+.r-sched-rail a[aria-current='true'] .r-rail-name { color: var(--text); }
+.r-sched-foot {
+  padding: 0.7rem 0.9rem;
+  border-top: 1px solid var(--line);
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-2);
+}
+
+/* ── The sheet ────────────────────────────────────────────────────────── */
+.r-sched-sheet { border: 1px solid var(--line-sand); min-width: 0; }
+.r-sched-colhead {
+  position: sticky;
+  top: var(--r-nav-h, 72px);
+  z-index: 2;
+  background: var(--raise);
+  border-bottom: 1px solid var(--fill-strong);
+}
+.r-sched-colhead span {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  /* `--text-3` is 3.79:1 on this ground and fails AA. An `aria-hidden`
+     element still has to be readable by sighted low-vision users. */
+  color: var(--text-2);
+}
+
+.r-svc { scroll-margin-top: calc(var(--r-nav-h, 72px) + 2.5rem + 1rem); }
+.r-svc + .r-svc { border-top: 1px solid var(--fill-strong); }
+.r-svc:focus { outline: none; }
+.r-svc:focus-visible { outline: 2px solid var(--fill-strong); outline-offset: -2px; }
+.r-svc-head {
+  display: grid;
+  grid-template-columns: 4.25rem minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 0 1rem;
+  padding: 1rem 1rem 0.8rem;
+  background: color-mix(in srgb, var(--raise) 60%, transparent);
+}
+.r-svc-n { font-family: var(--font-mono); font-size: var(--step-0); color: var(--sand-text); }
+.r-svc-head h4 { font-size: var(--step-1); color: var(--text); line-height: 1.1; }
+.r-svc-sub {
+  grid-column: 2;
+  font-size: var(--step--1);
+  line-height: 1.5;
+  color: var(--text-2);
+  max-width: 68ch;
+  margin-top: 0.3rem;
+}
+.r-svc-tally {
+  font-family: var(--font-mono);
+  font-size: var(--step--2);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-2);
+  white-space: nowrap;
+}
+
+.r-work { border-top: 1px solid var(--line-soft); }
+.r-work:hover { background: color-mix(in srgb, var(--raise) 55%, transparent); }
+.r-work-n { font-family: var(--font-mono); font-size: var(--step--2); color: var(--sand-text); }
+.r-work-t { font-size: var(--step-0); font-weight: 600; color: var(--text); line-height: 1.3; }
+.r-work-d { font-size: var(--step--1); line-height: 1.5; color: var(--text-2); }
+/* A border on the cell, not a background on the sheet: a gradient would have
+   to be redeclared at every breakpoint, and the row hover would paint over
+   the very rule it is there to guide the eye along. */
+.r-work-c,
+.r-colhead-c { border-left: 1px solid var(--line-soft); }
+.r-work-c { display: flex; align-items: baseline; gap: 0.45rem; flex-wrap: wrap; }
+.r-work.is-cond .r-work-t { color: var(--text-2); }
+/* 45° hatch is the drawing convention for a qualified or excluded area. No
+   hue, so it cannot be mistaken for a status pill. */
+.r-work.is-cond .r-work-c {
+  background-image: repeating-linear-gradient(-45deg, var(--line-soft) 0 1px, transparent 1px 6px);
+}
+.r-work-ref {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: var(--fill-strong);
+  border: 1px solid var(--line-sand);
+  padding: 0.08rem 0.28rem;
+  flex: none;
+}
+.r-work-cond {
+  font-family: var(--font-mono);
+  font-size: var(--step--2);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--sand-text);
+}
+
+.r-svc-note {
+  padding: 0.8rem 1rem 1rem;
+  border-top: 1px dashed var(--line-sand);
+  font-size: var(--step--1);
+  line-height: 1.55;
+  color: var(--text-2);
+  max-width: 78ch;
+}
+.r-svc-note b {
+  font-family: var(--font-mono);
+  font-size: var(--step--2);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--sand-text);
+  margin-right: 0.5rem;
+}
+
+/* Service 08 is an access route, not an offer. Its condition is stated ABOVE
+   its works rather than beside each one, because the condition governs the
+   reading and has to arrive first — and its CONDITION column is switched off,
+   because the schedule genuinely stops there. */
+/* The column rule and hatch STAY for service 08 — its cells now carry marks
+   like any other conditional row, and blanking the rule there was what left
+   note N1 asserting direct delivery over asbestos. */
+.r-svc-gate {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.7rem 1rem;
+  border-bottom: 1px dashed var(--line-sand);
+  font-family: var(--font-mono);
+  font-size: var(--step--2);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--sand-text);
+}
+.r-svc-gate::after {
+  content: '';
+  flex: 1;
+  height: 0;
+  border-bottom: 1px dashed var(--line);
+}
+
+.r-sched-total {
+  border-top: 1px solid var(--fill-strong);
+  background: color-mix(in srgb, var(--raise) 60%, transparent);
+  font-family: var(--font-mono);
+  font-size: var(--step--2);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+
+/* ── The notes ────────────────────────────────────────────────────────
+   N1 is the load-bearing one: it gives the fifty-three blank cells a printed
+   meaning, using the publication gate's own supplied safe wording. Without
+   it a blank is an absence; with it, it is a statement ORYX is permitted to
+   make. */
+.r-sched-notes {
+  grid-column: 2;
+  margin-top: 1.2rem;
+  display: grid;
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+}
+.r-sched-notes > div { background: var(--tone); padding: 0.8rem 1rem; display: grid; gap: 0.3rem; }
+.r-note-k {
+  font-family: var(--font-mono);
+  font-size: var(--step--2);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--sand-text);
+}
+.r-note-d { font-size: var(--step--1); line-height: 1.5; color: var(--text-2); }
+
+@media (max-width: 1099px) {
+  .r-sched { --r-cols: 3.75rem 14rem minmax(0, 1fr) 10rem; }
+  .r-sched-body { grid-template-columns: minmax(0, 1fr); }
+  .r-sched-notes { grid-column: 1; }
+  /* The flex axis belongs on the LIST, not on the nav.
+     `.r-sched-rail` is a <nav> whose only children are the <ol> and the foot
+     line, so `display: flex` here made the <ol> the single flex item and left
+     its nine <li> stacked exactly as before — a 485px opaque block pinned
+     under the nav for the whole section, covering two thirds of a phone and
+     painting over the sticky column header. `flex` and `scroll-snap-align` on
+     the <a> were inert for the same reason: the anchors are grandchildren. */
+  /* The strip's height is DECLARED, not measured. Measuring it meant one
+     variable standing for two different things — a 600px sidebar above 1100px
+     and a 56px strip below it — and the offsets underneath only make sense
+     against the second. Declaring it also closes the window where a stale
+     measurement pushes the column header off the screen, which is exactly what
+     a hidden tab produced: ResizeObserver only delivers during rendering
+     steps, so a breakpoint crossed while the tab is in the background leaves
+     the old value in place until it is looked at again. */
+  .r-sched-rail {
+    position: sticky;
+    top: var(--r-nav-h, 72px);
+    z-index: 3;
+    height: 3.5rem;
+    max-height: 3.5rem;
+    overflow: hidden;
+    border-left: 0;
+    border: 1px solid var(--line-sand);
+    background: var(--sunk);
+  }
+  .r-sched-rail ol {
+    display: flex;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+  }
+  .r-sched-rail ol::-webkit-scrollbar { display: none; }
+  .r-sched-rail li { flex: 0 0 auto; scroll-snap-align: start; }
+  .r-sched-rail a {
+    border-left: 0;
+    border-bottom: 2px solid transparent;
+    margin-left: 0;
+    white-space: nowrap;
+  }
+  .r-sched-rail a[aria-current='true'] { border-left-color: transparent; border-bottom-color: var(--fill-strong); }
+  /* The service name STAYS VISIBLE. Hiding it left nine chips reading
+     "01 · 7 works", which is not an index of anything — a reader cannot pick
+     "Heritage restoration" out of a row of numbers. The strip scrolls
+     horizontally instead, which is what the horizontal axis is for. */
+  /* One line per link, so the declared height is never overrun. */
+  .r-sched-rail a { display: flex; align-items: baseline; gap: 0.5rem; padding: 0.9rem 0.9rem; }
+  .r-sched-rail .r-rail-name { max-width: 11rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .r-sched-rail .r-rail-w { display: none; }
+  .r-sched-foot { display: none; }
+  /* Both offsets are now knowable: the nav is measured because its height
+     moves with its copy, and the strip and header are declared. */
+  .r-sched-colhead { top: calc(var(--r-nav-h, 72px) + 3.5rem); height: 2.5rem; align-items: center; }
+  .r-svc { scroll-margin-top: calc(var(--r-nav-h, 72px) + 3.5rem + 2.5rem + 0.75rem); }
+}
+
+@media (max-width: 899px) {
+  /* The CONDITION column dies as a column — at this width it would be a
+     quarter of the sheet and almost entirely blank — and becomes a marked
+     sub-line under the description it qualifies. Dashed, not hatched: at full
+     width a hatch reads as damage rather than as a qualification. */
+  .r-sched { --r-cols: 3.25rem minmax(0, 1fr); }
+  .r-work-t,
+  .r-work-d,
+  .r-work-c { grid-column: 2; }
+  .r-work > * { padding: 0.45rem 0.8rem; }
+  /* Only a cell that HAS a condition draws a rule. The dashed border was on
+     every `.r-work-c`, so all 53 unconditioned works carried a stray hairline
+     and ~15px of empty space under their description — 53 rules marking
+     nothing. */
+  .r-work-c { border-left: 0; padding-block: 0; }
+  .r-work.is-cond .r-work-c {
+    margin-top: 0.15rem;
+    padding-top: 0.4rem;
+    background-image: none;
+    border-top: 1px dashed var(--line-sand);
+  }
+  /* Two tracks in the rows means two tracks in the header, or "Description"
+     wraps into the 52px Item column and the header reads as gibberish. */
+  .r-sched-colhead { grid-template-columns: 3.25rem minmax(0, 1fr); }
+  .r-sched-colhead span:nth-child(2) { display: none; }
+  .r-colhead-c { display: none; }
+  .r-sched-total { grid-template-columns: 3.25rem minmax(0, 1fr); }
+  .r-sched-total span:nth-child(1) { display: none; }
+  .r-sched-total span:nth-child(3),
+  .r-sched-total span:nth-child(4) { grid-column: 2; padding-top: 0; }
+  .r-svc-head { grid-template-columns: 3.25rem minmax(0, 1fr); }
+  .r-svc-tally { grid-column: 2; }
+}
+
+@media (max-width: 639px) {
+  .r-sched { --r-cols: 2.6rem minmax(0, 1fr); padding-inline: 0; }
+  .r-sched-head,
+  .r-sched-notes { margin-inline: var(--gutter); }
+  .r-sched-sheet { border-inline: 0; }
+  .r-work > * { padding: 0.4rem 0.6rem; }
+  .r-svc-head h4 { font-size: var(--step-0); }
+}
+
+@media print {
+  .r-sched-rail,
+  .r-sched-colhead { position: static; }
+}
+
+/* ══ The remaining sections ══════════════════════════════════════════════ */
+
+/* The source's four beats, under the opening headline. Mono, because on this
+   sheet a sequence of named stages is annotation. */
+.r-beats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.4rem;
+  margin-top: 1rem;
+}
+.r-beats li {
+  font-family: var(--font-mono);
+  font-size: var(--step--2);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--oryx-white);
+  position: relative;
+}
+.r-beats li + li::before {
+  content: '';
+  position: absolute;
+  left: -0.75rem;
+  top: 50%;
+  width: 4px;
+  height: 1px;
+  background: var(--sand);
+}
+
+/* ── The two named methods ────────────────────────────────────────────
+   Named and described, and explicitly not sold as software: the source
+   permits the names as METHODS and forbids the product claim until the
+   process is technically implemented. */
+.r-tools {
+  grid-column: 1 / -1;
+  margin-top: clamp(2rem, 5vh, 3rem);
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line-sand);
+}
+.r-tool { background: var(--tone); padding: clamp(1.2rem, 3vh, 1.7rem); display: grid; gap: 0.35rem; align-content: start; }
+.r-tool-k {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: var(--step-1);
+  text-transform: uppercase;
+  letter-spacing: var(--track-display-lg);
+  color: var(--text);
+  line-height: 1.1;
+}
+.r-tool-nl {
+  font-family: var(--font-mono);
+  font-size: var(--step--2);
+  letter-spacing: 0.12em;
+  color: var(--sand-text);
+}
+.r-tool-d { font-size: var(--step--1); line-height: 1.55; color: var(--text-2); }
+.r-tools-note {
+  grid-column: 1 / -1;
+  background: var(--raise);
+  padding: 0.8rem clamp(1.2rem, 3vh, 1.7rem);
+  border-top: 1px solid var(--line);
+  font-family: var(--font-mono);
+  font-size: var(--step--2);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-2);
+}
+
+/* ── Who arrives ──────────────────────────────────────────────────────── */
+.r-who {
   max-width: var(--maxw);
   margin: 0 auto;
   padding: clamp(3.5rem, 9vh, 6rem) var(--gutter);
   display: grid;
-  grid-template-columns: 0.8fr 1.2fr;
-  gap: clamp(2.5rem, 6vw, 5rem);
-  align-items: start;
+  gap: clamp(1.4rem, 4vh, 2.2rem);
 }
-.r-figs { display: grid; gap: 1px; background: var(--line); border: 1px solid var(--line); }
-/* Staggered like the swatches and the Gantt bars: on a drawing sheet the
-   annotations do not all appear at once. */
-.r-figs li,
-.r-define-card { transition-delay: calc(var(--i, 0) * 70ms); }
-
-.r-figs li {
+.r-who-head { display: grid; gap: 0.8rem; max-width: 56ch; }
+.r-who-head h3 { font-size: var(--step-3); color: var(--text); }
+.r-clients {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+}
+.r-clients li {
   background: var(--tone);
-  padding: clamp(1.2rem, 3vh, 1.8rem);
+  padding: clamp(1rem, 2.6vh, 1.4rem);
   display: grid;
-  gap: 0.3rem;
+  gap: 0.35rem;
+  align-content: start;
 }
-.r-fig-n {
+.r-client-k {
   font-family: var(--font-display);
+  font-weight: 500;
+  font-size: var(--step-0);
+  text-transform: uppercase;
+  letter-spacing: var(--track-display-lg);
+  color: var(--text);
+  line-height: 1.15;
+}
+.r-client-d { font-size: var(--step--1); line-height: 1.5; color: var(--text-2); }
+
+/* ── Trust, and the five questions ────────────────────────────────────
+   The source calls these "answers written to close the gap between promise
+   and evidence", and every one of them narrows a claim rather than widening
+   it — which is exactly why they can be published while the claims matrix is
+   still open. */
+.r-trust {
+  background: var(--sunk);
+  border-block: 1px solid var(--line-sand);
+  padding: clamp(3.5rem, 9vh, 6rem) var(--gutter);
+}
+.r-trust-say,
+.r-faq { max-width: var(--maxw); margin-inline: auto; }
+.r-trust-say { display: grid; gap: 0.9rem; max-width: 60ch; margin-bottom: clamp(1.6rem, 4vh, 2.4rem); }
+.r-trust-line {
+  font-family: var(--font-display);
+  font-weight: 500;
   font-size: var(--step-3);
-  color: var(--fill-strong);
-  font-variant-numeric: tabular-nums;
-  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: var(--track-display-lg);
+  line-height: 1.02;
+  color: var(--text);
 }
-.r-fig-l { font-size: var(--step--2); color: var(--text-3); }
-
-.r-for-line { font-size: var(--step-1); color: var(--text); max-width: 44ch; }
-.r-sectors { margin-top: 1.6rem; display: grid; }
-.r-sectors div {
+.r-trust-d { font-size: var(--step-0); line-height: 1.55; color: var(--text-2); max-width: 52ch; }
+.r-faq {
   display: grid;
-  grid-template-columns: 12rem 1fr;
-  gap: 0.2rem 1.2rem;
-  padding: 0.9rem 0;
-  border-top: 1px solid var(--line);
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
 }
-.r-sectors dt { font-size: var(--step-0); font-weight: 600; color: var(--text); }
-.r-sectors dd { font-size: var(--step--1); color: var(--text-2); }
+.r-faq > div {
+  background: var(--tone);
+  padding: clamp(0.9rem, 2.4vh, 1.2rem) clamp(1rem, 2vw, 1.4rem);
+  display: grid;
+  grid-template-columns: minmax(0, 20rem) minmax(0, 1fr);
+  gap: 0.3rem 1.6rem;
+  align-items: baseline;
+}
+.r-faq dt { font-size: var(--step-0); font-weight: 600; color: var(--text); line-height: 1.35; }
+.r-faq dd { font-size: var(--step--1); line-height: 1.55; color: var(--text-2); }
 
+/* ── The cross-link ───────────────────────────────────────────────────
+   The source requires the separation to be explicit: Property Care delivers
+   work packages, Workforce supplies people the client manages, and the two
+   must never be blurred. This sits where somebody who has read the whole
+   schedule and wants the other thing will look for it. */
+.r-cross {
+  margin-top: clamp(1.6rem, 4vh, 2.2rem);
+  padding-top: clamp(1rem, 2.6vh, 1.4rem);
+  border-top: 1px solid var(--line-sand);
+  display: grid;
+  gap: 0.4rem;
+  max-width: 52ch;
+}
+/* Scoped, because `.r-foot-ask p` is (0,1,1) and outranks a bare single class
+   — the cross-link inherited the ask paragraph's size and colour and stopped
+   reading as a separate note. */
+.r-foot-ask .r-cross-k {
+  font-family: var(--font-mono);
+  font-size: var(--step--2);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--sand-text);
+}
+.r-foot-ask .r-cross-d { font-size: var(--step--1); line-height: 1.55; color: var(--text-2); }
+
+@media (max-width: 900px) {
+  .r-clients { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .r-faq > div { grid-template-columns: minmax(0, 1fr); }
+  .r-tools { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 560px) {
+  .r-clients { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* The scrub is the one device on this page a visitor operates, which is
+   exactly why it needs saying that the pair is an illustration. A
+   before/after slider reads as proof. */
+.r-scrub-note {
+  max-width: var(--maxw);
+  margin: 0.9rem auto 0;
+  padding-inline: var(--gutter);
+  font-family: var(--font-mono);
+  font-size: var(--step--2);
+  line-height: 1.5;
+  color: var(--text-2);
+}
