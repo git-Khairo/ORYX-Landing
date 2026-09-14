@@ -1,0 +1,25 @@
+# One service: the built site behind nginx.
+#
+#   docker compose up -d --build     build (or rebuild) and start
+#   docker compose logs -f           follow nginx's access/error log
+#   docker compose down              stop and remove
+#
+# Host port 8084 by default — 8080–8083 are taken on the production server —
+# and the container itself listens on 80. Override with PORT=… in front of
+# the command, or in a .env file next to this one. TLS is not here: the
+# server's reverse proxy owns the certificate and forwards to this port.
+
+services:
+  web:
+    build: .
+    image: oryx-landing:latest
+    container_name: oryx-landing
+    restart: unless-stopped
+    ports:
+      - "${PORT:-8084}:80"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1/"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 5s

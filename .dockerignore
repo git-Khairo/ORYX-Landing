@@ -1,0 +1,21 @@
+# Everything the image build does not need. The build context is sent to
+# the daemon in full, so this is also what keeps `docker compose build`
+# from shipping 14 MB of a previous dist and every unused clip.
+node_modules
+dist
+dist-ssr
+.git
+.gitignore
+.vite
+*.log
+.env
+.env.*
+.DS_Store
+.idea
+.vscode
+.claude
+frames
+docker-compose.yml
+Dockerfile
+.dockerignore
+*.md
