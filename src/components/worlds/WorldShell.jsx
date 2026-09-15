@@ -118,6 +118,16 @@ export default function WorldShell({ service, onClose, children }) {
   )
 }
 
+/* The `muted` attribute, not just the property React sets. iOS Safari reads
+   the attribute when it weighs a muted source for autoplay and cellular
+   preload; without it the observer's `play()` above can be refused on an
+   iPhone and the section shows its poster — or, with no poster, nothing. */
+const muteAttr = (node) => {
+  if (!node) return
+  node.muted = true
+  node.setAttribute('muted', '')
+}
+
 /** Film or still — the origin plate is an image, so both have to be handled. */
 export function Media({ clip, className = '' }) {
   if (!clip?.src) return <div className={`world-film ${className}`} aria-hidden="true" />
@@ -127,6 +137,7 @@ export function Media({ clip, className = '' }) {
         <img src={clip.src} alt="" />
       ) : (
         <video
+          ref={muteAttr}
           src={clip.src}
           poster={clip.poster}
           muted

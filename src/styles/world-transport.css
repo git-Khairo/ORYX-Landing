@@ -946,11 +946,28 @@
 .t-pod-meta { font-size: var(--step--2); color: var(--text-2); }
 
 @media (max-width: 900px) {
-  .t-manifest { grid-template-columns: repeat(2, 1fr); }
+  /* In flow under the copy, not hung off the foot of the frame. Absolute and
+     half-translated it sat exactly over the headline and the promise on a
+     phone — measured at 85–93% overlap — because the copy is anchored to the
+     same bottom edge it was hanging from. */
+  .t-manifest {
+    grid-template-columns: repeat(2, 1fr);
+    position: relative;
+    left: auto;
+    right: auto;
+    bottom: auto;
+    transform: none;
+    margin-top: 1.4rem;
+    z-index: 1;
+  }
   .t-route,
   .t-inside-block { grid-template-columns: 1fr; }
-  .t-route-intro,
-  .t-pod { position: static; }
+  /* `.t-pod` stays `relative`. It was made static here too, which let its
+     absolutely positioned stamp escape to the scroll container and sit at
+     "bottom: 12%" of the *screen* — a DELIVERED stamp riding down the whole
+     page over the service cards. The intro block is sticky on desktop and
+     static is right for it on a phone. */
+  .t-route-intro { position: static; }
   .t-figs { grid-template-columns: 1fr; }
   .t-stops { --paddingLeft: 3.4rem; --rail: 1.8rem; }
 }

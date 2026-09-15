@@ -69,15 +69,37 @@ export default function FilmStage({ activeId, enter, cam, hold, phase, reduced }
   const prevId = activeId ? prev.current : null
 
   useEffect(() => {
+    /* A refused `play()` is not the end of the shot. Muted autoplay is
+       "normally" allowed, and on a phone "normally" means: not in Low Power
+       Mode, not with Safari's auto-play set to never, not on a data saver.
+       Swallowing the rejection left those visitors with a black stage under
+       the copy. The poster holds the frame, and the first gesture — a tap, a
+       scroll — starts the live shot, the same way the Hero and the soundtrack
+       are armed. */
+    let off = () => {}
+    const arm = (node) => {
+      off()
+      const kick = () => { off(); node.play?.().catch(() => {}) }
+      const evs = ['pointerdown', 'keydown', 'touchstart', 'wheel']
+      evs.forEach((e) => window.addEventListener(e, kick, { once: true, passive: true }))
+      off = () => evs.forEach((e) => window.removeEventListener(e, kick))
+    }
     Object.entries(videos.current).forEach(([id, node]) => {
       if (!node) return
       if (id === activeId) {
+        /* The attribute as well as the property: React sets `muted` as a
+           property only, and the property is what the autoplay policy reads
+           at play time — but the attribute is what a browser consults when
+           it decides whether to *preload* a muted source on cellular. */
+        node.muted = true
+        node.setAttribute('muted', '')
         node.currentTime = 0
-        if (!reduced) node.play?.().catch(() => {})
+        if (!reduced) node.play?.().catch(() => arm(node))
       } else {
         node.pause?.()
       }
     })
+    return () => off()
   }, [activeId, reduced])
 
   /* The wipe itself.
@@ -166,6 +188,7 @@ export default function FilmStage({ activeId, enter, cam, hold, phase, reduced }
                   videos.current[id] = node
                 }}
                 src={clip.src}
+                poster={clip.poster}
                 muted
                 playsInline
                 preload="auto"

@@ -382,6 +382,15 @@
    reveals text the visitor cannot see is not discoverable. */
 @media (max-width: 1000px) {
   .gate { grid-template-columns: 1fr; height: auto; overflow: visible; }
+  /* One column means one column. Above this width the doors sit in column 2
+     and the panel in column 1; those placements do not reset on their own,
+     and a `grid-column: 2` on a one-column grid creates an implicit second
+     column — which is exactly what happened: the panel squeezed into a
+     narrow strip beside the doors on every phone. Both are placed in column
+     1 explicitly, doors first, panel under them: the doors are the point of
+     the page and lead in the DOM, so the visual order now matches. */
+  .doors { grid-column: 1; grid-row: 1; }
+  .purpose { grid-column: 1; grid-row: 2; border-right: 0; border-top: 1px solid var(--line); }
   /* The spine is a wide-screen idea — on a phone the panel is not tall enough
      for a rotated wordmark to be anything but a stripe, so it goes. */
   .purpose { grid-template-columns: 1fr; overflow: visible; }
@@ -393,7 +402,11 @@
   .door::before { display: none; }
   .door-film { opacity: 1; }
   .door-spine { display: none; }
-  .door-open { opacity: 1; transform: none; position: static; padding-top: 30svh; }
+  /* `relative`, not `static`: the copy keeps its place in flow either way,
+     but `z-index` is ignored on a static box, and the film underneath is
+     absolutely positioned — so `static` put every door's title and promise
+     BEHIND its own video, and phones showed three silent clips. */
+  .door-open { opacity: 1; transform: none; position: relative; padding-top: 30svh; }
   .door-index { text-align: left; padding-inline: clamp(1.4rem, 4vh, 2.6rem); }
   .door-body { display: none; }
 

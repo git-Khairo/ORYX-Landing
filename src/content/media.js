@@ -39,8 +39,14 @@ export const film = {
      848×480 was already flagged as soft. The grade and the scrim carry a
      good deal of it. The real fix is regeneration at 720p+ (a 16:9 finale
      from the first/last-frame Space, wide keyframes) or an upscale pass. */
+  /* Every intro clip carries a first-frame poster. iOS paints nothing for a
+     video that has not started, and muted autoplay is refused there whenever
+     Low Power Mode is on or Safari's auto-play setting says so — which left
+     the whole film as black frames under the copy. With a poster the stage
+     always shows the shot, and FilmStage retries `play()` on the first touch. */
   oryxWide: {
     src: '/film/01-wide.mp4',
+    poster: '/film/01-wide.jpg',
     /* Where the animal stands on the first frame, as a fraction of the plate —
        it walks left to right across the shot. Documentation for the `stalk`
        camera; this act runs `cam: 'none'`. */
@@ -48,9 +54,11 @@ export const film = {
   },
   oryxBush: {
     src: '/film/02-bush.mp4',
+    poster: '/film/02-bush.jpg',
   },
   oryxPush: {
     src: '/film/03-push.mp4',
+    poster: '/film/03-push.jpg',
   },
   /* Ends on the shot the whole identity rests on: the head square to camera,
      the horns rising in a narrow V, and the sun sitting exactly in the gap
@@ -58,6 +66,7 @@ export const film = {
      mark lands after it has stopped — see the phase timers in Hero.jsx. */
   oryxSun: {
     src: '/film/04-sun.mp4',
+    poster: '/film/04-sun.jpg',
     /* Where the horns converge in this clip, as fractions of the frame.
        Documentation — the live numbers are `--horn-x` / `--horn-y` /
        `--mark-w` on `.origin-mark` in hero.css. */
@@ -66,10 +75,16 @@ export const film = {
 
   facilities: {
     src: 'https://videos.pexels.com/video-files/8783705/8783705-hd_1920_1080_30fps.mp4',
+    /* First frame, so the section paints before the file arrives — and on an
+       iPhone that refuses muted autoplay, instead of a black band. */
+    poster: 'https://images.pexels.com/videos/8783705/pictures/preview-0.jpeg',
     credit: 'https://www.pexels.com/video/drone-footage-of-modern-city-buildings-8783705/',
   },
   transport: {
     src: 'https://videos.pexels.com/video-files/32838797/13996854_1920_1080_30fps.mp4',
+    /* First frame, so the section paints before the file arrives — and on an
+       iPhone that refuses muted autoplay, instead of a black band. */
+    poster: 'https://images.pexels.com/videos/32838797/copells-32838797.jpeg?auto=compress&cs=tinysrgb&w=1600',
     credit: 'https://www.pexels.com/video/efficient-warehouse-forklift-loading-outdoors-32838797/',
   },
   /* A uniformed team walking equipment toward a modern building — people being
@@ -77,6 +92,9 @@ export const film = {
      floor-scrubbing, which read as janitorial rather than as staffing. */
   workforce: {
     src: 'https://videos.pexels.com/video-files/6195153/6195153-hd_1920_1080_25fps.mp4',
+    /* First frame, so the section paints before the file arrives — and on an
+       iPhone that refuses muted autoplay, instead of a black band. */
+    poster: 'https://images.pexels.com/videos/6195153/pexels-photo-6195153.jpeg?auto=compress&cs=tinysrgb&w=1600',
     credit: 'https://www.pexels.com/video/cleaners-carrying-working-tools-6195153/',
   },
   /* A room mid-renovation in an existing building: plaster, dust sheets, a
@@ -111,6 +129,9 @@ export const film = {
      is why that act looked black — not a bug in the player. */
   outro: {
     src: 'https://videos.pexels.com/video-files/28542398/12414662_1280_720_30fps.mp4',
+    /* First frame, so the section paints before the file arrives — and on an
+       iPhone that refuses muted autoplay, instead of a black band. */
+    poster: 'https://images.pexels.com/videos/28542398/pictures/preview-0.jpg',
     credit: 'https://www.pexels.com/video/sunset-28542398/',
   },
 }
@@ -144,6 +165,9 @@ export const promo = {
     so the last two things on the page are not the same shot twice. */
 export const footerFilm = {
   src: 'https://videos.pexels.com/video-files/8783386/8783386-hd_1920_1080_30fps.mp4',
+  /* First frame, so the section paints before the file arrives — and on an
+     iPhone that refuses muted autoplay, instead of a black band. */
+  poster: 'https://images.pexels.com/videos/8783386/pexels-photo-8783386.jpeg?auto=compress&cs=tinysrgb&w=1600',
   credit: 'https://www.pexels.com/video/drone-footage-of-tall-buildings-in-the-city-8783386/',
 }
 
@@ -151,10 +175,16 @@ export const footerFilm = {
 export const portal = {
   transport: {
     src: 'https://videos.pexels.com/video-files/6170613/6170613-hd_1920_1080_25fps.mp4',
+    /* First frame, so the section paints before the file arrives — and on an
+       iPhone that refuses muted autoplay, instead of a black band. */
+    poster: 'https://images.pexels.com/videos/6170613/pexels-photo-6170613.jpeg?auto=compress&cs=tinysrgb&w=1600',
     credit: 'https://www.pexels.com/video/male-worker-loading-boxes-into-a-white-van-6170613/',
   },
   workforce: {
     src: 'https://videos.pexels.com/video-files/13422071/13422071-hd_1920_1080_30fps.mp4',
+    /* First frame, so the section paints before the file arrives — and on an
+       iPhone that refuses muted autoplay, instead of a black band. */
+    poster: 'https://images.pexels.com/videos/13422071/pictures/preview-0.jpeg',
     credit: 'https://www.pexels.com/video/workers-cleaning-warehouse-13422071/',
   },
   /* From the same shoot as the opening clip, so the two cut together: an

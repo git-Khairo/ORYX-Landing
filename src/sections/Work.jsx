@@ -22,6 +22,27 @@ import { portal } from '../content/media'
  * carries the same content in a third of the height, which is what lets the
  * whole gateway hold to exactly one screen.
  */
+/* React sets `muted` as a DOM property only — it never writes the attribute
+   (facebook/react#10389) — and iOS Safari decides whether an `autoplay` video
+   may start by reading the attribute. So on an iPhone the three doors sat
+   black while every desktop browser played them. The attribute is set by
+   hand and `play()` is called explicitly; when the policy still refuses (Low
+   Power Mode, Safari's auto-play set to never) the first gesture starts it.
+   Module-level so the ref is stable and runs once per mount, not per render. */
+function startMuted(node) {
+  if (!node) return
+  node.muted = true
+  node.setAttribute('muted', '')
+  node.play?.().catch(() => {
+    const evs = ['pointerdown', 'touchstart', 'keydown', 'wheel']
+    const kick = () => {
+      evs.forEach((e) => window.removeEventListener(e, kick))
+      node.play?.().catch(() => {})
+    }
+    evs.forEach((e) => window.addEventListener(e, kick, { once: true, passive: true }))
+  })
+}
+
 export default function Work({ onOpenService, warm = true }) {
   /* Nullable, and starting closed. Nothing is open until you point at
      something — the page opens on three equal doors rather than on one that
@@ -66,7 +87,9 @@ export default function Work({ onOpenService, warm = true }) {
                 <span className="door-film" aria-hidden="true">
                   {warm && portal[s.id]?.src && (
                     <video
+                      ref={startMuted}
                       src={portal[s.id].src}
+                      poster={portal[s.id].poster}
                       muted
                       loop
                       autoPlay

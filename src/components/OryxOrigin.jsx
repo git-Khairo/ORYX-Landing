@@ -50,8 +50,22 @@ export default function OryxOrigin({ play, phase, reduced }) {
       v.pause?.()
       return
     }
+    v.muted = true
+    v.setAttribute('muted', '')
     v.currentTime = 0
-    if (!reduced) v.play?.().catch(() => {})
+    /* Same retry as FilmStage: a refused muted autoplay on a phone holds the
+       poster and starts on the first gesture rather than leaving the finale
+       black under the mark. */
+    let off = () => {}
+    if (!reduced) {
+      v.play?.().catch(() => {
+        const kick = () => { off(); v.play?.().catch(() => {}) }
+        const evs = ['pointerdown', 'keydown', 'touchstart', 'wheel']
+        evs.forEach((e) => window.addEventListener(e, kick, { once: true, passive: true }))
+        off = () => evs.forEach((e) => window.removeEventListener(e, kick))
+      })
+    }
+    return () => off()
   }, [play, reduced])
 
 
@@ -144,7 +158,7 @@ export default function OryxOrigin({ play, phase, reduced }) {
     <div className="origin origin--sunset" ref={root} aria-hidden="true">
       <div className="origin-plate">
         <div className="origin-photo">
-          <video ref={video} src={clip.src} muted playsInline preload="auto" tabIndex={-1} />
+          <video ref={video} src={clip.src} poster={clip.poster} muted playsInline preload="auto" tabIndex={-1} />
           {/* Graded to the brand before anything is drawn on top. */}
           <span className="origin-grade" />
         </div>
