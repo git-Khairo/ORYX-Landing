@@ -41,18 +41,38 @@ export function useScrollLock(active) {
   }, [active])
 }
 
-/** Escape closes. Capture phase, so it wins over anything below. */
+/**
+ * Escape closes the overlay on top, and only that one.
+ *
+ * Overlays now stack: a service page, a detail popup over it, the request page
+ * over that. Each used to register its own capture listener on `window`, and
+ * `stopPropagation` does not stop sibling listeners on the same target, so one
+ * key press closed every layer at once. A single listener and a stack fix it:
+ * whatever mounted last is what Escape means.
+ */
+const escStack = []
+const onEscKey = (e) => {
+  if (e.key !== 'Escape' || !escStack.length) return
+  e.stopPropagation()
+  /* A held key repeats. Without this, holding Escape walks down the whole
+     stack, which is exactly what the stack exists to prevent. */
+  if (e.repeat) return
+  escStack[escStack.length - 1].current?.()
+}
+
 export function useEscape(active, onEscape) {
+  const cb = useRef(onEscape)
+  cb.current = onEscape
   useEffect(() => {
     if (!active) return
-    const onKey = (e) => {
-      if (e.key !== 'Escape') return
-      e.stopPropagation()
-      onEscape()
+    escStack.push(cb)
+    if (escStack.length === 1) window.addEventListener('keydown', onEscKey, true)
+    return () => {
+      const i = escStack.indexOf(cb)
+      if (i >= 0) escStack.splice(i, 1)
+      if (!escStack.length) window.removeEventListener('keydown', onEscKey, true)
     }
-    window.addEventListener('keydown', onKey, true)
-    return () => window.removeEventListener('keydown', onKey, true)
-  }, [active, onEscape])
+  }, [active])
 }
 
 const FOCUSABLE = [
@@ -84,6 +104,10 @@ export function useFocusTrap(active) {
 
     const onKey = (e) => {
       if (e.key !== 'Tab') return
+      /* A popup sits inside a service page that traps focus too. Without this
+         the outer trap also runs and can pull focus out from under the inner
+         one. */
+      e.stopPropagation()
       const items = [...root.querySelectorAll(FOCUSABLE)].filter(
         (el) => el.offsetParent !== null,
       )

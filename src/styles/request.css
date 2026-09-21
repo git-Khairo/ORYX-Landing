@@ -1,0 +1,288 @@
+/* ══ The request page ═══════════════════════════════════════════════════
+   A full page in the group's own voice: Cinzel and Montserrat on Oryx Black,
+   whichever service it was opened from. It speaks as ORYX, because the form
+   is where the three services become one company again.
+
+   It enters on the same chevron the service pages use, so the way in is the
+   same gesture everywhere on the site. */
+.req {
+  position: fixed;
+  inset: 0;
+  z-index: 130;
+  background: var(--ground);
+  color: var(--text-2);
+  font-family: var(--font);
+  animation: world-in 0.72s var(--ease-inout) both;
+}
+.req-shell { height: 100%; display: flex; flex-direction: column; }
+
+/* ── Bar ────────────────────────────────────────────────────────────── */
+.req-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.8rem var(--gutter);
+  border-bottom: 1px solid var(--line);
+}
+.req-mark { display: inline-flex; align-items: center; gap: 0.7rem; }
+.req-mark i {
+  display: block;
+  width: 14px;
+  aspect-ratio: 0.4161;
+  background: var(--sand);
+  -webkit-mask: url('/mark.png') center / contain no-repeat;
+  mask: url('/mark.png') center / contain no-repeat;
+}
+.req-mark span {
+  font-family: var(--font-group);
+  font-size: clamp(0.78rem, 0.95vw, 0.95rem);
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--oryx-white);
+}
+.req-bar-r { display: inline-flex; align-items: center; gap: 0.6rem; }
+.req-close {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.5rem 0.8rem;
+  border: 1px solid var(--line);
+  font-size: var(--step--2);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--text-2);
+  transition: color 0.25s var(--ease-out), border-color 0.25s var(--ease-out);
+}
+.req-close:hover { color: var(--oryx-white); border-color: var(--line-sand); }
+
+/* ── Body ───────────────────────────────────────────────────────────── */
+.req-scroll { flex: 1; overflow-y: auto; overscroll-behavior: contain; }
+.req-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  gap: clamp(1.8rem, 5vw, 5rem);
+  align-items: start;
+  width: 100%;
+  max-width: 76rem;
+  margin: 0 auto;
+  padding: clamp(1.6rem, 5vh, 3.6rem) var(--gutter) clamp(2rem, 6vh, 4rem);
+}
+
+.req-side { display: grid; gap: clamp(0.9rem, 2.2vh, 1.4rem); position: sticky; top: clamp(1.6rem, 5vh, 3.6rem); }
+.req-kicker {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: var(--step--2);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--sand-text);
+}
+.req-kicker::after { content: ''; width: 42px; height: 1px; background: var(--line-sand); }
+.req-side h2 {
+  font-family: var(--font-display);
+  font-size: clamp(1.9rem, 1.4rem + 2vw, 3.1rem);
+  line-height: 1.08;
+  letter-spacing: var(--track-display);
+  color: var(--oryx-white);
+  text-wrap: balance;
+}
+.req-lede { font-size: var(--step-0); line-height: 1.65; max-width: 42ch; }
+
+.req-steps { list-style: none; margin: 0.4rem 0 0; padding: 0; display: grid; }
+.req-steps li {
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  align-items: center;
+  gap: 0.15rem 0.8rem;
+  padding: 0.85rem 0;
+  border-top: 1px solid var(--line);
+}
+.req-steps li:last-child { border-bottom: 1px solid var(--line); }
+.req-step-i {
+  grid-row: span 2;
+  display: grid;
+  place-items: center;
+  width: 2.6rem;
+  height: 2.6rem;
+  border: 1px solid var(--line-sand);
+  color: var(--sand);
+}
+.req-step-n {
+  font-size: var(--step--2);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-3);
+}
+.req-step-k { font-size: var(--step-0); font-weight: 600; color: var(--oryx-white); }
+.req-step-d { grid-column: 2 / -1; font-size: var(--step--1); line-height: 1.5; color: var(--text-2); }
+.req-slogan { font-size: var(--step--1); font-weight: 600; letter-spacing: 0.03em; }
+
+/* ── Form ───────────────────────────────────────────────────────────── */
+.req-form,
+.req-done {
+  display: grid;
+  gap: clamp(0.9rem, 2vh, 1.2rem);
+  padding: clamp(1.1rem, 2.6vw, 2rem);
+  border: 1px solid var(--line);
+  background: var(--raise);
+}
+.req-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(0.9rem, 2vh, 1.2rem) 1rem; }
+
+.req-field { display: grid; gap: 0.45rem; min-width: 0; }
+.req-field label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: var(--step--2);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--text-2);
+}
+.req-field label .icon { color: var(--sand); }
+.req-field label span { white-space: nowrap; }
+.req-field label em {
+  margin-left: auto;
+  font-style: normal;
+  letter-spacing: 0.08em;
+  color: var(--text-3);
+}
+.req-field input,
+.req-field select,
+.req-field textarea {
+  width: 100%;
+  padding: 0.85rem 0.95rem;
+  border: 1px solid var(--line);
+  border-radius: 0;
+  background: var(--ground);
+  color: var(--oryx-white);
+  font: inherit;
+  /* Sixteen pixels and no less: iOS zooms the page into any field set
+     smaller, and does not zoom back out. */
+  font-size: max(1rem, 16px);
+  line-height: 1.4;
+  transition: border-color 0.25s var(--ease-out), background 0.25s var(--ease-out);
+}
+.req-field textarea { resize: vertical; min-height: 6.5rem; }
+.req-field input::placeholder,
+.req-field textarea::placeholder { color: var(--text-3); }
+.req-field input:hover,
+.req-field select:hover,
+.req-field textarea:hover { border-color: var(--line-sand); }
+.req-field input:focus-visible,
+.req-field select:focus-visible,
+.req-field textarea:focus-visible {
+  outline: none;
+  border-color: var(--sand);
+  background: var(--sunk);
+}
+.req-field.is-bad input,
+.req-field.is-bad select { border-color: #d98a6a; }
+/* An invalid field keeps its warning border, so focus needs its own ring
+   there or a keyboard user cannot see which bad field they are on. */
+.req-field.is-bad input:focus-visible,
+.req-field.is-bad select:focus-visible { outline: 2px solid var(--sand); outline-offset: 2px; }
+.req-err { font-size: var(--step--1); color: #e7a386; }
+.req-link { color: var(--sand); text-decoration: underline; text-underline-offset: 0.2em; }
+.req-link:hover { color: var(--oryx-white); }
+
+.req-select { position: relative; }
+.req-select select { appearance: none; -webkit-appearance: none; padding-right: 2.6rem; cursor: pointer; }
+.req-select select:invalid,
+.req-select select option[value=''] { color: var(--text-3); }
+.req-select option { color: #1c1c1a; background: #f4f1e8; }
+.req-select::after {
+  content: '';
+  position: absolute;
+  right: 1.05rem;
+  top: 50%;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-right: 1.5px solid var(--sand);
+  border-bottom: 1.5px solid var(--sand);
+  transform: translateY(-70%) rotate(45deg);
+  pointer-events: none;
+}
+
+/* The second dropdown arrives. Transform only, so it is never invisible. */
+.req-field--sub { animation: req-sub 0.45s var(--ease-out) both; }
+@keyframes req-sub {
+  from { transform: translateY(-10px); }
+  to { transform: none; }
+}
+.req.is-still .req-field--sub { animation: none; }
+
+.req-trap { position: absolute; left: -200vw; width: 1px; height: 1px; overflow: hidden; }
+
+.req-foot { display: flex; align-items: center; flex-wrap: wrap; gap: 0.8rem 1.4rem; margin-top: 0.3rem; }
+.req-submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.7rem;
+  padding: 1rem 1.7rem;
+  border: 1px solid var(--sand);
+  background: var(--sand);
+  font-size: var(--step--2);
+  font-weight: 700;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--oryx-black);
+  transition: background 0.3s var(--ease-out), border-color 0.3s var(--ease-out);
+}
+.req-submit i { display: grid; transition: transform 0.3s var(--ease-out); }
+.req-submit:hover { background: var(--oryx-white); border-color: var(--oryx-white); }
+.req-submit:hover i { transform: translateX(4px); }
+.req-submit:disabled { opacity: 0.6; cursor: progress; }
+.req-ghost {
+  padding: 1rem 1.4rem;
+  border: 1px solid var(--line-sand);
+  font-size: var(--step--2);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--text);
+}
+.req-ghost:hover { border-color: var(--sand); color: var(--sand); }
+.req-small { font-size: var(--step--1); color: var(--text-3); }
+.req-fail { padding: 0.8rem 1rem; border: 1px solid #d98a6a; font-size: var(--step--1); color: #f0c2ae; }
+
+/* ── Sent ───────────────────────────────────────────────────────────── */
+.req-done { align-content: start; outline: none; }
+.req-done-i {
+  display: grid;
+  place-items: center;
+  width: 3.4rem;
+  height: 3.4rem;
+  background: var(--sand);
+  color: var(--oryx-black);
+}
+.req-done h3 {
+  font-family: var(--font-display);
+  font-size: var(--step-2);
+  letter-spacing: var(--track-display);
+  color: var(--oryx-white);
+}
+.req-done p { font-size: var(--step-0); line-height: 1.65; max-width: 52ch; overflow-wrap: anywhere; }
+.req-done-actions { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 0.4rem; }
+
+@media (max-width: 900px) {
+  .req-grid { grid-template-columns: minmax(0, 1fr); }
+  .req-side { position: static; }
+  /* The three steps are reassurance, not instructions. On a phone the form
+     has to be reachable without scrolling past them. */
+  .req-steps { display: none; }
+}
+@media (max-width: 560px) {
+  .req-row { grid-template-columns: minmax(0, 1fr); }
+  .req-close span { display: none; }
+  .req-close { padding: 0.55rem 0.6rem; }
+  .req-submit { width: 100%; }
+  .req-done-actions > * { width: 100%; }
+}

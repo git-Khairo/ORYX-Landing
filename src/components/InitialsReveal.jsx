@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import gsap from 'gsap'
 import { brand } from '../content/copy'
+import { SloganWord } from './Slogan'
 
 /**
  * O · R · Y · X resolving into Our Reliability, Your eXcellence.
@@ -40,14 +41,14 @@ export default function InitialsReveal({ play, reduced }) {
   }, [play, reduced])
 
   return (
-    <h2 className="initials" ref={root} aria-label={`ORYX — ${brand.slogan}`}>
+    <h2 className="initials" ref={root} aria-label={`ORYX. ${brand.slogan}`}>
       {brand.letters.map(({ k, w }) => (
         <span className="ir-col" key={k} aria-hidden="true">
           <span className="ir-mask">
             <span className="ir-initial">{k}</span>
           </span>
           <span className="ir-rule" />
-          <span className="ir-word">{w}</span>
+          <span className="ir-word"><SloganWord k={k} w={w} /></span>
         </span>
       ))}
     </h2>

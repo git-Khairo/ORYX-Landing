@@ -142,6 +142,9 @@ export default function OryxOrigin({ play, phase, reduced }) {
             top: to.top,
             width: to.width,
             height: to.height,
+            /* Sand on the horns, white on the end card. It lands as the
+               white mark the identity board shows on black. */
+            backgroundColor: '#f4f1e8',
             duration: 1.2,
             ease: 'power2.inOut',
           }),

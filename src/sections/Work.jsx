@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { services, pillars, brand } from '../content/copy'
 import { portal } from '../content/media'
+import Slogan from '../components/Slogan'
+import Icon from '../components/Icon'
 
 /**
  * The gateway, and the group beneath it.
@@ -112,7 +114,7 @@ export default function Work({ onOpenService, warm = true }) {
                   <span className="door-promise">{s.promise}</span>
                   <span className="door-body">{s.body}</span>
                   <span className="door-go" aria-hidden="true">
-                    Enter <i>→</i>
+                    Enter <i aria-hidden="true"><Icon name="arrow" size={14} /></i>
                   </span>
                 </span>
               </button>
@@ -202,7 +204,7 @@ export default function Work({ onOpenService, warm = true }) {
             })}
           </div>
 
-          <p className="purpose-foot">{brand.slogan}</p>
+          <Slogan className="purpose-foot" />
         </div>
 
         {/* The wordmark, down the outer edge, answering the door spines. */}

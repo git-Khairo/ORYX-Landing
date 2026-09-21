@@ -2,6 +2,9 @@ import { useEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
 import FilmStage from '../components/FilmStage'
 import InitialsReveal from '../components/InitialsReveal'
+import Slogan from '../components/Slogan'
+import Icon from '../components/Icon'
+import { SoundToggle } from '../components/Sound'
 import { acts, brand } from '../content/copy'
 import { promo } from '../content/media'
 import { usePrefersReduced } from '../lib/usePrefersReduced'
@@ -109,15 +112,17 @@ function PromoFilm({ onFinish }) {
         )}
       </div>
 
+      {done && <EndPlate />}
+
       <div className="hero-copy shell">
         {done && (
-          <div className="hero-end">
+          <div className="hero-end is-open">
             <span className="hero-end-mark" aria-hidden="true" />
-            <p className="hero-end-word">{brand.full}</p>
-            <p className="hero-end-slogan">{brand.slogan}</p>
+            <p className="sr-only">{brand.full}</p>
             <button type="button" className="hero-enter" onClick={dismiss}>
-              Enter worlds <i aria-hidden="true">→</i>
+              Enter
             </button>
+            <Slogan className="hero-end-slogan" />
           </div>
         )}
       </div>
@@ -129,6 +134,10 @@ function PromoFilm({ onFinish }) {
             <i aria-hidden="true" />
           </button>
         )}
+        {done && <p className="hero-caption">The horns became the mark</p>}
+        {/* The soundtrack belongs to this film, so the switch for it has to be
+            reachable while the film is playing and not only after it. */}
+        <SoundToggle className="hero-sound" />
       </div>
     </section>
   )
@@ -287,6 +296,12 @@ function PlayedSequence({ onFinish }) {
         reduced={reduced}
       />
 
+      {/* The end card's own ground: the horns at the left edge, fading into
+          black, with the mark's construction lines drawn over them in sand.
+          It is the last thing the film says, held still. Decorative, so it
+          may fade in; nothing a visitor needs depends on it arriving. */}
+      {centred && <EndPlate />}
+
       {/* The shot's text is announced once, not letter by letter. */}
       <p className="sr-only" aria-live="polite">
         {act.line} {act.sub}
@@ -328,11 +343,14 @@ function PlayedSequence({ onFinish }) {
         {act.kind === 'finale' && (phase === 'travel' || ended) && (
           <div className={`hero-end ${ended ? 'is-open' : ''}`}>
             <span className="hero-end-slot" aria-hidden="true" />
-            <p className="hero-end-word">{brand.full}</p>
-            <p className="hero-end-slogan">{brand.slogan}</p>
+            <p className="sr-only">{brand.full}</p>
+            {/* The door, then the line under it: the mark, one word to press,
+                and the slogan as the sign-off. The group's name is not set
+                here because the mark above is the name. */}
             <button type="button" className="hero-enter" onClick={dismiss}>
-              Enter worlds <i aria-hidden="true">→</i>
+              Enter
             </button>
+            <Slogan className="hero-end-slogan" />
           </div>
         )}
       </div>
@@ -347,7 +365,42 @@ function PlayedSequence({ onFinish }) {
             <i aria-hidden="true" />
           </button>
         )}
+        {ended && <p className="hero-caption">The horns became the mark</p>}
+        {/* The soundtrack belongs to this film, so the switch for it has to be
+            reachable while the film is playing and not only after it. */}
+        <SoundToggle className="hero-sound" />
       </div>
     </section>
+  )
+}
+
+/**
+ * The plate behind the end card.
+ *
+ * A still of the horns, cropped hard to the left edge and taken almost to
+ * black, with the straight lines the mark is constructed from laid over it.
+ * The lines are the two arms of the V carried on past their ends, and the
+ * crossing diagonals that fix where the arms meet, which is how the identity
+ * board draws the mark's construction.
+ */
+function EndPlate() {
+  return (
+    <div className="hero-end-plate" aria-hidden="true">
+      <span className="hero-end-photo" />
+      <svg viewBox="0 0 800 750" preserveAspectRatio="xMinYMid slice">
+        <g fill="none" stroke="currentColor" strokeWidth="1">
+          <path d="M180 0 L470 750" />
+          <path d="M235 0 L600 750" />
+          <path d="M690 0 L330 560" />
+          <path d="M760 40 L400 640" />
+          <path d="M120 120 L640 640" />
+          <path d="M210 150 L520 470" />
+          <path d="M560 250 L250 560" />
+          <path d="M640 300 L330 640" />
+          <path d="M330 560 L600 750" />
+          <path d="M400 640 L300 750" />
+        </g>
+      </svg>
+    </div>
   )
 }

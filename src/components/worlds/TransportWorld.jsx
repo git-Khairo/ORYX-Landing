@@ -2,9 +2,14 @@
    the section, so it does not share the loading scene's driver. */
 import { useEffect, useRef, useState } from 'react'
 import WorldShell, { Media } from './WorldShell'
-import { film, portal, gallery, closing } from '../../content/media'
+import { film, gallery, closing } from '../../content/media'
 import { clients } from '../../content/copy'
 import { useSmoothProgress } from '../../lib/useReveal'
+import { ctaFor, emailFor, transportServices } from '../../content/requests'
+import { cardImage } from '../../lib/cardImage'
+import { SoundToggle } from '../Sound'
+import { Social } from '../../sections/Footer'
+import Icon from '../Icon'
 
 /**
  * Transport & Logistics — "The Route."
@@ -48,10 +53,16 @@ export default function TransportWorld({ service, onClose, onRequest }) {
               the publication gate — see the note on `figures` in copy.js. The
               badge describes the consignment instead, which is what the dot
               beside it is actually reporting. */}
-          <span className="t-nav-status">
-            <i aria-hidden="true" />
-            Tracked · End to end
-          </span>
+          <div className="t-nav-r">
+            <span className="t-nav-status">
+              <i aria-hidden="true" />
+              Tracked end to end
+            </span>
+            <SoundToggle bare />
+            <button type="button" className="t-nav-cta" onClick={() => onRequest(service.id)}>
+              {ctaFor(service.id)}
+            </button>
+          </div>
         </div>
         <span className="t-nav-progress" aria-hidden="true" />
       </header>
@@ -61,7 +72,7 @@ export default function TransportWorld({ service, onClose, onRequest }) {
         <Media clip={film.transport} />
         <div className="t-open-copy">
           <p className="world-eyebrow" data-reveal>
-            {service.index} · {service.title}
+            {service.index} / {service.title}
           </p>
           {/* The headline carries the opening, not the service name — the name
               is already in the eyebrow above it and in the navigation. */}
@@ -78,10 +89,10 @@ export default function TransportWorld({ service, onClose, onRequest }) {
             page uses. It tells you what kind of page this is before a word of
             body copy is read. */}
         <dl className="t-manifest" data-reveal>
-          <div><dt>Origin</dt><dd>Depot · Randstad</dd></div>
-          <div><dt>Service</dt><dd>Scheduled · On demand</dd></div>
-          <div><dt>Cover</dt><dd>24 / 7</dd></div>
-          <div><dt>Proof</dt><dd>Signed · Timestamped</dd></div>
+          <div><dt>Origin</dt><dd>Amsterdam hub</dd></div>
+          <div><dt>Service</dt><dd>Scheduled and on demand</dd></div>
+          <div><dt>Reach</dt><dd>Five capitals</dd></div>
+          <div><dt>Proof</dt><dd>Signed and timestamped</dd></div>
         </dl>
       </header>
 
@@ -92,7 +103,9 @@ export default function TransportWorld({ service, onClose, onRequest }) {
       <NetworkMap map={world.map} />
 
       {/* ── The route ─────────────────────────────────────────────────── */}
-      <Route stops={world.route} lede={world.lede} shot={shots[0]} />
+      {/* A generated ORYX picture takes over from the stock still as soon as
+          one is dropped in `src/assets/cards/transport/`. */}
+      <Route stops={world.route} lede={world.lede} shot={cardImage('transport/route') || shots[0]} />
 
       {/* ── What it is, as a load ─────────────────────────────────────
           The four things this service is, as four crates going onto a lorry
@@ -117,12 +130,6 @@ export default function TransportWorld({ service, onClose, onRequest }) {
             </li>
           ))}
         </ol>
-      </section>
-
-      {/* ── Interlude ─────────────────────────────────────────────────── */}
-      <section className="t-interlude">
-        <Media clip={portal.transport} />
-        <p className="t-interlude-line" data-reveal>{service.body}</p>
       </section>
 
       {/* ── The board ─────────────────────────────────────────────────
@@ -183,9 +190,6 @@ export default function TransportWorld({ service, onClose, onRequest }) {
         <div className="t-inside-copy">
           <p className="world-kicker" data-reveal>The services</p>
           <h3 className="t-inside-head" data-reveal>Five things we run for you</h3>
-          <p className="world-line" data-reveal>
-            Every one of them sits under one agreement, with one point of contact.
-          </p>
           <ol className="t-inside">
             {world.inside.map((it, i) => (
               <li key={it.k} data-reveal>
@@ -199,7 +203,7 @@ export default function TransportWorld({ service, onClose, onRequest }) {
           </ol>
         </div>
 
-        <Pod shot={shots[2]} />
+        <Pod shot={cardImage('transport/proof') || shots[2]} />
       </section>
 
       <TransportFooter service={service} onClose={onClose} onRequest={onRequest} />
@@ -223,8 +227,8 @@ function TransportFooter({ service, onClose, onRequest }) {
         <div className="t-foot-call-inner">
           <p className="t-foot-prompt">{service.world.prompt}</p>
           <div className="t-foot-actions">
-            <button type="button" className="t-foot-cta" onClick={onRequest}>
-              Book a collection <i aria-hidden="true">→</i>
+            <button type="button" className="t-foot-cta" onClick={() => onRequest(service.id)}>
+              {ctaFor(service.id)} <i aria-hidden="true"><Icon name="arrow" size={16} /></i>
             </button>
             <a className="t-foot-tel" href="tel:+310000000000">+31 (0)00 000 0000</a>
           </div>
@@ -235,27 +239,21 @@ function TransportFooter({ service, onClose, onRequest }) {
         <div>
           <h4>Services</h4>
           <ul>
-            <li>Scheduled routes</li>
-            <li>On demand</li>
-            <li>Between sites</li>
-            <li>Specialist handling</li>
+            {transportServices.map((t) => <li key={t.id}>{t.label}</li>)}
           </ul>
         </div>
         <div>
           <h4>Coverage</h4>
           <ul>
-            <li>Randstad</li>
-            <li>Nationwide</li>
-            <li>Cross-border</li>
+            <li>The Netherlands</li>
+            <li>Belgium and Luxembourg</li>
+            <li>France and Germany</li>
           </ul>
         </div>
         <div>
-          <h4>Depots</h4>
+          <h4>Network</h4>
           <ul className="t-foot-mono">
-            <li>Rotterdam · Port</li>
-            <li>Den Haag · Cross-dock</li>
-            <li>Amsterdam · Hub</li>
-            <li>Eindhoven · Drop</li>
+            {service.world.map.nodes.map((n) => <li key={n.k}>{n.k}</li>)}
           </ul>
         </div>
         <div>
@@ -265,15 +263,16 @@ function TransportFooter({ service, onClose, onRequest }) {
                 "Exception cover · always" both promised a person on the end of
                 it, which the gate blocks until it is evidenced. */}
             <li>Requests may be submitted 24/7</li>
-            <li>dispatch@oryx.example</li>
+            <li><a href={`mailto:${emailFor('transport')}`}>{emailFor('transport')}</a></li>
           </ul>
         </div>
       </div>
 
       <div className="t-foot-base">
-        <span>ORYX Dispatch — a service of ORYX GROUP</span>
+        <span>ORYX Dispatch, a service of ORYX GROUP</span>
+        <Social />
         <button type="button" className="t-foot-back" onClick={onClose}>
-          ← All ORYX services
+          <Icon name="back" size={16} /> All ORYX services
         </button>
       </div>
     </footer>
@@ -388,13 +387,12 @@ function NetworkMap({ map }) {
       <div className="t-map-head">
         <p className="world-kicker" data-reveal>The network</p>
         <p className="world-line" data-reveal>
-          Fixed routes across the Randstad, and capacity to anywhere else in the
-          country on the same agreement.
+          One hub in Amsterdam, and regular runs to four more capitals.
         </p>
       </div>
 
       <figure className="t-map" data-reveal>
-        <svg viewBox="0 0 1180 340" role="img" aria-label="Route network across the Netherlands">
+        <svg viewBox="0 0 1180 340" role="img" aria-label="Route network linking Paris, Luxembourg, Brussels, Amsterdam and Berlin">
           <defs>
             <pattern id="t-grid" width="40" height="40" patternUnits="userSpaceOnUse">
               <path d="M40 0 H0 V40" fill="none" stroke="currentColor" strokeWidth="1" />
@@ -539,7 +537,7 @@ function Pod({ shot }) {
       {shot && <img src={shot.src} alt={shot.alt || ''} loading="lazy" />}
       <figcaption className="t-pod-stamp" aria-hidden="true">
         <span className="t-pod-mark">Delivered</span>
-        <span className="t-pod-meta">Signed · 11:20 · Proof returned</span>
+        <span className="t-pod-meta">Signed 11:20 / Proof returned</span>
       </figcaption>
     </figure>
   )

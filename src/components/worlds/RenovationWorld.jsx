@@ -1,8 +1,14 @@
 import { useCallback, useEffect, useId, useRef, useState } from 'react'
 import WorldShell, { Media } from './WorldShell'
 import { useMeasured } from '../../lib/useMeasured'
-import { film, portal, gallery } from '../../content/media'
+import { film, gallery } from '../../content/media'
 import { services as svcs, route, tools, clients, faq, totals } from '../../content/renovation'
+import { ctaFor, emailFor } from '../../content/requests'
+import { cardImage } from '../../lib/cardImage'
+import { SoundToggle } from '../Sound'
+import { Social } from '../../sections/Footer'
+import Sheet from '../Sheet'
+import Icon from '../Icon'
 
 /**
  * Renovation — "The Sheet."
@@ -75,6 +81,10 @@ export default function RenovationWorld({ service, onClose, onRequest }) {
           <a href="#r-trust">Trust</a>
         </nav>
 
+        <div className="r-nav-cell r-nav-sound">
+          <SoundToggle bare />
+        </div>
+
         <dl className="r-nav-cell r-nav-meta">
           <div><dt>Sheet</dt><dd>03</dd></div>
           <div><dt>Services</dt><dd>{String(totals.services).padStart(2, '0')}</dd></div>
@@ -87,7 +97,7 @@ export default function RenovationWorld({ service, onClose, onRequest }) {
         <Media clip={film.renovation} />
         <div className="r-open-copy">
           <p className="world-eyebrow" data-reveal>
-            {service.index} · {service.title}
+            {service.index} / {service.title}
           </p>
           <h2 data-reveal>
             {world.headline.split('\n').map((l) => (
@@ -106,7 +116,7 @@ export default function RenovationWorld({ service, onClose, onRequest }) {
       <Fork world={world} />
 
       {/* ── The schedule ──────────────────────────────────────────────── */}
-      <Schedule />
+      <Schedule onRequest={onRequest} />
 
       {/* ── The scrub ─────────────────────────────────────────────────
           The one claim on this page a visitor can check by hand. */}
@@ -123,8 +133,8 @@ export default function RenovationWorld({ service, onClose, onRequest }) {
             source's gate says the same thing about client cases: consent,
             accuracy and publication period first, anonymised until then. */}
         <p className="r-scrub-note" data-reveal>
-          Illustration of a typical scope. Not a photograph of a completed ORYX
-          project — project images follow written client consent.
+          Illustration of a typical scope, not a photograph of a completed ORYX
+          project. Project photographs follow once clients give written consent.
         </p>
       </section>
 
@@ -135,8 +145,8 @@ export default function RenovationWorld({ service, onClose, onRequest }) {
           of things that happen to be done. */}
       <section className="r-process" id="r-route">
         <div className="r-process-head">
-          <p className="world-kicker" data-reveal>Method · the ORYX project route</p>
-          <h3 data-reveal>Seven steps, whatever the service</h3>
+          <p className="world-kicker" data-reveal>How a project runs</p>
+          <h3 data-reveal>Seven steps on every project</h3>
           <p className="world-lede" data-reveal>{world.routeLine}</p>
         </div>
         <ol className="r-steps" role="list">
@@ -155,7 +165,7 @@ export default function RenovationWorld({ service, onClose, onRequest }) {
           {tools.map((t) => (
             <div className="r-tool" key={t.k} data-reveal>
               <p className="r-tool-k">{t.k}</p>
-              <p className="r-tool-nl">NL · {t.nl}</p>
+              <p className="r-tool-nl">In Dutch: {t.nl}</p>
               <p className="r-tool-d">{t.d}</p>
             </div>
           ))}
@@ -163,20 +173,11 @@ export default function RenovationWorld({ service, onClose, onRequest }) {
         </div>
       </section>
 
-      {/* ── Interlude ─────────────────────────────────────────────────── */}
-      <section className="r-interlude">
-        <Media clip={portal.renovation} />
-        {/* Not `forkNote` — that sentence is already the note under the fork,
-            and printing the page's strongest line twice spends it. This is the
-            source's positioning line, which nothing else on the page uses. */}
-        <p className="r-interlude-line" data-reveal>{service.promise}</p>
-      </section>
-
       {/* ── Who arrives, and what they ask ────────────────────────────── */}
       <section className="r-who">
         <div className="r-who-head">
           <p className="world-kicker" data-reveal>Clients</p>
-          <h3 data-reveal>Six audiences, six first questions</h3>
+          <h3 data-reveal>Who we work for</h3>
         </div>
         <ul className="r-clients" role="list">
           {clients.map((c, i) => (
@@ -196,7 +197,7 @@ export default function RenovationWorld({ service, onClose, onRequest }) {
           published while the claims matrix is still open. */}
       <section className="r-trust" id="r-trust">
         <div className="r-trust-say">
-          <p className="world-kicker" data-reveal>Publication discipline</p>
+          <p className="world-kicker" data-reveal>What we promise</p>
           <p className="r-trust-line" data-reveal>{world.trust.line}</p>
           <p className="r-trust-d" data-reveal>{world.trust.d}</p>
         </div>
@@ -264,7 +265,7 @@ function Fork({ world }) {
           <fieldset className="r-fork-rail">
             <legend className="sr-only">
               Choose a scenario. These are three alternatives for the same
-              property, not three stages of one job — one is chosen, and the
+              property, not three stages of one job. One is chosen, and the
               other two are not done afterwards.
             </legend>
             {world.scenarios.map((s) => (
@@ -297,7 +298,7 @@ function Fork({ world }) {
         <div className="r-fork-read">
           {world.scenarios.map((s) => (
             <div className="r-fork-panel" key={s.id} aria-hidden={s.id !== live}>
-              <p className="r-fork-over">Scenario — {s.k}</p>
+              <p className="r-fork-over">Scenario: {s.k}</p>
               <p className="r-fork-claim">{s.claim}</p>
               <p className="r-fork-body">{s.body}</p>
               <div className="r-fork-marks">
@@ -314,8 +315,8 @@ function Fork({ world }) {
                         <span className="r-fork-st">
                           {m.st}
                           <span className="sr-only">
-                            {' '}— delivered or supervised only by competent and
-                            qualified parties where required.
+                            . Carried out or supervised by a qualified
+                            specialist where required.
                           </span>
                         </span>
                       )}
@@ -481,210 +482,141 @@ function Section({ scenarios }) {
 }
 
 /* ═══ The schedule of works ═══════════════════════════════════════════
-   Nine services and sixty-five works on one continuous ruled sheet.
+   Nine services as nine cards, and one popup for whichever is opened.
 
-   ── Nothing here has a second height ─────────────────────────────────
-   No accordion, no shelf, no tabs, no search, no filter, no "show more". The
-   only state in the section is a scroll-spy that changes one border colour.
-   The page-jump failure class — which this project has had to correct twice —
-   cannot occur, because nothing in the section has two heights to move
-   between, and there is no scroll correction to get wrong.
+   ── What this replaced ───────────────────────────────────────────────
+   All sixty-five works printed on one ruled sheet with an index rail beside
+   it. It was faithful to a real schedule of works and it was four screens of
+   small type, which is a document and not a page. The sixty-five lines still
+   exist, word for word: nine at a time in the popups, and all together in the
+   downloadable brochures.
 
-   That is affordable on arithmetic rather than taste. The 65 descriptions come
-   to roughly 5,400 characters; Workforce's 307 role sentences come to about
-   21,000. Workforce needed progressive disclosure at four times the volume;
-   a fifth of it does not. So everything is printed, and the reader's own
-   find-in-page works across all of it — which a filter over hidden content
-   cannot offer.
-
-   ── The blank means something ────────────────────────────────────────
-   The fourth column is headed CONDITION, and note N1 gives its fifty-three
-   empty cells a printed meaning: *where this column is blank, ORYX organises
-   delivery* — which is the publication gate's own supplied safe wording for
-   the direct-delivery claim. Without that note a blank is an absence; with it,
-   it is a statement ORYX is permitted to make. It is the single load-bearing
-   idea in this section.
-
-   Twelve works carry a condition, and no status is invented for any service:
-   the source assigns an explicit label to service 08 alone. */
+   ── The condition still travels with the work ────────────────────────
+   Twelve works carry a condition, and that has to stay visible wherever the
+   work is named, because an unmarked regulated work reads as something ORYX
+   simply does. Every conditional work carries its tag in the popup, all eight
+   under service 08 included, and the line under the grid says what no tag
+   means. No status is invented for any service: the source assigns an
+   explicit label to service 08 alone. */
 const CONDS = {
-  project: { ref: 'N2', k: 'Project basis' },
-  qualified: { ref: 'N3', k: 'Qualified party' },
+  project: { k: 'Project basis', d: 'Confirmed for each project after property, risk, partner and qualification checks.' },
+  qualified: { k: 'Qualified specialist', d: 'Carried out or supervised by a qualified specialist where required.' },
 }
-const NOTES = [
-  /* N1 is only true because NO conditional work leaves this column blank —
-     see the note on the condition cell below. Break that and this note starts
-     lying about the most regulated rows on the sheet. */
-  { ref: 'N1', k: 'Default', d: 'Where this column is blank, ORYX organises delivery.' },
-  { ref: 'N2', k: 'Project basis', d: 'Confirmed per project, not offered as a standing service. Released after property, risk, partner and qualification checks.' },
-  { ref: 'N3', k: 'Qualified party', d: 'Delivered or supervised only by competent and qualified parties where required.' },
-]
 
-function Schedule() {
-  const [here, setHere] = useState(svcs[0].id)
-  const sheet = useRef(null)
-  /* Nothing measured here. The rail and the column header are declared
-     heights in CSS at the one breakpoint where they stack; only the nav, whose
-     height moves with its own copy, is measured — and that is done once at the
-     top of the world. */
+function Schedule({ onRequest }) {
+  const [openId, setOpenId] = useState(null)
   const uid = useId().replace(/:/g, '')
-
-  /* One observer over the nine service blocks. The topmost intersecting block
-     wins, and the last value is retained when none intersects, so the marker
-     never blanks between blocks. */
-  useEffect(() => {
-    const el = sheet.current
-    if (!el) return
-    const blocks = [...el.querySelectorAll('[data-svc]')]
-    if (!blocks.length) return
-    const io = new IntersectionObserver(
-      (entries) => {
-        const on = entries.filter((e) => e.isIntersecting)
-        if (!on.length) return
-        on.sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)
-        setHere(on[0].target.dataset.svc)
-      },
-      { root: el.closest('.world-scroll'), rootMargin: '-120px 0px -62% 0px', threshold: 0 },
-    )
-    blocks.forEach((b) => io.observe(b))
-    return () => io.disconnect()
-  }, [])
-
-  /* Item numbers are computed, never stored. A stored number drifts the moment
-     a work moves, and the unbroken run 001–065 across all nine services is the
-     whole of the "one catalogue" claim. */
-  let n = 0
+  const cur = svcs.find((s) => s.id === openId) || null
 
   return (
     <section className="r-sched" id="r-schedule" aria-labelledby={`${uid}-h`}>
       <div className="r-sched-head" data-reveal>
         <p className="world-kicker">Schedule of works</p>
-        <h3 id={`${uid}-h`}>Sixty-five works, one schedule</h3>
+        <h3 id={`${uid}-h`}>Nine services</h3>
         <p className="world-lede">
-          The works ORYX organises as complete packages, with one scope,
-          programme and handover record. Twelve carry a condition, marked in
-          the Condition column. Supplying skilled people your own team manages
-          is a different route — that is ORYX Workforce, and it is not in this
-          schedule.
-        </p>
-        <p className="r-sched-count">
-          {totals.services} services · {totals.works} works · {totals.conditional} conditional
+          Open a service to see the work it covers.
         </p>
       </div>
 
-      <div className="r-sched-body">
-        <nav className="r-sched-rail" aria-label="Schedule index">
-          <ol role="list">
-            {svcs.map((s) => (
-              <li key={s.id}>
-                <a href={`#${uid}-${s.id}`} aria-current={here === s.id ? 'true' : undefined}>
-                  <span className="r-rail-n">{s.no}</span>
-                  <span className="r-rail-name">{s.name}</span>
-                  <span className="r-rail-w">{s.works.length} works</span>
-                </a>
-              </li>
-            ))}
-          </ol>
-          <p className="r-sched-foot">
-            {totals.services} services · {totals.works} works · {totals.conditional} conditional
-          </p>
-        </nav>
+      <ul className="cards" role="list" data-reveal>
+        {svcs.map((s) => {
+          const img = cardImage(`renovation/${s.id}`)
+          return (
+            <li key={s.id}>
+              <button type="button" className="card" onClick={() => setOpenId(s.id)} aria-haspopup="dialog">
+                <span className="card-img">
+                  {img && <img src={img.src} alt="" loading="lazy" />}
+                  <span className="card-n">{s.no}</span>
+                  <span className="card-i"><Icon name={s.id} size={20} /></span>
+                </span>
+                <span className="card-body">
+                  <span className="card-k">{s.name}</span>
+                  <span className="card-c">
+                    {s.works.length} works
+                    {s.cond && <span className="card-tag"> / {CONDS[s.cond].k}</span>}
+                  </span>
+                  <span className="card-go"><span>View</span><Icon name="arrow" size={14} /></span>
+                </span>
+              </button>
+            </li>
+          )
+        })}
+      </ul>
 
-        <div className="r-sched-sheet" ref={sheet}>
-          {/* Decorative: every condition cell reads "N2 Project basis" and is
-              self-describing without its column header. */}
-          <div className="r-sched-colhead" aria-hidden="true">
-            <span>Item</span>
-            <span>Work</span>
-            <span>Description</span>
-            <span className="r-colhead-c">Condition</span>
-          </div>
+      <p className="cards-note" data-reveal>
+        {totals.services} services and {totals.works} works in all. ORYX organises
+        delivery of every work. {totals.conditional} of them are marked, because they
+        are confirmed for each project or carried out by a qualified specialist.
+      </p>
 
-          {svcs.map((s) => (
-            <article
-              className={`r-svc ${s.cond ? 'r-svc--gate' : ''}`}
-              key={s.id}
-              id={`${uid}-${s.id}`}
-              data-svc={s.id}
-              tabIndex={-1}
-              aria-labelledby={`${uid}-${s.id}-h`}
-            >
-              <header className="r-svc-head">
-                <span className="r-svc-n">{s.no}</span>
-                <h4 id={`${uid}-${s.id}-h`}>{s.name}</h4>
-                <p className="r-svc-tally">{s.works.length} works</p>
-                <p className="r-svc-sub">{s.sub}</p>
-              </header>
-
-              {/* Service 08 is an access route rather than an offer, so its
-                  condition is stated once, above its works — the condition
-                  governs the reading and has to arrive first. */}
-              {s.cond && (
-                <p className="r-svc-gate">
-                  <span>{CONDS[s.cond].ref} · {CONDS[s.cond].k} · not a standing service</span>
-                </p>
-              )}
-
-              <ol className="r-works" role="list">
-                {s.works.map((w) => {
-                  n += 1
-                  /* A service-level condition applies to every work under it —
-                     that is what "service 08 is on a project basis" means. */
-                  const cond = w.s || s.cond
-                  const c = cond ? CONDS[cond] : null
-                  return (
-                    <li className={`r-work ${c ? 'is-cond' : ''}`} key={w.t}>
-                      <span className="r-work-n">{String(n).padStart(3, '0')}</span>
-                      <p className="r-work-t">{w.t}</p>
-                      <p className="r-work-d">{w.d}</p>
-                      {/* Every conditional work carries a VISIBLE mark, and
-                          that includes all eight under service 08.
-                          Stating 08's condition only once above its block left
-                          its eight Condition cells blank — and note N1 says a
-                          blank cell means ORYX organises delivery. So the
-                          sheet told a reader that ORYX directly delivers
-                          asbestos, Chromium VI, fire safety and work at
-                          height, which is the exact opposite of what the
-                          source says and the single most dangerous sentence
-                          the page could carry. The block banner stays as well;
-                          the two say different things. */}
-                      <p className="r-work-c">
-                        {c && (
-                          <>
-                            <span className="r-work-ref" aria-hidden="true">{c.ref}</span>
-                            <span className="r-work-cond">{c.k}</span>
-                          </>
-                        )}
-                      </p>
-                    </li>
-                  )
-                })}
-              </ol>
-
-              {s.note && <p className="r-svc-note"><b>Note</b>{s.note}</p>}
-            </article>
-          ))}
-
-          <div className="r-sched-total">
-            <span />
-            <span>Total</span>
-            <span>{String(totals.works).padStart(3, '0')} items</span>
-            <span>{String(totals.conditional).padStart(3, '0')} conditional</span>
-          </div>
-        </div>
-
-        <div className="r-sched-notes">
-          {NOTES.map((x) => (
-            <div key={x.ref}>
-              <p className="r-note-k">{x.ref} · {x.k}</p>
-              <p className="r-note-d">{x.d}</p>
-            </div>
-          ))}
-        </div>
-      </div>
+      {cur && (
+        <ServiceSheet
+          svc={cur}
+          onClose={() => setOpenId(null)}
+          onRequest={() => onRequest('renovation', cur.id)}
+        />
+      )}
     </section>
   )
 }
+
+function ServiceSheet({ svc, onClose, onRequest }) {
+  const img = cardImage(`renovation/${svc.id}`)
+  const used = [...new Set(svc.works.map((w) => w.s || svc.cond).filter(Boolean))]
+
+  return (
+    <Sheet
+      tone="renovation"
+      label={svc.name}
+      image={img}
+      onClose={onClose}
+      actions={
+        <>
+          {/* The link first and the button last, on purpose. The focus trap
+              wraps on the last control, and Safari does not tab to links by
+              default, so a link in last place let Tab walk out of the popup. */}
+          <a className="btn" href={`/brochures/renovation-${svc.id}.pdf`} download>
+            <Icon name="download" size={16} /> Download brochure
+          </a>
+          <button type="button" className="btn btn--fill" onClick={onRequest}>
+            {ctaFor('renovation')} <Icon name="arrow" size={16} />
+          </button>
+        </>
+      }
+    >
+      <div className="sheet-head">
+        <span className="sheet-badge"><Icon name={svc.id} size={24} /></span>
+        <ul className="sheet-stats" role="list">
+          <li><b>{svc.no}</b>of {String(totals.services).padStart(2, '0')}</li>
+          <li><b>{svc.works.length}</b>works</li>
+        </ul>
+      </div>
+      <p className="sheet-lede">{svc.sub}</p>
+
+      <h4 className="sheet-h">What it covers</h4>
+      <ul className="sheet-works" role="list">
+        {svc.works.map((w) => {
+          /* A service-level condition applies to every work under it. */
+          const cond = w.s || svc.cond
+          return (
+            <li className="sheet-work" key={w.t}>
+              <Icon name="check" size={16} />
+              <span className="sheet-work-k">{w.t}</span>
+              <span className="sheet-work-d">{w.d}</span>
+              {cond && <span className="sheet-work-tag">{CONDS[cond].k}</span>}
+            </li>
+          )
+        })}
+      </ul>
+
+      {used.map((c) => (
+        <p className="sheet-note" key={c}><b>{CONDS[c].k}.</b> {CONDS[c].d}</p>
+      ))}
+      {svc.note && <p className="sheet-note">{svc.note}</p>}
+    </Sheet>
+  )
+}
+
 function Scrub({ before, after }) {
   const [at, setAt] = useState(52)
   const frame = useRef(null)
@@ -775,8 +707,8 @@ function RenovationFooter({ service, onClose, onRequest }) {
             has seen the property — and the gate blocks exactly that class of
             claim. */}
         <p>{service.world.check.d}</p>
-        <button type="button" className="r-foot-cta" onClick={onRequest}>
-          {service.world.cta} <i aria-hidden="true">→</i>
+        <button type="button" className="r-foot-cta" onClick={() => onRequest(service.id)}>
+          {ctaFor(service.id)} <i aria-hidden="true"><Icon name="arrow" size={16} /></i>
         </button>
 
         {/* The separation the source requires, stated where somebody who has
@@ -798,7 +730,7 @@ function RenovationFooter({ service, onClose, onRequest }) {
           </dl>
           <dl className="r-tb-cell">
             <dt>Discipline</dt>
-            <dd>Maintenance · Renovation · Heritage restoration</dd>
+            <dd>Maintenance, renovation and heritage restoration</dd>
           </dl>
         </div>
         <div className="r-tb-row">
@@ -826,18 +758,21 @@ function RenovationFooter({ service, onClose, onRequest }) {
         <div className="r-tb-row">
           <dl className="r-tb-cell r-tb-wide">
             <dt>Project</dt>
-            <dd>ORYX Projects — a service of ORYX GROUP</dd>
+            <dd>ORYX Projects, a service of ORYX GROUP</dd>
           </dl>
           <dl className="r-tb-cell">
             <dt>Contact</dt>
-            <dd><a href="mailto:projects@oryx.example">projects@oryx.example</a></dd>
+            <dd><a href={`mailto:${emailFor('renovation')}`}>{emailFor('renovation')}</a></dd>
           </dl>
         </div>
       </div>
 
-      <button type="button" className="r-foot-back" onClick={onClose}>
-        ← All ORYX services
-      </button>
+      <div className="r-foot-end">
+        <button type="button" className="r-foot-back" onClick={onClose}>
+          <Icon name="back" size={16} /> All ORYX services
+        </button>
+        <Social />
+      </div>
     </footer>
   )
 }

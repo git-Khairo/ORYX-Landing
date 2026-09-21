@@ -1,0 +1,539 @@
+/* ══ Shared pieces ══════════════════════════════════════════════════════
+   The few things every surface uses: the slogan's accent letters, icons, the
+   sound switch, the social row, the card grids and the detail popup.
+
+   Everything here reads the colour tokens and nothing else, because the same
+   component has to sit on the dark home page, on Transport and Workforce's
+   near-blacks, and on Renovation's cream sheet. */
+
+/* ── The slogan ─────────────────────────────────────────────────────────
+   O, R, Y and X in sand; the rest of the line in white. Loaded last, so it
+   wins over the colour each setting used to give the whole line. */
+.slogan { color: var(--oryx-white); }
+.slogan-k { font-weight: inherit; color: var(--sand); }
+
+/* ── Icons ──────────────────────────────────────────────────────────── */
+.icon { display: block; flex: none; }
+
+/* ── The sound switch ───────────────────────────────────────────────────
+   A control in a bar, not a pill in a corner. It used to be fixed at the
+   bottom-left under the service pages' own stacking level, which is why it
+   disappeared inside them. It now sits in whichever bar is on screen. */
+.sound {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.5rem 0.8rem;
+  border: 1px solid var(--line);
+  font-family: var(--font);
+  font-size: var(--step--2);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--text-3);
+  transition: color 0.25s var(--ease-out), border-color 0.25s var(--ease-out);
+}
+.sound:hover { color: var(--text); border-color: var(--line-sand); }
+.sound.is-on { color: var(--sand-text); border-color: var(--line-sand); }
+.sound--bare { padding: 0.55rem 0.6rem; }
+
+.sound-eq {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 12px;
+}
+.sound-eq i {
+  width: 2px;
+  height: 3px;
+  background: currentColor;
+  transition: height 0.25s var(--ease-out);
+}
+/* Only the playing state animates. Off, the bars sit flat, which is the honest
+   picture of what the audio is doing. */
+.sound.is-on .sound-eq i {
+  animation: sound-eq 0.9s var(--ease-out) infinite alternate;
+  animation-delay: calc(var(--i) * 0.12s);
+}
+@keyframes sound-eq {
+  from { height: 3px; }
+  to { height: 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sound.is-on .sound-eq i { animation: none; height: 8px; }
+}
+@media (max-width: 640px) {
+  /* The label is the first thing to go. The bars and the `aria-label` still
+     say what it is and what state it is in. */
+  .sound-l { display: none; }
+  .sound { padding: 0.55rem 0.6rem; }
+}
+
+/* ── Social row ─────────────────────────────────────────────────────── */
+.social {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.social a,
+.social span {
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 1px solid var(--line);
+  color: var(--text-2);
+  transition: color 0.25s var(--ease-out), border-color 0.25s var(--ease-out),
+    background 0.25s var(--ease-out);
+}
+.social a:hover { color: var(--sand-text); border-color: var(--line-sand); }
+
+/* ══ Card grids ═════════════════════════════════════════════════════════
+   Workforce's twelve sectors and Renovation's nine services. A card is a
+   picture, a number, an icon, a name and one count. Everything else is in the
+   popup the card opens, which is the whole point: the page is scanned and the
+   popup is read. */
+.cards {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 15.5rem), 1fr));
+  gap: clamp(0.6rem, 1.2vw, 1rem);
+}
+.card {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  width: 100%;
+  height: 100%;
+  text-align: left;
+  border: 1px solid var(--line);
+  background: var(--raise);
+  color: var(--text);
+  overflow: hidden;
+  transition: border-color 0.3s var(--ease-out), transform 0.3s var(--ease-out);
+}
+.card:hover,
+.card:focus-visible { border-color: var(--fill-strong); transform: translateY(-3px); }
+/* `--fill-strong` and not sand: it is sand on the dark pages and deep brown on
+   Renovation's cream, where a sand ring is about 2:1 and cannot be seen. */
+.card:focus-visible,
+.sheet :focus-visible { outline-color: var(--fill-strong); }
+
+.card-img {
+  display: block;
+  position: relative;
+  aspect-ratio: 16 / 10;
+  margin: 0;
+  overflow: hidden;
+  background: var(--sunk);
+}
+.card-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* A light touch only. This was a heavy grey-and-sepia grade while the
+     cards held stock photographs from twenty-one photographers. The pictures
+     are ORYX's own now, already in the brand's black and sand, and a strong
+     grade would only dull the uniform they exist to show. */
+  filter: contrast(1.03) brightness(0.9);
+  transform: scale(1.02);
+  transition: transform 0.7s var(--ease-out), filter 0.5s var(--ease-out);
+}
+.card:hover .card-img img,
+.card:focus-visible .card-img img {
+  transform: scale(1.07);
+  filter: contrast(1.03) brightness(1);
+}
+.card-img::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(13, 13, 12, 0.72), rgba(13, 13, 12, 0) 58%);
+}
+.card-n {
+  position: absolute;
+  left: 0.8rem;
+  bottom: 0.65rem;
+  z-index: 1;
+  font-family: var(--font-mono, var(--font));
+  font-size: var(--step--2);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  font-variant-numeric: tabular-nums;
+  color: #f4f1e8;
+}
+.card-i {
+  position: absolute;
+  right: 0.7rem;
+  bottom: 0.6rem;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 2.2rem;
+  height: 2.2rem;
+  background: var(--sand);
+  color: #1c1c1a;
+}
+.card-body {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: 0.35rem 0.8rem;
+  padding: 0.85rem 0.9rem 0.9rem;
+}
+.card-k {
+  grid-column: 1 / -1;
+  font-family: var(--font-display);
+  font-size: var(--step-0);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: var(--track-display);
+  text-transform: uppercase;
+  color: var(--text);
+  text-wrap: balance;
+}
+.card-c {
+  font-size: var(--step--2);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+.card-tag {
+  color: var(--sand-text);
+}
+.card-go {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: var(--step--2);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--sand-text);
+}
+.card-go .icon { transition: transform 0.3s var(--ease-out); }
+.card:hover .card-go .icon { transform: translateX(4px); }
+
+.cards-note {
+  margin-top: 0.4rem;
+  font-size: var(--step--1);
+  line-height: 1.55;
+  /* These two notes carry the conditions on regulated work, so they are set
+     in the secondary text colour and not the faintest one. */
+  color: var(--text-2);
+  max-width: 70ch;
+}
+
+/* ══ The detail popup ═══════════════════════════════════════════════════ */
+.sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: grid;
+  place-items: center;
+  --sheet-pad: clamp(0.6rem, 2.5vw, 2rem);
+  padding: var(--sheet-pad);
+  font-family: var(--font);
+  color: var(--text-2);
+  /* Inside a service page the type scale is a step smaller. The popup is
+     outside `.world`, so it takes the same steps by hand. */
+  --step-3: clamp(1.6rem, 1.25rem + 1.5vw, 2.5rem);
+}
+.sheet-back {
+  position: absolute;
+  inset: 0;
+  background: rgba(8, 8, 7, 0.74);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+.sheet-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: min(100%, 58rem);
+  /* Against the viewport, not `100%`. A percentage here resolves against an
+     auto-sized grid row, which is no limit at all: the card grew to its full
+     52rem and pushed its own buttons off the bottom of a laptop screen. */
+  max-height: min(calc(100svh - 2 * var(--sheet-pad)), 52rem);
+  background: var(--ground);
+  border: 1px solid var(--line-sand);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+  animation: sheet-in 0.5s var(--ease-out) both;
+}
+/* Transform only. A fade would leave the whole popup invisible wherever the
+   animation clock is stalled. */
+@keyframes sheet-in {
+  from { transform: translateY(28px) scale(0.985); }
+  to { transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sheet-card { animation: none; }
+}
+.sheet-close {
+  position: absolute;
+  top: 0.7rem;
+  right: 0.7rem;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  background: var(--ground);
+  border: 1px solid var(--line);
+  color: var(--text);
+  transition: background 0.25s var(--ease-out), color 0.25s var(--ease-out);
+}
+.sheet-close:hover { background: var(--sand); color: #1c1c1a; border-color: var(--sand); }
+
+.sheet-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.sheet-body:focus-visible { outline-offset: -3px; }
+.sheet-img {
+  position: relative;
+  margin: 0;
+  aspect-ratio: 21 / 8;
+  overflow: hidden;
+  background: var(--sunk);
+}
+.sheet-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: contrast(1.02) brightness(0.92);
+}
+.sheet-img::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, var(--ground) 0%, transparent 55%);
+}
+.sheet-in {
+  display: grid;
+  gap: clamp(1rem, 2.4vh, 1.5rem);
+  padding: clamp(1.2rem, 3vh, 2rem) clamp(1.1rem, 3vw, 2.2rem);
+  position: relative;
+}
+/* Only when there is a picture to climb onto. Without one the same negative
+   margin pulled the title up out of the card. */
+.sheet-img + .sheet-in { padding-top: 0; margin-top: clamp(-2.6rem, -4vw, -1.4rem); }
+.sheet-title {
+  font-family: var(--font-display);
+  font-size: var(--step-3);
+  line-height: 1.04;
+  color: var(--text);
+  text-wrap: balance;
+  padding-right: 2.5rem;
+}
+.sheet-lede {
+  font-size: var(--step-0);
+  line-height: 1.6;
+  color: var(--text-2);
+  max-width: 62ch;
+}
+.sheet-head {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+}
+.sheet-badge {
+  display: grid;
+  place-items: center;
+  width: 2.8rem;
+  height: 2.8rem;
+  background: var(--sand);
+  color: #1c1c1a;
+}
+.sheet-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.4rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: var(--step--2);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+.sheet-stats b { color: var(--sand-text); font-weight: 700; margin-right: 0.35em; }
+
+.sheet-h {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--font);
+  font-size: var(--step--2);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--sand-text);
+}
+.sheet-h::after { content: ''; flex: 1; height: 1px; background: var(--line); }
+
+/* Groups (Workforce) */
+.sheet-groups {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+  gap: 0.7rem;
+}
+.sheet-group {
+  display: grid;
+  gap: 0.55rem;
+  align-content: start;
+  padding: 0.9rem 1rem 1rem;
+  border: 1px solid var(--line);
+  background: var(--raise);
+}
+.sheet-group-k {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.8rem;
+  font-size: var(--step-0);
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--text);
+}
+.sheet-group-k span {
+  flex: none;
+  font-size: var(--step--2);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+.sheet-chips {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+.sheet-chips li {
+  padding: 0.28rem 0.55rem;
+  border: 1px solid var(--line);
+  font-size: var(--step--1);
+  line-height: 1.3;
+  color: var(--text-2);
+}
+.sheet-chips li.is-more { border-style: dashed; color: var(--text-3); }
+.sheet-chips li.is-hit { border-color: var(--sand); color: var(--text); }
+
+/* Works (Renovation) */
+.sheet-works {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr));
+  gap: 0 1.6rem;
+}
+.sheet-work {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.15rem 0.7rem;
+  padding: 0.75rem 0;
+  border-top: 1px solid var(--line);
+}
+.sheet-work .icon { margin-top: 0.15rem; color: var(--sand-text); }
+.sheet-work-k { font-size: var(--step-0); font-weight: 700; line-height: 1.3; color: var(--text); }
+.sheet-work-d { grid-column: 2; font-size: var(--step--1); line-height: 1.5; color: var(--text-2); }
+.sheet-work-tag {
+  grid-column: 2;
+  justify-self: start;
+  margin-top: 0.25rem;
+  padding: 0.18rem 0.5rem;
+  border: 1px solid var(--line-sand);
+  font-size: var(--step--2);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--sand-text);
+}
+
+/* Ways to hire (Workforce) */
+.sheet-ways {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
+  gap: 0.5rem;
+}
+.sheet-ways li {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem 0.7rem;
+  border: 1px solid var(--line);
+  font-size: var(--step--1);
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--text);
+}
+.sheet-ways .icon { color: var(--sand-text); }
+
+.sheet-note {
+  font-size: var(--step--1);
+  line-height: 1.55;
+  color: var(--text-2);
+  max-width: 70ch;
+}
+
+.sheet-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  padding: 0.8rem clamp(1.1rem, 3vw, 2.2rem);
+  border-top: 1px solid var(--line);
+  background: var(--raise);
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 0.85rem 1.3rem;
+  border: 1px solid var(--line-sand);
+  font-family: var(--font);
+  font-size: var(--step--2);
+  font-weight: 700;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--text);
+  transition: background 0.3s var(--ease-out), color 0.3s var(--ease-out),
+    border-color 0.3s var(--ease-out);
+}
+.btn:hover { border-color: var(--sand); color: var(--sand-text); }
+.btn--fill { background: var(--sand); border-color: var(--sand); color: #1c1c1a; }
+.btn--fill:hover { background: var(--text); border-color: var(--text); color: var(--ground); }
+
+@media (max-width: 560px) {
+  .sheet { padding: 0; place-items: end stretch; }
+  .sheet-card { width: 100%; max-height: 94svh; border-left: 0; border-right: 0; border-bottom: 0; }
+  .sheet-img { aspect-ratio: 16 / 8; }
+  .sheet-actions { flex-direction: column; }
+  .sheet-actions .btn { width: 100%; }
+  .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.5rem; }
+  .card-body { padding: 0.65rem 0.65rem 0.7rem; }
+  .card-k { font-size: var(--step--1); }
+  .card-go span { display: none; }
+  .card-i { width: 1.9rem; height: 1.9rem; }
+}

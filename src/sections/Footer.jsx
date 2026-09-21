@@ -1,4 +1,30 @@
 import { brand, services } from '../content/copy'
+import { social } from '../content/requests'
+import Slogan from '../components/Slogan'
+import Icon from '../components/Icon'
+
+/* The three accounts, as icons. An entry with no `href` yet renders as a plain
+   icon and not as a link, so the footer never ships a dead address. Exported
+   because each service page has its own footer and carries the same row. */
+export function Social({ className = '' }) {
+  return (
+    <ul className={`social ${className}`} role="list">
+      {social.map((s) => (
+        <li key={s.id}>
+          {s.href ? (
+            <a href={s.href} target="_blank" rel="noreferrer noopener" aria-label={s.label}>
+              <Icon name={s.id} size={18} />
+            </a>
+          ) : (
+            <span title={s.label}>
+              <Icon name={s.id} size={18} title={s.label} />
+            </span>
+          )}
+        </li>
+      ))}
+    </ul>
+  )
+}
 
 /**
  * The other bookend.
@@ -8,7 +34,7 @@ import { brand, services } from '../content/copy'
  * and closes on the same gesture.
  *
  * The services are quiet links in a column here, not a numbered index. They
- * were set as one before — full-width rows, names in display capitals — and it
+ * were set as one before (full-width rows, names in display capitals) and it
  * made the middle of the footer the loudest thing on the page, competing with
  * the gateway that had just shown the same three doors properly. A footer is
  * somewhere you go to look something up; it should be scanned, not read.
@@ -29,10 +55,10 @@ export default function Footer({ onOpenService }) {
         <div className="foot-main">
           <div className="foot-say">
             <span className="foot-mark" aria-hidden="true" />
-            <p className="foot-line">{brand.slogan}</p>
+            <Slogan className="foot-line" />
             <div className="foot-actions">
               <button type="button" className="foot-cta" onClick={() => onOpenService?.('')}>
-                Start a request <i aria-hidden="true">→</i>
+                Start a request <i aria-hidden="true"><Icon name="arrow" size={16} /></i>
               </button>
               <a className="foot-mail" href="mailto:hello@oryx.example">
                 hello@oryx.example
@@ -69,7 +95,7 @@ export default function Footer({ onOpenService }) {
               <ul>
                 <li><a href="mailto:hello@oryx.example">hello@oryx.example</a></li>
                 <li><a href="tel:+310000000000">+31 (0)00 000 0000</a></li>
-                <li>Mon&ndash;Fri &middot; 08:00&ndash;18:00</li>
+                <li>Monday to Friday, 08:00 to 18:00</li>
                 <li>{brand.region}</li>
               </ul>
             </div>
@@ -83,7 +109,10 @@ export default function Footer({ onOpenService }) {
             <span aria-hidden="true">/</span>
             <a href="#terms">Terms</a>
           </span>
-          <span className="foot-place">{brand.descriptor.join(' / ')}</span>
+          {/* Where the descriptor line used to close the row. The descriptor is
+              already on the purpose panel at the top of the page, so here the
+              three accounts take its place at the right-hand end. */}
+          <Social />
         </div>
       </div>
     </footer>

@@ -128,7 +128,7 @@ export const acts = [
     cam: 'none',
     text: 'brief',
     line: 'ORYX GROUP',
-    sub: 'One group for transport, workforce and renovation — reliable people and services, delivered across the Netherlands.',
+    sub: 'One group for transport, workforce and renovation, with reliable people and services across the Netherlands.',
   },
 ]
 
@@ -169,7 +169,7 @@ export const services = [
     title: 'Transport & Logistics',
     short: 'Transport',
     promise: 'Moved on time, tracked end to end.',
-    body: 'Fixed routes for predictable volume and on-demand capacity for everything else, run for organisations that cannot afford to find out late.',
+    body: 'Regular routes for the loads you can plan, and extra vehicles for the ones you cannot.',
     world: {
       /* The opening line of the world. Short and declarative, where the body
          copy stays discursive — a headline and an essay are different jobs. */
@@ -183,7 +183,7 @@ export const services = [
         { k: 'Run', d: 'Collected, sealed and tracked, with exceptions reported before you ask.' },
         { k: 'Prove', d: 'Signed and timestamped at the door, proof returned the same day.' },
       ],
-      lede: 'Most delivery problems are not driving problems. They are information problems — you find out late, and by then the only choice left is which apology to make. We plan routes to be reported, not chased.',
+      lede: 'Most delivery problems start with not knowing. You hear about a delay when it is already too late to do anything about it. We tell you first, so you never have to chase us.',
       /* The route this page is built around. Each stop is a section; scroll
          position moves the marker down the line. */
       route: [
@@ -197,10 +197,10 @@ export const services = [
         { k: 'Scheduled', d: 'Fixed routes for volume you can predict a month out.' },
         { k: 'On demand', d: 'Capacity within the day for the volume you cannot.' },
         { k: 'Between sites', d: 'Internal movement across your own locations.' },
-        { k: 'Tracked', d: 'Departure, exception and arrival, told rather than asked for.' },
+        { k: 'Tracked', d: 'We tell you when it leaves, when something changes and when it arrives.' },
       ],
       audience: {
-        line: 'For organisations where something arriving late costs more than the delivery itself.',
+        line: 'For organisations where a late delivery costs more than the delivery itself.',
         items: [
           { k: 'Retail groups', d: 'Stock between depot and floor, ahead of opening.' },
           { k: 'Manufacturers', d: 'Parts and pallets on a line that cannot wait.' },
@@ -213,20 +213,33 @@ export const services = [
         { k: 'Proof of delivery', d: 'Captured at the door, signed, timestamped and returned to you.' },
         { k: 'Exception handling', d: 'If something slips, the message reaches you before it reaches your customer.' },
         { k: 'Specialist handling', d: 'Fragile, temperature-controlled, oversized or restricted-access, agreed up front.' },
-        { k: 'Coverage', d: 'City, Randstad, nationwide and cross-border, on one agreement.' },
+        { k: 'Coverage', d: 'Local, national and cross-border, all on one agreement.' },
       ],
-      /* The network, as a map draws it. Coordinates are in the map's own
-         viewBox units, so the route and its pins are authored together and
-         cannot drift apart. */
+      /* The network, as a map draws it: five capital cities on one corridor,
+         with Amsterdam as the home hub. It was five Dutch cities, and the
+         client asked for capitals so the map shows reach beyond the
+         Netherlands.
+
+         It is a schematic, the way a metro map is. Brussels, Amsterdam and
+         Luxembourg sit within a few degrees of longitude of one another, so
+         true geography would stack their labels on top of each other. The
+         order is the order a vehicle would meet them driving north-east from
+         Paris, and the heights follow latitude loosely. Coordinates are in
+         the map's own viewBox units, so the route and its pins are authored
+         together and cannot drift apart.
+
+         ⚠ This is a coverage statement. Confirm the five cities with ORYX
+         before launch, and edit this one list if any of them changes: the
+         map, the footer and the figure below all read from it. */
       map: {
         nodes: [
-          { k: 'Rotterdam', s: 'Port · depot', x: 150, y: 250 },
-          { k: 'Den Haag', s: 'Cross-dock', x: 330, y: 150 },
-          { k: 'Amsterdam', s: 'Hub', x: 610, y: 95 },
-          { k: 'Utrecht', s: 'Regional', x: 800, y: 205 },
-          { k: 'Eindhoven', s: 'Drop', x: 1030, y: 275 },
+          { k: 'Paris', s: 'France', x: 150, y: 268 },
+          { k: 'Luxembourg', s: 'Grand Duchy', x: 360, y: 232 },
+          { k: 'Brussels', s: 'Belgium', x: 570, y: 176 },
+          { k: 'Amsterdam', s: 'Home hub', x: 790, y: 104 },
+          { k: 'Berlin', s: 'Germany', x: 1030, y: 136 },
         ],
-        path: 'M150 250 C 230 220, 260 180, 330 150 S 470 90, 610 95 S 760 170, 800 205 S 950 250, 1030 275',
+        path: 'M150 268 C 230 266, 290 246, 360 232 S 500 204, 570 176 S 710 112, 790 104 S 950 120, 1030 136',
       },
       /* ⚠ Two of these were blocked claims and have been replaced.
          "24/7 — Dispatch and exception cover" and "<1h — Response on an urgent
@@ -241,7 +254,7 @@ export const services = [
          network has five points because `map.nodes` has five entries, and the
          single line of contact is the group's own approved wording. */
       figures: [
-        { n: '5', l: 'Network points, Rotterdam to Eindhoven' },
+        { n: '5', l: 'Capitals on the network, Paris to Berlin' },
         { n: '1', l: 'Contact for the whole movement' },
         { n: '100%', l: 'Consignments with proof of delivery' },
       ],
@@ -257,7 +270,7 @@ export const services = [
     short: 'Workforce',
     /* Source, HOMEPAGE block, quoted exactly. */
     promise: 'From one skilled worker to a complete flex pool or project crew.',
-    body: 'Qualified capacity for your operation, across twelve sectors — supplied as temporary staffing, secondment, permanent recruitment or a complete project team.',
+    body: 'Qualified people for your operation in twelve sectors, as temporary staff, on secondment, as permanent hires or as a complete project team.',
     world: {
       /* ── Everything below is transcribed from the ORYX source document
          *Workforce / Structure*, whose LANGUAGE pages carry the approved
@@ -295,16 +308,10 @@ export const services = [
          here. The source CTA "Start the Workforcecheck" is therefore rendered
          as "Urgent request", which is a sibling CTA in the same source list. */
 
-      headline: 'Qualified capacity\nfor your operation.',
+      headline: 'The right people\nfor your operation.',
 
-      /* The north star. Set as a statement and never as a testimonial: it is
-         ORYX speaking about itself, and putting it in quotation marks with an
-         attribution underneath would dress a self-description as social proof.
-         The previous page did exactly that with an invented facilities manager,
-         who has been removed — there is no real quote to publish yet. */
-      northStar: 'Not merely available. Verifiably ready.',
 
-      lede: 'You receive clear guidance on what is feasible — and which evidence has been checked before the start. One request. One control line. One accountable team.',
+      lede: 'We tell you plainly what is possible and which documents have been checked before anyone starts. You make one request, and one team is responsible for it.',
 
       /* The catalogue's size, stated as coverage and never as availability.
          The governing line beneath it is quoted from the source and is the
@@ -316,28 +323,26 @@ export const services = [
         { n: '41', l: 'Groups within them' },
         { n: '307', l: 'Roles in the register' },
       ],
-      stripNote: 'A role is listed only where ORYX can demonstrably recruit, select and support it. These counts precede that review and are expected to reduce.',
+      stripNote: 'We list a role only where we can recruit, select and support people for it. The list is still under review, so these numbers may come down.',
 
       /* The two axes. This is the page's structural argument, and the figure
          beside it exists to stop a reader treating the four service lines as a
          fifth level of the sector tree. Source wording, condensed. */
       axes: {
         kicker: 'How to read this',
-        line: 'Two axes, not one hierarchy.',
-        d: 'Sector, group and role nest inside one another — that part is a real hierarchy. Service line sits on a separate axis: it describes how a role is delivered, not what industry it belongs to.',
-        note: 'The same role can be supplied as temporary staffing, secondment, recruitment or inside a project team. The occupation does not change — the contract does.',
-        hier: { k: 'Sector → group → role', d: 'The work itself. Nests.' },
-        line2: { k: 'Service line', d: 'How it is delivered. Does not nest.' },
-      },
+        line: 'The job and the contract are separate choices',
+        d: 'Every role belongs to a group, and every group belongs to a sector. How we supply the person is a separate choice, and it is the same in every sector.',
+        note: 'The same role can be supplied as temporary staff, on secondment, as a permanent hire or inside a project team. The job stays the same and only the contract changes.',
+        },
 
       /* METHOD, source page 5. Three triplets, in the source's own order.
          They are cadence rather than process — the previous page ran a
          seven-step journey (Source, Screen, Verify, Match, Deploy, Monitor,
          Develop) which appears nowhere in this document. */
       method: [
-        { k: 'Move quickly. Select precisely. Confirm clearly.', d: 'The request is captured in minutes; ORYX then takes personal control of it.' },
-        { k: 'Role first. Authority second. Planning third.', d: 'What the work is, who is permitted to do it, and only then when it happens.' },
-        { k: 'The right documents. The right instruction. The right deployment.', d: 'Three things checked before a start date, in that order.' },
+        { k: 'We move fast and choose carefully', d: 'Your request takes minutes to record. After that, one person at ORYX owns it.' },
+        { k: 'The role comes first', d: 'We settle what the work is, then who is allowed to do it, and only then the dates.' },
+        { k: 'Checked before the start date', d: 'Documents, site instructions and the placement itself are checked, in that order.' },
       ],
 
       /* TRUST, source page 5. Principles, not a certificate matrix.
@@ -345,32 +350,23 @@ export const services = [
          restraint clauses under it are the ones that make the claim credible —
          each one narrows what ORYX is promising rather than widening it. */
       trust: {
-        kicker: 'What we will and will not claim',
-        line: 'A job title is not the complete profile.',
-        d: 'Evidence before promise. Technology proposes; authorised staff decide and can override.',
+        kicker: 'What we promise',
+        line: 'A job title does not tell you everything about a person.',
+        d: 'We check the evidence before we promise anything. Technology can make a suggestion, but our own staff make the decision and can overrule it.',
         holds: [
           'Availability and qualifications are reconfirmed for every assignment.',
           'A certificate does not automatically grant authority.',
-          'The status is time-bound and assignment-specific — it is not a general certification of a person.',
-          'The website must never promise more than ORYX can prove.',
+          'A status applies to one assignment for a set period. It is not a general certificate for the person.',
+          'This website never promises more than ORYX can prove.',
         ],
       },
 
-      /* VALUE PROPOSITION, source page 4, quoted. The interlude sets its line
-         in display capitals on a 30ch measure, so it takes one sentence and
-         not a paragraph — the source's other three value lines ("Capacity that
-         moves with your operation", "Not just a technician. The right
-         specialist for your equipment.", "One partner for the cab, the
-         warehouse and the planning desk.") are equally good and equally
-         available if this one is ever swapped. */
-      value: 'More than extra hands. Skilled people who fit the work.',
-
       bestFit: 'Best fit',
 
-      /* The two cleared calls to action. "Urgent request" is a source CTA;
-         "Which people does your schedule need?" is the source prompt. */
+      /* The source prompt. The button label beside it is not here: all three
+         request buttons are named in `content/requests.js`, next to the inbox
+         each one sends to. */
       prompt: 'Which people does your schedule need?',
-      cta: 'Urgent request',
       /* The one cleared 24/7 wording, and the only place the page may say it. */
       submitNote: 'Requests may be submitted 24/7.',
     },
@@ -383,8 +379,8 @@ export const services = [
     title: 'Renovation',
     short: 'Renovation',
     /* Source, POSITIONING block, quoted. */
-    promise: 'One property. One plan. One accountable route.',
-    body: 'Maintenance, renovation and heritage restoration organised from one plan — from the first property assessment to delivery, handover and aftercare.',
+    promise: 'One plan for your property, and one team accountable for it.',
+    body: 'Maintenance, renovation and heritage restoration run from one plan, from the first property assessment through to handover and aftercare.',
     world: {
       /* ── Everything below is transcribed from the ORYX source document
          *Property Care / Structure* (22pp), whose LANGUAGE pages carry the
@@ -431,7 +427,7 @@ export const services = [
 
       headline: 'Property that\nkeeps performing.',
       /* Source, HOMEPAGE HERO, quoted. */
-      lede: 'From maintenance need to verifiable results. ORYX organises property maintenance, renovation and heritage restoration from one plan.',
+      lede: 'ORYX organises property maintenance, renovation and heritage restoration from one plan, and shows you the results.',
       beats: ['Assessment', 'Plan', 'Delivery', 'Handover'],
 
       /* ── The fork ─────────────────────────────────────────────────────
@@ -444,12 +440,12 @@ export const services = [
          because Structural is genuinely one of the four works the source marks
          QUALIFIED PARTY. No status is invented for anything else. */
       forkHead: 'A clear choice: maintain, improve or transform.',
-      forkLede: 'Start with the right decision for the property, not a long list of trades.',
+      forkLede: 'Start by deciding what the property needs. The list of trades comes after that.',
       forkTop: { k: 'Datum', v: 'One property, assessed once.', n: 'ORYX Property Check' },
-      forkFoot: { k: 'Whichever is chosen', v: 'One plan. One accountable route. Verifiable results.', n: 'Evidence-based handover' },
+      forkFoot: { k: 'Whichever is chosen', v: 'One plan, one accountable team and results you can check.', n: 'Evidence-based handover' },
       forkSet: 'Scope, phasing and budget range are set at the ORYX Property Check, for whichever is chosen.',
-      forkNote: 'Conserve what has value. Repair what is necessary. Replace only as a last resort.',
-      forkNoteKey: 'Note — ordered by depth of intervention, not by preference.',
+      forkNote: 'We keep what has value, repair what needs it and replace only as a last resort.',
+      forkNoteKey: 'The three options are ordered by how deep the work goes, not by preference.',
       scenarios: [
         {
           id: 'maintain',
@@ -479,7 +475,7 @@ export const services = [
             { t: 'Frames & glazing', ref: '05' },
             { t: 'Ventilation & indoor climate', ref: '05' },
           ],
-          cav: 'Energy-performance and permit requirements depend on the intervention. Scenario with expected effects; no guarantee.',
+          cav: 'Energy-performance and permit requirements depend on the work. This is a scenario with expected effects, not a guarantee.',
         },
         {
           id: 'transform',
@@ -491,10 +487,10 @@ export const services = [
           body: 'Prepare existing property for a new function or layout.',
           marks: [
             { t: 'New layout', ref: '06' },
-            { t: 'Structural', ref: '06', st: 'Qualified party' },
+            { t: 'Structural', ref: '06', st: 'Qualified specialist' },
             { t: 'Extension', ref: '06' },
           ],
-          cav: 'Feasibility and risk first. Scope, programme and delivery second.',
+          cav: 'We look at feasibility and risk first, then at scope, programme and delivery.',
         },
       ],
 
@@ -515,8 +511,8 @@ export const services = [
          promised, which is exactly why they can be published while the claims
          matrix is still open. */
       trust: {
-        line: 'Evidence first. Promise second.',
-        d: 'Never publish a certification, standard, response-time, capacity or availability claim without current evidence. Publish only what ORYX can deliver operationally.',
+        line: 'We show evidence before we make promises.',
+        d: 'We do not publish a certification, standard, response-time, capacity or availability claim unless we hold current evidence for it. We publish only what ORYX can actually deliver.',
       },
 
       /* The cross-link the source requires. "ORYX Property Care delivers and
@@ -525,17 +521,16 @@ export const services = [
          cross-link between them is people, not contracted works." */
       cross: {
         k: 'Need tradespeople instead?',
-        d: 'This page is work ORYX delivers and coordinates as complete packages, with one scope, programme and handover record. Supplying skilled people your own team manages is ORYX Workforce — a different route.',
+        d: 'This page is work ORYX delivers and coordinates as complete packages, with one scope, programme and handover record. Supplying skilled people for your own team to manage is a different service, ORYX Workforce.',
         cta: 'ORYX Workforce',
       },
 
       /* The intake every route on the site is meant to end at. */
       check: {
         k: 'Property Check',
-        d: 'Six fields to start: property type, location, need or issue, desired outcome, preferred start and contact details.',
+        d: 'A few details are enough to start: the type of property, where it is, what needs doing and when you would like to begin.',
       },
       prompt: 'Tell us about the property.',
-      cta: 'Start the Property Check',
     },
   },
 ]

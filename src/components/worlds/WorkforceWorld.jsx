@@ -1,8 +1,15 @@
-import { useEffect, useId, useMemo, useRef, useState } from 'react'
+import { useEffect, useId, useMemo, useState } from 'react'
 import WorldShell, { Media } from './WorldShell'
 import { useMeasured } from '../../lib/useMeasured'
-import { film, portal } from '../../content/media'
+import { film } from '../../content/media'
 import { sectors, roles, serviceLines, totals } from '../../content/workforce'
+import { ctaFor, emailFor } from '../../content/requests'
+import { cardImage } from '../../lib/cardImage'
+import { useEscape } from '../../lib/useOverlay'
+import { SoundToggle } from '../Sound'
+import { Social } from '../../sections/Footer'
+import Sheet from '../Sheet'
+import Icon from '../Icon'
 
 /**
  * Workforce — "The Register."
@@ -53,15 +60,17 @@ export default function WorkforceWorld({ service, onClose, onRequest }) {
 
           <nav className="w-nav-links" aria-label="Workforce sections">
             <a href="#w-sectors">Register</a>
-            <a href="#w-axes">Two axes</a>
-            <a href="#w-lines">Service lines</a>
+            <a href="#w-axes">How it works</a>
             <a href="#w-method">Method</a>
             <a href="#w-trust">Trust</a>
           </nav>
 
-          <button type="button" className="w-nav-cta" onClick={onRequest}>
-            {world.cta}
-          </button>
+          <div className="w-nav-r">
+            <SoundToggle bare />
+            <button type="button" className="w-nav-cta" onClick={() => onRequest(service.id)}>
+              {ctaFor(service.id)}
+            </button>
+          </div>
         </div>
       </header>
 
@@ -69,7 +78,7 @@ export default function WorkforceWorld({ service, onClose, onRequest }) {
         <Media clip={film.workforce} />
         <div className="w-open-copy">
           <p className="world-eyebrow" data-reveal>
-            {service.index} · {service.title}
+            {service.index} / {service.title}
           </p>
           <h2 data-reveal>
             {world.headline.split('\n').map((l) => (
@@ -81,7 +90,6 @@ export default function WorkforceWorld({ service, onClose, onRequest }) {
               statement, never as a quotation: it is ORYX describing itself, and
               quotation marks with an attribution beneath would dress a
               self-description as somebody else's testimony. */}
-          <p className="w-north" data-reveal>{world.northStar}</p>
           <p className="w-open-lede" data-reveal>{world.lede}</p>
         </div>
 
@@ -106,23 +114,13 @@ export default function WorkforceWorld({ service, onClose, onRequest }) {
           apart. "We staff construction" is a claim anyone can make; "Formwork
           carpenter — formwork, striking, supports and concrete preparation" is
           not. */}
-      <Register />
+      <Register onRequest={onRequest} />
 
       {/* ── The two axes ──────────────────────────────────────────────
-          Placed here on purpose, between the register and the service lines.
-          Adjacency is load-bearing: the figure exists to pre-empt a misreading
-          of the section directly beneath it. If the service lines ever move,
-          this moves with them. */}
+          The one place the four ways of supplying people are laid out. A
+          separate "Four ways to work with us" section used to follow it and
+          said the same thing again as four cards, so it was removed. */}
       <Axes copy={world.axes} />
-
-      {/* ── Axis two ──────────────────────────────────────────────────── */}
-      <ServiceLines />
-
-      {/* ── Interlude ─────────────────────────────────────────────────── */}
-      <section className="w-interlude">
-        <Media clip={portal.workforce} />
-        <p className="w-interlude-line" data-reveal>{world.value}</p>
-      </section>
 
       {/* ── Method ────────────────────────────────────────────────────
           Three triplets from the source, in its order. Cadence rather than
@@ -133,7 +131,7 @@ export default function WorkforceWorld({ service, onClose, onRequest }) {
         <div className="w-method-head">
           <div className="w-stick">
             <p className="world-kicker" data-reveal>Method</p>
-            <h3 data-reveal>Move quickly.<br />Select precisely.<br />Confirm clearly.</h3>
+            <h3 data-reveal>How we fill a role</h3>
           </div>
         </div>
 
@@ -181,59 +179,50 @@ export default function WorkforceWorld({ service, onClose, onRequest }) {
 }
 
 /* ═══ The register ═══════════════════════════════════════════════════
-   Twelve sectors as twelve tabs, and one panel showing the chosen sector's
-   groups and roles.
+   Twelve sectors as twelve cards, and one popup for whichever is opened.
 
-   ── What this replaced, three times ──────────────────────────────────
-   First a fixed-height frame holding a sector rail, a group strip and a
-   scrolling column of roles: seventeen controls before a line of content, and
-   a scroll container inside a scrolling page. Then a grid of twelve cards
-   summarising the whole taxonomy twelve times over. Then twelve accordion
-   rows — which worked, and which read as a dropdown to the person paying for
-   it. Tabs were asked for by name.
+   ── What this replaced ───────────────────────────────────────────────
+   A tab bar with a panel under it that printed every role in the chosen
+   sector by name. It was complete and it was a wall: up to forty-nine lines
+   of type before a reader had decided the sector was even theirs.
 
-   ── Why tabs suit this data ──────────────────────────────────────────
-   A sector is a *choice*, not a list to read down: nobody wants all twelve
-   open. Tabs make the choice the whole interface — every sector visible at
-   once as a name and a count, and exactly one open. The bar stays put while
-   the panel below it changes, so nothing moves under the cursor.
+   The page now only answers "is my sector here". A card is a picture, an
+   icon, a name and a count. What the sector contains is one click away in a
+   popup, and the full list with a sentence on every role is a brochure the
+   reader can download and keep. Three depths, and nobody is made to read the
+   third to get past the first.
 
-   ── The ARIA tabs pattern, with automatic activation ─────────────────
-   `role="tablist"` / `role="tab"` / `role="tabpanel"`; the selected tab is
-   the only one in the tab order, and Left/Right/Home/End move between them
-   and select as they go. Automatic rather than manual activation because
-   switching is cheap here — no fetch, no layout of consequence — and it is
-   what a visitor expects from a row of names.
-
-   ── What is deliberately not here ────────────────────────────────────
-   No grid, no column counting, no scroll container, no per-role disclosure.
-   One field to search, one tab per sector, one panel.
+   ── Search survives ──────────────────────────────────────────────────
+   With 307 roles behind twelve cards, a reader who knows the job title needs
+   a way straight to it. Results are names only. Picking one opens the popup
+   for its sector with that role marked.
 
    ── No scroll-linked motion ──────────────────────────────────────────
-   `useSmoothProgress` writes `--p` unconditionally, and when a section is not
-   taller than `.world-scroll` it writes `"0.0000"` rather than leaving the
-   property unset — so `var(--p, 1)` never falls back and anything slicing an
-   opacity out of `--p` renders permanently invisible. Entrance reveal only. */
-function Register() {
-  const [active, setActive] = useState(sectors[0].id)
+   Entrance reveal only. Nothing here slices an opacity out of `--p`. */
+const STATUS = { req: 'On request', qc: 'Qualification required' }
+const SHOWN = 6
+
+function Register({ onRequest }) {
+  const [openId, setOpenId] = useState(null)
+  const [mark, setMark] = useState(null)
   const [q, setQ] = useState('')
   const uid = useId().replace(/:/g, '')
 
   const query = q.trim().toLowerCase()
   const searching = query.length >= 2
 
-  /* Built once — the data is a static import. `where` is singular by
-     construction: no role id appears in two groups, because the five
-     occupations the source writes twice ship under sector-qualified ids. */
+  /* Built once. `where` is singular by construction: no role id appears in
+     two groups, because the five occupations the source writes twice ship
+     under sector-qualified ids. */
   const { index, where } = useMemo(() => {
     const idx = []
     const w = {}
-    sectors.forEach((s, si) => {
+    sectors.forEach((s) => {
       s.groups.forEach((g) => {
         g.roles.forEach((id) => {
           const [t, d, st] = roles[id]
-          idx.push({ id, t, d, st, tn: t.toLowerCase(), dn: d.toLowerCase() })
-          w[id] = { si, short: s.short, gid: g.id, gname: g.name }
+          idx.push({ id, t, st, tn: t.toLowerCase(), dn: d.toLowerCase() })
+          w[id] = { sid: s.id, short: s.short, gname: g.name }
         })
       })
     })
@@ -241,9 +230,8 @@ function Register() {
   }, [])
 
   /* Title hits above description hits, alphabetical within each. Capped, with
-     the cap stated — a silently truncated result list reads as "that is all
-     there is", which for a register is the one lie it must not tell. */
-  const CAP = 60
+     the cap stated, so a cut-off list never reads as the whole answer. */
+  const CAP = 24
   const hits = useMemo(() => {
     if (!searching) return null
     const t = [], d = []
@@ -255,74 +243,36 @@ function Register() {
     return t.sort(by).concat(d.sort(by))
   }, [index, query, searching])
 
-  /* Left/Right/Home/End on a tab move the selection and the focus together. */
-  const onTabKey = (e, i) => {
-    const n = sectors.length
-    let j = null
-    if (e.key === 'ArrowRight') j = (i + 1) % n
-    else if (e.key === 'ArrowLeft') j = (i - 1 + n) % n
-    else if (e.key === 'Home') j = 0
-    else if (e.key === 'End') j = n - 1
-    if (j === null) return
-    e.preventDefault()
-    setActive(sectors[j].id)
-    document.getElementById(`${uid}-t-${sectors[j].id}`)?.focus()
-  }
+  /* Escape clears the search before it closes the page. */
+  useEscape(Boolean(q) && !openId, () => setQ(''))
 
   const status = searching
     ? `${hits.length} role${hits.length === 1 ? '' : 's'} matching ${q.trim()}`
     : `${totals.sectors} sectors, ${totals.roles} roles.`
-
-  /* The live region lags the state on purpose: `role="status"` is polite, but
-     a screen reader still queues one announcement per keystroke. */
   const [announced, setAnnounced] = useState(status)
   useEffect(() => {
     const t = setTimeout(() => setAnnounced(status), 350)
     return () => clearTimeout(t)
   }, [status])
 
-  const toSector = (id) => {
-    setQ('')
-    setActive(sectors[where[id].si].id)
+  const openSector = (sid, roleId = null) => {
+    setMark(roleId)
+    setOpenId(sid)
   }
-
-  const cur = sectors.find((s) => s.id === active) ?? sectors[0]
-
-  /* Bring the chosen tab into view when it changes — a tap, a search crumb,
-     the arrow keys. On a phone the bar is a scrolling row with start-aligned
-     snap points, so the tab is scrolled to the START of the row: `nearest`
-     would align its far edge and the proximity snap would then pull the row
-     back to the previous tab's start, leaving the chosen one half under the
-     edge fade. On wider screens the bar does not scroll and this is a no-op
-     horizontally. Not on mount: `block: 'nearest'` would scroll the world
-     down to the register the moment it opened. */
-  const first = useRef(true)
-  useEffect(() => {
-    if (first.current) {
-      first.current = false
-      return
-    }
-    document
-      .getElementById(`${uid}-t-${active}`)
-      ?.scrollIntoView({ block: 'nearest', inline: 'start' })
-  }, [active, uid])
+  const cur = sectors.find((s) => s.id === openId) || null
 
   return (
     <section className="w-reg-wrap" id="w-sectors" aria-labelledby={`${uid}-h`} data-reveal>
       <div className="w-reg-head">
         <p className="world-kicker">What the register covers</p>
-        <h3 id={`${uid}-h`}>Twelve sectors, role by role</h3>
+        <h3 id={`${uid}-h`}>Twelve sectors</h3>
         <p className="world-line">
-          Every role named. Not “construction labour” — a carpenter, a paver
-          and a groundworker, each doing something different. Search any of the{' '}
-          {totals.roles} by name, or pick a sector.
+          Pick your sector to see the roles we supply, or search for a job title.
         </p>
       </div>
 
-      {/* Tracked caps rather than a magnifier: there is no magnifier anywhere
-          in this brand kit and there are tracked caps on every page of it. */}
       <div className="w-find">
-        <span className="w-find-tag" aria-hidden="true">Find</span>
+        <span className="w-find-tag" aria-hidden="true"><Icon name="search" size={16} /></span>
         <label className="sr-only" htmlFor={`${uid}-find`}>
           Search all {totals.roles} roles
         </label>
@@ -332,17 +282,7 @@ function Register() {
           type="search"
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          /* Escape clears the search rather than closing the whole Workforce
-             world. `useEscape` listens on `window`, so without this a visitor
-             pressing Escape to dismiss a query is thrown back to the gateway. */
-          onKeyDown={(e) => {
-            if (e.key === 'Escape' && q) {
-              e.preventDefault()
-              e.stopPropagation()
-              setQ('')
-            }
-          }}
-          placeholder="Role, e.g. forklift, welder, carpenter"
+          placeholder="Search a job title, for example forklift, welder, carpenter"
         />
         {q && (
           <button type="button" className="w-find-clear" onClick={() => setQ('')}>
@@ -350,136 +290,134 @@ function Register() {
           </button>
         )}
       </div>
-      <p id={`${uid}-status`} className="sr-only" role="status">{announced}</p>
+      <p className="sr-only" role="status">{announced}</p>
 
-      {searching ? (
-        <div
-          className="w-results"
-          role="region"
-          aria-label={`Search results: ${hits.length} role${hits.length === 1 ? '' : 's'} matching ${q.trim()}`}
-          aria-describedby={`${uid}-legend`}
-        >
+      {searching && (
+        <div className="w-results" role="region" aria-label="Search results">
           {hits.length === 0 ? (
             <p className="w-reg-none">
-              No role matches “{q.trim()}”. The register covers {totals.sectors}{' '}
-              sectors and {totals.roles} roles — try a shorter word, or open a
-              sector below.
+              Nothing matches “{q.trim()}”. Try a shorter word, or open a sector below.
             </p>
           ) : (
             <ul className="w-hits" role="list">
-              {hits.slice(0, CAP).map((r) => {
-                const s = r.st === 'req' ? 'On request' : r.st === 'qc' ? 'Qualification required' : null
-                return (
-                  <li className={`w-hit ${s ? 'is-q' : ''}`} key={r.id}>
-                    <p className="w-hit-t">
-                      {r.t}
-                      {s && <span className="w-hit-s"><span className="sr-only">Status: </span>{s}</span>}
-                    </p>
-                    {/* The sentence that tells two similar titles apart. It is
-                        shown here, where a reader is looking at a handful of
-                        results, rather than 307 times in the browse list. */}
-                    <p className="w-hit-d">{r.d}</p>
-                    <button type="button" className="w-hit-crumb" onClick={() => toSector(r.id)}>
-                      {where[r.id].short} · {where[r.id].gname}
-                    </button>
-                  </li>
-                )
-              })}
+              {hits.slice(0, CAP).map((r) => (
+                <li key={r.id}>
+                  <button type="button" className="w-hit" onClick={() => openSector(where[r.id].sid, r.id)}>
+                    <span className="w-hit-t">{r.t}</span>
+                    <span className="w-hit-crumb">{where[r.id].short}</span>
+                    <Icon name="arrow" size={14} />
+                  </button>
+                </li>
+              ))}
             </ul>
           )}
           {hits.length > CAP && (
             <p className="w-reg-more">
-              Showing {CAP} of {hits.length}. Narrow the search to see the rest.
+              Showing {CAP} of {hits.length}. Type a little more to narrow it down.
             </p>
           )}
         </div>
-      ) : (
-        <>
-          <div className="w-tabs" role="tablist" aria-label="Sectors">
-            {sectors.map((s, i) => {
-              const on = s.id === active
-              return (
-                <button
-                  type="button"
-                  role="tab"
-                  key={s.id}
-                  id={`${uid}-t-${s.id}`}
-                  className={`w-tab ${on ? 'is-on' : ''}`}
-                  aria-selected={on}
-                  aria-controls={`${uid}-p-${s.id}`}
-                  tabIndex={on ? 0 : -1}
-                  onClick={() => setActive(s.id)}
-                  onKeyDown={(e) => onTabKey(e, i)}
-                >
-                  {/* Positional, never `s.no`. The source numbers run 01–07 and
-                      09–13 because Security and Automotive are cut, and a bar
-                      that skips 08 invites the one question this page cannot
-                      answer. `no` stays in the data for reconciliation. */}
-                  <span className="w-tab-n">{String(i + 1).padStart(2, '0')}</span>
-                  <span className="w-tab-k">{s.short}</span>
-                  <span className="w-tab-c">{count(s)}</span>
-                </button>
-              )
-            })}
-          </div>
-
-          {/* Keyed on the sector so the panel remounts and its entrance plays
-              on every switch. Transform only — see the CSS. */}
-          <div
-            className="w-panel"
-            role="tabpanel"
-            id={`${uid}-p-${cur.id}`}
-            aria-labelledby={`${uid}-t-${cur.id}`}
-            key={cur.id}
-          >
-            <div className="w-panel-head">
-              <h4>{cur.name}</h4>
-              <p className="w-panel-c">
-                {count(cur)} roles in {cur.groups.length} group{cur.groups.length === 1 ? '' : 's'}
-              </p>
-              <p className="w-panel-blurb">{cur.blurb}</p>
-            </div>
-            {cur.groups.map((g) => (
-              <section className="w-grp" key={g.id}>
-                <h4>
-                  {g.name} <span>{g.roles.length}</span>
-                </h4>
-                <ul className="w-roles" role="list">
-                  {g.roles.map((id) => {
-                    const [t, , st] = roles[id]
-                    const lbl = st === 'req' ? 'On request' : st === 'qc' ? 'Qualification required' : null
-                    return (
-                      <li className={lbl ? 'is-q' : ''} key={id}>
-                        {t}
-                        {lbl && (
-                          <span className="w-role-s">
-                            <span className="sr-only">Status: </span>{lbl}
-                          </span>
-                        )}
-                      </li>
-                    )
-                  })}
-                </ul>
-              </section>
-            ))}
-          </div>
-        </>
       )}
 
-      {/* "Published" is an internal workflow word — it describes the state of a
-          record in ORYX's copy files, not anything a visitor can act on. And
-          the note against a qualification role has to describe the *role*
-          rather than promise a check ORYX performs, because the source blocks
-          every compliance claim until the lending entity is fixed. The closing
-          clause is quoted from the source's own trust language and narrows the
-          claim rather than widening it. */}
-      <p className="w-reg-legend" id={`${uid}-legend`}>
-        Most roles carry no note.{' '}
-        <b>On request</b> — supplied subject to confirmation.{' '}
-        <b>Qualification required</b> — the role calls for a certificate, and a
-        certificate does not automatically grant authority.
-      </p>
+      <ul className="cards" role="list">
+        {sectors.map((s, i) => {
+          const img = cardImage(`workforce/${s.id}`)
+          return (
+            <li key={s.id}>
+              <button type="button" className="card" onClick={() => openSector(s.id)} aria-haspopup="dialog">
+                <span className="card-img">
+                  {img && <img src={img.src} alt="" loading="lazy" />}
+                  {/* Positional, never `s.no`. The source numbers skip 08,
+                      because Security is cut, and a grid that skips a number
+                      invites the one question this page cannot answer. */}
+                  <span className="card-n">{String(i + 1).padStart(2, '0')}</span>
+                  <span className="card-i"><Icon name={s.id} size={20} /></span>
+                </span>
+                <span className="card-body">
+                  <span className="card-k">{s.short}</span>
+                  <span className="card-c">{count(s)} roles</span>
+                  <span className="card-go"><span>View</span><Icon name="arrow" size={14} /></span>
+                </span>
+              </button>
+            </li>
+          )
+        })}
+      </ul>
+
+      {cur && (
+        <SectorSheet
+          sector={cur}
+          mark={mark}
+          onClose={() => setOpenId(null)}
+          onRequest={() => onRequest('workforce', cur.id)}
+        />
+      )}
     </section>
+  )
+}
+
+/* The popup for one sector. Group names, a handful of role names in each and
+   a count of the rest, which are in the brochure with a sentence apiece. */
+function SectorSheet({ sector, mark, onClose, onRequest }) {
+  const img = cardImage(`workforce/${sector.id}`)
+  const flagged = sector.groups.some((g) => g.roles.some((id) => roles[id][2]))
+
+  return (
+    <Sheet
+      tone="workforce"
+      label={sector.name}
+      image={img}
+      onClose={onClose}
+      actions={
+        <>
+          {/* The link first and the button last, on purpose. The focus trap
+              wraps on the last control, and Safari does not tab to links by
+              default, so a link in last place let Tab walk out of the popup. */}
+          <a className="btn" href={`/brochures/workforce-${sector.id}.pdf`} download>
+            <Icon name="download" size={16} /> Download brochure
+          </a>
+          <button type="button" className="btn btn--fill" onClick={onRequest}>
+            {ctaFor('workforce')} <Icon name="arrow" size={16} />
+          </button>
+        </>
+      }
+    >
+      <div className="sheet-head">
+        <span className="sheet-badge"><Icon name={sector.id} size={24} /></span>
+        <ul className="sheet-stats" role="list">
+          <li><b>{count(sector)}</b>roles</li>
+          <li><b>{sector.groups.length}</b>groups</li>
+        </ul>
+      </div>
+      <p className="sheet-lede">{sector.blurb}</p>
+
+      <h4 className="sheet-h">Roles we supply</h4>
+      <ul className="sheet-groups" role="list">
+        {sector.groups.map((g) => {
+          /* A role reached from search is always among the ones shown. */
+          const ids = mark && g.roles.includes(mark)
+            ? [mark, ...g.roles.filter((id) => id !== mark)]
+            : g.roles
+          const more = ids.length - SHOWN
+          return (
+            <li className="sheet-group" key={g.id}>
+              <p className="sheet-group-k">{g.name} <span>{g.roles.length}</span></p>
+              <ul className="sheet-chips" role="list">
+                {ids.slice(0, SHOWN).map((id) => (
+                  <li key={id} className={id === mark ? 'is-hit' : ''}>{roles[id][0]}</li>
+                ))}
+                {more > 0 && <li className="is-more">and {more} more</li>}
+              </ul>
+            </li>
+          )
+        })}
+      </ul>
+
+      <p className="sheet-note">
+        The brochure lists every role in this sector with a line on what it covers.
+        {flagged && ` Some roles are marked "${STATUS.req}" or "${STATUS.qc}" there. Those are confirmed for each assignment.`}
+      </p>
+    </Sheet>
   )
 }
 
@@ -622,34 +560,6 @@ function Axes({ copy }) {
  * five were invented for the earlier proposal. Four is also the better grid:
  * five cards widowed one at every breakpoint the page has.
  */
-function ServiceLines() {
-  return (
-    <section className="w-lines" id="w-lines">
-      <div className="w-lines-head">
-        <p className="world-kicker" data-reveal>Axis two · how capacity is delivered</p>
-        <h3 data-reveal>Four service lines</h3>
-        <p className="world-line" data-reveal>
-          Every role in the register can be supplied through any of the four.
-          The choice is commercial and contractual, not occupational.
-        </p>
-      </div>
-
-      <ol className="w-models" role="list">
-        {serviceLines.map((l, i) => (
-          <li className="w-model" key={l.n} data-reveal style={{ '--i': i }}>
-            <span className="w-model-n">{l.n}</span>
-            <span className="w-model-k">{l.k}</span>
-            <span className="w-model-d">{l.d}</span>
-            <span className="w-model-ex">
-              <b>Best fit</b> {l.fit}
-            </span>
-          </li>
-        ))}
-      </ol>
-    </section>
-  )
-}
-
 function WorkforceFooter({ service, onClose, onRequest }) {
   const year = new Date().getFullYear()
   const { world } = service
@@ -664,8 +574,8 @@ function WorkforceFooter({ service, onClose, onRequest }) {
               *submitted* around the clock, which is a fact about the form and
               not a promise about a person. */}
           <p>{world.submitNote}</p>
-          <button type="button" className="w-foot-cta" onClick={onRequest}>
-            {world.cta} <i aria-hidden="true">→</i>
+          <button type="button" className="w-foot-cta" onClick={() => onRequest(service.id)}>
+            {ctaFor(service.id)} <i aria-hidden="true"><Icon name="arrow" size={16} /></i>
           </button>
         </div>
 
@@ -692,7 +602,7 @@ function WorkforceFooter({ service, onClose, onRequest }) {
                 — the source names no hours anywhere — and any hours here read
                 as a response-time promise, which is the blocked claim. */}
             <ul role="list">
-              <li><a href="mailto:people@oryx.example">people@oryx.example</a></li>
+              <li><a href={`mailto:${emailFor('workforce')}`}>{emailFor('workforce')}</a></li>
               <li>{world.submitNote}</li>
             </ul>
           </div>
@@ -700,7 +610,8 @@ function WorkforceFooter({ service, onClose, onRequest }) {
       </div>
 
       <div className="w-foot-base">
-        <span>© {year} ORYX Workforce — a service of ORYX GROUP</span>
+        <span>© {year} ORYX Workforce, a service of ORYX GROUP</span>
+        <Social />
         <button type="button" className="w-foot-back" onClick={onClose}>
           All ORYX services
         </button>

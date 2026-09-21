@@ -455,63 +455,123 @@
    in it would give the beat two logos, one fading out as the other faded in,
    which is exactly the cut this replaces. */
 .hero-end-slot {
-  width: clamp(54px, 6vw, 82px);
+  width: clamp(62px, 6.6vw, 92px);
   aspect-ratio: 0.4161;
 }
-
-/* The single-file promo path has no travelling mark to receive — its video
-   carries whatever logo animation was baked into the edit — so its end card
-   still paints a real one. */
+/* The single-file promo path has no travelling mark to receive, so its end
+   card still paints a real one. White, as the travelling mark is when it
+   lands. */
 .hero-end-mark {
-  width: clamp(54px, 6vw, 82px);
+  width: clamp(62px, 6.6vw, 92px);
   aspect-ratio: 0.4161;
-  background: var(--sand);
+  background: var(--oryx-white);
   -webkit-mask: url('/mark.png') center / contain no-repeat;
   mask: url('/mark.png') center / contain no-repeat;
 }
-
-.hero-end-word {
-  font-family: var(--font-group);
-  font-size: clamp(1.5rem, 3.4vw, 2.6rem);
-  font-weight: 600;
-  letter-spacing: 0.32em;
-  margin-right: -0.32em;
-  text-transform: uppercase;
-  color: var(--oryx-white);
-}
-
+/* Condensed and tracked, under the button. O, R, Y and X are sand and the
+   rest is white, from `.slogan` in shared.css. */
 .hero-end-slogan {
-  font-size: var(--step-1);
-  font-weight: 300;
-  letter-spacing: 0.02em;
-  color: var(--sand-text);
+  margin-top: clamp(1rem, 3.4vh, 2.2rem);
+  font-family: 'Barlow Condensed', 'Arial Narrow', var(--font);
+  font-size: clamp(1.05rem, 0.95rem + 0.5vw, 1.4rem);
+  font-weight: 500;
+  letter-spacing: 0.09em;
 }
+.hero-end-slogan .slogan-k { font-weight: 600; }
 
+/* One word in a ruled box. Wide, quiet and unmistakably the way in. */
 .hero-enter {
-  margin-top: clamp(0.6rem, 2vh, 1.2rem);
+  margin-top: clamp(1.4rem, 4.5vh, 2.8rem);
   display: inline-flex;
   align-items: center;
-  gap: 0.7rem;
-  padding: 1rem 2rem;
-  border: 1px solid var(--line-sand);
+  justify-content: center;
+  min-width: clamp(10.5rem, 14vw, 13rem);
+  padding: 1.15rem 2.4rem;
+  border: 1px solid rgba(244, 241, 232, 0.42);
   background: transparent;
-  font-size: var(--step--2);
-  font-weight: 600;
-  letter-spacing: var(--track-label);
+  font-size: var(--step--1);
+  font-weight: 500;
+  letter-spacing: 0.34em;
+  /* Tracking adds a gap after the last letter too; take it back so the word
+     sits in the middle of its box. */
+  text-indent: 0.34em;
   text-transform: uppercase;
   color: var(--oryx-white);
   transition: background 0.3s var(--ease-out), border-color 0.3s var(--ease-out),
     color 0.3s var(--ease-out);
 }
-.hero-enter:hover {
-  background: var(--sand);
-  border-color: var(--sand);
+.hero-enter:hover,
+.hero-enter:focus-visible {
+  background: var(--oryx-white);
+  border-color: var(--oryx-white);
   color: var(--oryx-black);
 }
-.hero-enter i { font-style: normal; transition: transform 0.3s var(--ease-out); }
-.hero-enter:hover i { transform: translateX(5px); }
+
+/* The travelling mark lives inside `.stage`, whose `z-index: 0` made a stacking
+   context of it: the mark's own z-index could never rise above the plate, a
+   sibling at 1. On a desktop the plate has faded out before it reaches the
+   centre, so it did not show. On a phone the plate is full width and it laid a
+   near-black sheet over the white mark. With the context dissolved for the end
+   card, the mark paints above the plate and the stage's ground stays below. */
+.hero.is-end .stage { z-index: auto; }
+
+/* ── The plate behind the end card ────────────────────────────────────
+   The horns at the left edge, nearly black, dissolving into the ground to
+   the right, with the mark's construction lines over them. */
+.hero-end-plate {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: min(58vw, 62rem);
+  z-index: 1;
+  pointer-events: none;
+  color: var(--sand);
+  -webkit-mask-image: linear-gradient(to right, #000 0%, #000 24%, transparent 88%);
+  mask-image: linear-gradient(to right, #000 0%, #000 24%, transparent 88%);
+  animation: plate-in 1.6s var(--ease-out) 0.5s both;
+}
+.hero-end-photo {
+  position: absolute;
+  inset: 0;
+  background: url('/film/04-sun.jpg') 76% 6% / 230% auto no-repeat;
+  filter: grayscale(0.8) sepia(0.35) brightness(0.24) contrast(1.15);
+}
+.hero-end-plate svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.5;
+}
+/* No `to`: the plate ends at its own declared opacity, which is lower on a
+   phone. A keyframe of 1 would override that for good, because the animation
+   fills forwards. */
+@keyframes plate-in {
+  from { opacity: 0; }
+}
+.hero-caption {
+  display: inline-flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: var(--step--2);
+  font-weight: 500;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  animation: end-in 0.9s var(--ease-out) 0.3s both;
+}
+.hero-caption::before { content: ''; width: 46px; height: 1px; background: var(--sand); }
+@media (prefers-reduced-motion: reduce) {
+  .hero-end-plate, .hero-caption { animation: none; }
+}
+@media (max-width: 700px) {
+  .hero-end-plate { width: 100vw; opacity: 0.8; }
+  .hero-end-photo { background-size: 420% auto; background-position: 70% 6%; }
+  .hero-caption { letter-spacing: 0.18em; gap: 0.7rem; }
+  .hero-caption::before { width: 28px; }
+}
 
 /* ── Foot: progress and the way out ──────────────────────────────────── */
+.hero-sound { margin-left: auto; }
 .hero-foot {
   position: relative;
   z-index: 4;
@@ -553,7 +613,10 @@
   font-weight: 600;
   letter-spacing: 0.04em;
   line-height: 1;
-  color: var(--oryx-white);
+  /* Sand, and the words beneath go white with the same letter picked out in
+     sand again. The four letters are what the slogan is built from, so they
+     are the accent wherever the slogan is set. */
+  color: var(--sand);
 }
 .ir-rule {
   display: block;
@@ -580,7 +643,7 @@
   font-weight: 600;
   letter-spacing: 0.04em;
   line-height: 1.25;
-  color: var(--sand-text);
+  color: var(--oryx-white);
   /* The words are different lengths and must not be hyphenated apart. */
   overflow-wrap: normal;
 }

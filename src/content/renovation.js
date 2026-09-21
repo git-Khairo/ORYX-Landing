@@ -81,7 +81,7 @@ export const services = [
       { t: 'Condition & maintenance', d: 'Maintenance need, priorities and support for long-term maintenance planning.' },
       { t: 'Energy & comfort', d: 'Insulation, ventilation, moisture, temperature, noise and occupant experience.' },
       { t: 'Constraints', d: 'Early check of permits, heritage status, asbestos, ecology and access.' },
-      { t: 'Scenarios', d: 'Maintain, improve and transform — with scope, phasing and budget range.' },
+      { t: 'Scenarios', d: 'Maintain, improve and transform, each with scope, phasing and a budget range.' },
       { t: 'Delivery plan', d: 'Work package, programme, resident/user approach, qualifications and evidence.' },
       { t: 'Property record', d: 'Photos, findings, decisions and the starting point for the ORYX Property Passport.' },
     ],

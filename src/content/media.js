@@ -250,8 +250,8 @@ export const gallery = {
      JPEG, not the source PNG: 5.1 MB of lossless photograph became 644 KB with
      nothing visible lost. The PNGs stay beside them as the masters. */
   renovation: [
-    { src: '/renovation/before.jpg', alt: 'Illustration: a commercial floor stripped back before refurbishment — bare concrete, services exposed overhead, walls back to substrate' },
+    { src: '/renovation/before.jpg', alt: 'Illustration: a commercial floor stripped back before refurbishment, with bare concrete, services exposed overhead, walls back to substrate' },
     { src: shot(12526862), alt: 'A commercial floor part-cleared during works' },
-    { src: '/renovation/after.jpg', alt: 'Illustration: the same floor completed — oak flooring, suspended ceiling with linear lighting, desks in place' },
+    { src: '/renovation/after.jpg', alt: 'Illustration: the same floor completed, with oak flooring, suspended ceiling with linear lighting, desks in place' },
   ],
 }

@@ -1,11 +1,12 @@
 import { useState } from 'react'
 import Nav from './components/Nav'
 import Cursor from './components/Cursor'
-import Ambience from './components/Ambience'
+import { SoundProvider } from './components/Sound'
 import ServiceWorld from './components/ServiceWorld'
 import Hero from './sections/Hero'
 import Work from './sections/Work'
 import Footer from './sections/Footer'
+import RequestPage from './sections/RequestPage'
 import { services } from './content/copy'
 import './styles/nav.css'
 import './styles/cursor.css'
@@ -21,6 +22,11 @@ import './styles/world-renovation.css'
    styles they are overriding. */
 import './styles/world-identity.css'
 import './styles/footer.css'
+/* The pieces every surface shares: the sound switch, the detail popup, the
+   card grids and the request page. After the worlds, so a popup carrying a
+   `world--<id>` class still gets its own layout from here. */
+import './styles/shared.css'
+import './styles/request.css'
 
 /**
  * The site is two surfaces and an intro.
@@ -39,32 +45,28 @@ export default function App() {
   const [introDone, setIntroDone] = useState(false)
   const service = services.find((s) => s.id === openId) || null
 
-  /**
-   * One entry point for both callers, and they do not pass the same thing.
-   * `Work` sends a real service id; the footer's "Start a request" sends an
-   * empty string, meaning "take me to contact" rather than "open service ''".
-   * Resolving against the services list is what keeps that distinction honest —
-   * anything that is not a service simply falls through to the contact section.
-   */
+  /* The request page. `null` is closed; otherwise `{ service, sub }`, either
+     of which may be empty. It opens over whatever is already on screen, so a
+     visitor inside a service page closes the form and is back where they were
+     reading, not dropped at the foot of the home page. */
+  const [req, setReq] = useState(null)
+
+  /* `Work` and the footer's service links send a real service id. Anything
+     that is not a service id is a request to get in touch, which now means
+     the request page. */
   const open = (id) => {
-    if (services.some((s) => s.id === id)) {
-      setOpenId(id)
-      return
-    }
-    document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })
+    if (services.some((s) => s.id === id)) setOpenId(id)
+    else setReq({})
   }
 
-  const request = () => {
-    setOpenId(null)
-    // Let the overlay unmount and the scroll lock release before moving, or the
-    // restore fights the scroll and the page lands in the wrong place.
-    requestAnimationFrame(() =>
-      document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' }),
-    )
-  }
+  const request = (serviceId, subId) =>
+    setReq({
+      service: services.some((s) => s.id === serviceId) ? serviceId : '',
+      sub: subId || '',
+    })
 
   return (
-    <>
+    <SoundProvider>
       {/* Only once the film has gone. While the intro is up the page beneath
           is locked, so a link promising to jump into it would be a dead end —
           the intro's own control is the way through, and it is reachable by
@@ -73,11 +75,7 @@ export default function App() {
       {/* The chrome stays mounted underneath the film so the page is already
           there the instant the intro clears — nothing has to load in behind it. */}
       <Cursor />
-      <Nav />
-      {/* Armed from the first paint, so the soundtrack runs under the opening
-          film rather than starting after it. Ambience handles the case where
-          the browser refuses to autoplay. */}
-      <Ambience />
+      <Nav onRequest={() => request()} />
       {/* `warm` gates the door films. The gateway itself stays mounted under
           the intro so the page is there the instant the wipe clears — but its
           three 1080p door clips were mounting with `autoPlay` too, decoding
@@ -96,6 +94,8 @@ export default function App() {
           onRequest={request}
         />
       )}
-    </>
+
+      {req && <RequestPage preset={req} onClose={() => setReq(null)} />}
+    </SoundProvider>
   )
 }

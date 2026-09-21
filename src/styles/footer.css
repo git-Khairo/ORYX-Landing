@@ -179,7 +179,6 @@
 .foot-legal a { transition: color 0.25s var(--ease-out); }
 .foot-legal a:hover { color: var(--oryx-white); }
 .foot-legal span { color: var(--line-sand); }
-.foot-place { letter-spacing: var(--track-label); text-transform: uppercase; }
 
 @media (max-width: 860px) {
   /* The spine needs height to be anything but a stripe, and the footer is not

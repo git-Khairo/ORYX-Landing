@@ -22,6 +22,21 @@
      Reduced motion collapses the duration globally and leaves that end state
      intact. */
   animation: world-in 0.72s var(--ease-inout) both;
+
+  /* ── One place to size every section ───────────────────────────────────
+     Each service page used to hardcode its own vertical rhythm, the same
+     three or four `clamp()` recipes pasted about thirty times. They now read
+     these, so the pages were made more compact by changing four numbers and
+     can be loosened again the same way.
+
+     The type steps are overridden here and not in `tokens.css`, because the
+     home page reads the same scale and was not asked to change. */
+  --sec: clamp(2.2rem, 5.5vh, 3.6rem);
+  --sec-lg: clamp(2.6rem, 6.5vh, 4.2rem);
+  --sec-gap: clamp(1.1rem, 2.6vh, 1.6rem);
+  --step-4: clamp(2.3rem, 1.6rem + 3vw, 4.4rem);
+  --step-3: clamp(1.7rem, 1.3rem + 1.7vw, 2.8rem);
+  --step-2: clamp(1.35rem, 1.16rem + 0.8vw, 1.95rem);
 }
 
 /* The same shape the film cuts on: a panel whose leading edge is the mark's V,
@@ -120,7 +135,7 @@
 .w-open,
 .r-open {
   position: relative;
-  min-height: 88svh;
+  min-height: 70svh;
   display: grid;
   place-items: end start;
   padding: var(--gutter);

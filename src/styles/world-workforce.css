@@ -98,7 +98,20 @@
 }
 .w-nav-cta:hover { background: var(--oryx-white); }
 
-@media (max-width: 720px) {
+.w-nav-r { display: inline-flex; align-items: center; gap: 0.6rem; margin-left: auto; }
+/* Never wraps. Wrapped, the button took the bar from 65px to 83px at tablet
+   width, and everything sticky below it is positioned from that height. */
+.w-nav-cta { white-space: nowrap; }
+
+/* 820, up from 720: the sound switch now shares the bar, and measured at 768px
+   the links, the switch and the button no longer fit on one line together. */
+/* Measured at 360px: with the sound switch in the bar, "Request staff" ran off
+   the right edge. The word WORKFORCE beside the mark is the first thing to go;
+   the page's own heading says it again directly underneath. */
+@media (max-width: 430px) {
+  .w-nav-unit { display: none; }
+}
+@media (max-width: 820px) {
   .w-nav-links { display: none; }
   /* `nowrap` is not cosmetic: wrapped, the button took the bar from 54px to
      82px, and everything sticky below it is positioned from that height. */
@@ -112,7 +125,7 @@
 .w-foot-main {
   max-width: var(--maxw);
   margin: 0 auto;
-  padding: clamp(3.5rem, 10vh, 6rem) var(--gutter);
+  padding: var(--sec) var(--gutter);
   display: grid;
   grid-template-columns: 1.1fr 1fr;
   gap: clamp(2.5rem, 7vw, 6rem);
@@ -265,25 +278,11 @@
 .w-strip-note {
   max-width: var(--maxw);
   margin: 0 auto;
-  padding: 0.9rem var(--gutter) clamp(2.5rem, 7vh, 4rem);
+  padding: 0.9rem var(--gutter) clamp(1.4rem, 3.5vh, 2.2rem);
   font-size: var(--step--1);
   line-height: 1.5;
   color: var(--text-2);
 }
-/* The north star. A statement, so it is set as one — sand, display face, and
-   no quotation marks anywhere near it. */
-.w-north {
-  margin-top: 1.1rem;
-  font-family: var(--font-display);
-  font-size: var(--step-1);
-  font-weight: 800;
-  letter-spacing: var(--track-display);
-  text-transform: uppercase;
-  line-height: 1.12;
-  color: var(--sand);
-  max-width: 18ch;
-}
-
 .w-open-lede {
   font-size: var(--step-0);
   line-height: 1.6;
@@ -308,7 +307,7 @@
 .w-method {
   max-width: var(--maxw);
   margin: 0 auto;
-  padding: clamp(3.5rem, 9vh, 6rem) var(--gutter);
+  padding: var(--sec) var(--gutter);
   display: grid;
   grid-template-columns: 0.9fr 1.1fr;
   gap: clamp(2rem, 5vw, 4rem);
@@ -367,119 +366,6 @@
 }
 .w-step-d { font-size: var(--step-0); line-height: 1.6; color: var(--text-2); max-width: 46ch; }
 
-/* ── Interlude ────────────────────────────────────────────────────────── */
-.w-interlude {
-  position: relative;
-  min-height: 68svh;
-  display: grid;
-  place-items: center;
-  padding: var(--gutter);
-  isolation: isolate;
-}
-.w-interlude .world-film::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: rgba(13, 13, 12, 0.7);
-}
-.w-interlude-line {
-  position: relative;
-  z-index: 1;
-  max-width: 30ch;
-  text-align: center;
-  font-family: var(--font-display);
-  font-size: var(--step-2);
-  text-transform: uppercase;
-  letter-spacing: var(--track-display);
-  line-height: 1.35;
-  color: var(--oryx-white);
-}
-
-/* ── Axis two, the service lines ──────────────────────────────────────
-   Four ways to take on the same people. Not a fourth level of the register
-   above — the figure directly before this section exists to say so.
-
-   Four, not the five this held before: those five engagement models were
-   written for the earlier proposal and the source has four. Four is also the
-   better grid. Five never divided into any of this page's breakpoints without
-   widowing one card. */
-.w-lines {
-  max-width: var(--maxw);
-  margin: 0 auto;
-  padding: clamp(4rem, 11vh, 7rem) var(--gutter);
-  display: grid;
-  gap: clamp(1.6rem, 4vh, 2.4rem);
-}
-.w-lines-head { display: grid; gap: 0.9rem; max-width: 56ch; }
-
-/* One column per service line, explicitly. The count is not decorative: this
-   is a bordered grid whose cell walls are 1px gaps showing the background
-   through, so a track with no item in it does not collapse — it renders as an
-   empty box. That is exactly what a leftover `repeat(5)` produced here after
-   the fifth model was removed. If a service line is ever added or dropped,
-   this number changes with it. */
-.w-models {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 1px;
-  background: var(--line);
-  border: 1px solid var(--line);
-}
-.w-model {
-  background: var(--tone);
-  padding: clamp(1.2rem, 3vh, 1.8rem) clamp(1rem, 2vw, 1.4rem);
-  display: grid;
-  /* Four children — ordinal, name, description, best-fit — and the `1fr` on
-     the description absorbs each card's slack so the four best-fit rules land
-     on one line. `align-content: start` would collapse every track to the top
-     and stagger them by the length of the description above, which is the
-     length of somebody else's sentence. */
-  grid-template-rows: auto auto 1fr auto;
-  gap: 0.5rem;
-  transition: background 0.25s var(--ease-out);
-}
-.w-model:hover { background: var(--raise); }
-.w-model-n {
-  font-family: var(--font);
-  font-size: var(--step--2);
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  color: var(--text-3);
-  font-variant-numeric: tabular-nums;
-}
-.w-model-k {
-  font-family: var(--font-display);
-  font-size: var(--step-1);
-  font-weight: 800;
-  letter-spacing: var(--track-display);
-  text-transform: uppercase;
-  color: var(--text);
-  line-height: 1.05;
-}
-.w-model-d { font-size: var(--step--1); color: var(--text-2); line-height: 1.5; }
-/* The example is the offer. Set apart on its own rule so it reads as a figure
-   rather than as the last sentence of the description. */
-.w-model-ex {
-  margin-top: 0.3rem;
-  padding-top: 0.7rem;
-  border-top: 1px solid var(--line);
-  font-size: var(--step--2);
-  color: var(--text-2);
-}
-/* The source frames each of these as "Best fit — …", which is the difference
-   between a description and a recommendation for a particular situation. */
-.w-model-ex b {
-  display: block;
-  margin-bottom: 0.25rem;
-  font-weight: 700;
-  letter-spacing: var(--track-label);
-  text-transform: uppercase;
-  color: var(--sand-text);
-}
-/* No lead card. The source presents the four as genuine alternatives chosen on
-   the assignment, and singling one out with a fill would make it the
-   recommended option — a claim the document does not make. */
-
 /* ── Trust ───────────────────────────────────────────────────────────
    Set like a statement band, because that is what it is: something the company
    is saying about itself, not another table of data.
@@ -492,7 +378,7 @@
 .w-trust {
   border-block: 1px solid var(--line);
   background: var(--sunk);
-  padding: clamp(3rem, 9vh, 5rem) var(--gutter);
+  padding: var(--sec) var(--gutter);
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: clamp(2rem, 6vw, 5rem);
@@ -541,10 +427,8 @@
 /* 4 → 2 → 1. Never three: three columns leave one of four cards alone on a
    second row, and an empty track beside it. */
 @media (max-width: 1100px) {
-  .w-models { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 560px) {
-  .w-models { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 860px) {
@@ -572,7 +456,7 @@
 .w-reg-wrap {
   max-width: var(--maxw);
   margin: 0 auto;
-  padding: clamp(3.5rem, 9vh, 6rem) var(--gutter);
+  padding: var(--sec) var(--gutter);
   display: grid;
   gap: clamp(1.2rem, 3vh, 1.8rem);
 }
@@ -591,13 +475,7 @@
 .w-find-tag {
   display: flex;
   align-items: center;
-  padding: 0 clamp(0.9rem, 2vw, 1.2rem);
-  border-right: 1px solid var(--line);
-  font-family: var(--font);
-  font-size: var(--step--2);
-  font-weight: 700;
-  letter-spacing: var(--track-label);
-  text-transform: uppercase;
+  padding: 0 0 0 clamp(0.9rem, 2vw, 1.2rem);
   color: var(--sand-text);
 }
 .w-find-in {
@@ -627,261 +505,49 @@
 }
 .w-find-clear:hover { color: var(--text); }
 
-/* ── The tab bar ──────────────────────────────────────────────────────── */
-.w-tabs {
+/* ── Search results ─────────────────────────────────────────────────────
+   Names only. A result is a button that opens its sector's popup with that
+   role marked, so the list never has to explain a role itself. */
+.w-results { display: grid; gap: 0.6rem; }
+.w-hits {
+  list-style: none;
+  margin: 0;
+  padding: 0;
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 0.45rem;
-  padding-bottom: clamp(0.9rem, 2vh, 1.2rem);
-  border-bottom: 1px solid var(--line);
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr));
+  gap: 0.35rem;
 }
-.w-tab {
+.w-hit {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  align-items: baseline;
-  gap: 0.6rem;
-  min-width: 0;
-  padding: 0.55rem 0.85rem 0.5rem;
-  border: 1px solid var(--line);
-  background: transparent;
-  color: var(--text-2);
-  text-align: left;
-  transition: color 0.2s var(--ease-out), border-color 0.2s var(--ease-out), background 0.2s var(--ease-out);
-}
-.w-tab:hover { color: var(--text); border-color: var(--line-sand); }
-.w-tab.is-on { color: var(--text); background: var(--raise); border-color: var(--sand); }
-.w-tab:focus-visible { outline: 2px solid var(--sand); outline-offset: 2px; }
-.w-tab-n {
-  font-family: var(--font);
-  font-size: var(--step--2);
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  color: var(--text-2);
-  font-variant-numeric: tabular-nums;
-}
-.w-tab.is-on .w-tab-n { color: var(--sand); }
-/* Archivo 800 caps comes from world-identity.css and is shared with the other
-   display spans on this page — do not restate the family here or the two can
-   drift apart. */
-.w-tab-k {
-  font-size: var(--step--1);
-  line-height: 1.2;
-  /* A cell is a fixed share of the bar; a long name wraps inside it rather
-     than pushing the count out. */
-  overflow-wrap: anywhere;
-}
-.w-tab-c {
-  font-family: var(--font);
-  font-size: var(--step--2);
-  font-weight: 600;
-  letter-spacing: var(--track-label);
-  color: var(--sand-text);
-  font-variant-numeric: tabular-nums;
-  text-align: right;
-}
-
-/* ── The panel ────────────────────────────────────────────────────────
-   Transform only on entry, never opacity. A document timeline is paused
-   whenever the tab is not visible, and an animation in its active phase still
-   drives the property while frozen — so `from { opacity: 0 }` would leave the
-   whole panel in the DOM and invisible for as long as the tab stayed in the
-   background. Translating means the worst case is a panel sitting four pixels
-   low and perfectly readable. */
-.w-panel {
-  display: grid;
-  gap: clamp(1.2rem, 3vh, 1.8rem);
-  padding-top: 0.2rem;
-  animation: w-panel-in 0.28s var(--ease-out);
-}
-@keyframes w-panel-in { from { transform: translateY(4px); } }
-
-.w-panel-head { display: grid; gap: 0.45rem; max-width: 70ch; }
-.w-panel-head h4 {
-  font-size: var(--step-1);
-  line-height: 1.15;
-  color: var(--text);
-}
-.w-panel-c {
-  font-family: var(--font);
-  font-size: var(--step--2);
-  font-weight: 600;
-  letter-spacing: var(--track-label);
-  text-transform: uppercase;
-  color: var(--sand-text);
-  font-variant-numeric: tabular-nums;
-}
-
-.w-panel-blurb {
-  font-size: var(--step--1);
-  line-height: 1.55;
-  color: var(--text-2);
-  max-width: 70ch;
-}
-
-.w-grp { display: grid; gap: 0.5rem; }
-.w-grp h4 {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 1rem;
-  padding-bottom: 0.4rem;
-  border-bottom: 1px solid var(--line-sand);
-  font-family: var(--font);
-  font-size: var(--step--2);
-  font-weight: 700;
-  letter-spacing: var(--track-label);
-  text-transform: uppercase;
-  color: var(--sand-text);
-  max-width: 62ch;
-}
-.w-grp h4 span { color: var(--text-2); font-variant-numeric: tabular-nums; }
-
-/* Role names in columns. Titles only: the sentence that tells two similar ones
-   apart is shown in search results, where a reader is looking at a handful,
-   rather than 307 times down a browse list. */
-.w-roles {
-  columns: 3;
-  column-gap: clamp(1.4rem, 3vw, 2.6rem);
-  max-width: 100%;
-}
-.w-roles li {
-  break-inside: avoid;
-  padding: 0.22rem 0;
-  font-size: var(--step--1);
-  line-height: 1.4;
-  color: var(--text);
-}
-/* Demoted rather than decorated: a subtraction cannot read as a badge, and
-   "less available" reading as "less present" is the right direction. */
-.w-roles li.is-q { color: var(--text-2); }
-.w-role-s {
-  display: block;
-  font-family: var(--font);
-  font-size: var(--step--2);
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--text-2);
-}
-
-/* ── Search results ───────────────────────────────────────────────────── */
-.w-results {
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 0.7rem;
+  width: 100%;
+  padding: 0.6rem 0.8rem;
   border: 1px solid var(--line);
   background: var(--raise);
-  padding: clamp(1rem, 2.5vh, 1.4rem) clamp(1rem, 2.5vw, 1.6rem);
+  text-align: left;
+  color: var(--text-3);
+  transition: border-color 0.2s var(--ease-out), color 0.2s var(--ease-out);
 }
-.w-hits { columns: 2; column-gap: clamp(1.5rem, 4vw, 3rem); }
-.w-hit {
-  break-inside: avoid;
-  padding: 0.5rem 0 0.7rem;
-  border-bottom: 1px solid var(--line-soft);
-}
-.w-hit-t { font-size: var(--step-0); font-weight: 600; line-height: 1.3; color: var(--text); }
-.w-hit.is-q .w-hit-t { color: var(--text-2); }
-.w-hit-s {
-  display: block;
-  font-family: var(--font);
+.w-hit:hover,
+.w-hit:focus-visible { border-color: var(--sand); color: var(--sand-text); }
+.w-hit-t { font-size: var(--step--1); font-weight: 600; line-height: 1.3; color: var(--text); }
+.w-hit-crumb {
   font-size: var(--step--2);
   font-weight: 600;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--text-2);
+  color: var(--text-3);
+  white-space: nowrap;
 }
-.w-hit-d {
-  margin-top: 0.15rem;
-  font-size: var(--step--1);
-  line-height: 1.5;
-  /* #a9a595 — 6.83:1 on --raise. `--text-3` would be 4.37:1 and fail AA. */
-  color: color-mix(in srgb, var(--text-2) 72%, var(--text-3));
-}
-.w-hit-crumb {
-  display: block;
-  margin-top: 0.35rem;
-  font-family: var(--font);
-  font-size: var(--step--2);
-  letter-spacing: var(--track-label);
-  text-transform: uppercase;
-  color: var(--sand-text);
-  border-bottom: 1px solid var(--line-sand);
-  transition: color 0.2s var(--ease-out);
-}
-.w-hit-crumb:hover { color: var(--text); }
-
 .w-reg-none,
-.w-reg-more {
-  font-size: var(--step--1);
-  line-height: 1.6;
-  color: var(--text-2);
-  max-width: 60ch;
-}
-.w-reg-more { margin-top: 1rem; }
+.w-reg-more { font-size: var(--step--1); line-height: 1.55; color: var(--text-2); }
 
-.w-reg-legend {
-  font-size: var(--step--2);
-  line-height: 1.6;
-  color: var(--text-2);
-  max-width: 78ch;
-}
-.w-reg-legend b {
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--text);
-}
-
-/* Entrance only, off the shared `data-reveal` machinery. */
-.w-reg-wrap .w-tabs,
-.w-reg-wrap .w-panel {
-  opacity: 0;
-  transform: translateY(6px);
-  transition: opacity 0.4s var(--ease-out), transform 0.4s var(--ease-out);
-}
-.w-reg-wrap.is-in .w-tabs,
-.w-reg-wrap.is-in .w-panel { opacity: 1; transform: none; }
-
-@media (max-width: 1100px) {
-  .w-tabs { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-}
-@media (max-width: 900px) {
-  .w-roles { columns: 2; }
-  .w-hits { columns: 1; }
-}
-@media (max-width: 620px) {
-  /* One scrolling row. `overflow-x: auto` makes the box clip vertically too,
-     so 3px of top padding keeps the focus ring inside it. The mask feathers
-     the right edge; the border-bottom is on the box and does not scroll. */
-  .w-tabs {
-    display: flex;
-    gap: 0.4rem;
-    overflow-x: auto;
-    padding-top: 3px;
-    /* End padding the width of the fade, so the last chip can scroll clear of
-       it rather than living under it; `scroll-padding` keeps a tab brought
-       into view by script clear of the fade as well. */
-    padding-right: 2.5rem;
-    scroll-padding-inline: 0 2.5rem;
-    scroll-snap-type: x proximity;
-    scrollbar-width: none;
-    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 2.5rem), transparent);
-    mask-image: linear-gradient(to right, #000 calc(100% - 2.5rem), transparent);
-  }
-  .w-tabs::-webkit-scrollbar { display: none; }
-  .w-tab {
-    flex: 0 0 auto;
-    grid-template-columns: auto auto;
-    gap: 0.45rem;
-    padding: 0.5rem 0.7rem 0.45rem;
-    scroll-snap-align: start;
-  }
-  .w-tab-k { white-space: nowrap; overflow-wrap: normal; }
-  .w-tab-c { display: none; }
-  .w-roles { columns: 1; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .w-panel { animation: none; }
-  .w-reg-wrap .w-tabs,
-  .w-reg-wrap .w-panel { opacity: 1; transform: none; }
+@media (max-width: 560px) {
+  .w-hit { grid-template-columns: 1fr auto; }
+  .w-hit-crumb { grid-column: 1; grid-row: 2; white-space: normal; }
+  .w-hit .icon { grid-row: 1 / span 2; grid-column: 2; }
 }
 
 /* ══ The two axes ═══════════════════════════════════════════════════════
@@ -908,9 +574,9 @@
 .w-axes {
   max-width: var(--maxw);
   margin: 0 auto;
-  padding: clamp(3.5rem, 9vh, 6rem) var(--gutter);
+  padding: var(--sec) var(--gutter);
   display: grid;
-  gap: clamp(1.6rem, 4vh, 2.4rem);
+  gap: var(--sec-gap);
   border-top: 1px solid var(--line);
 }
 .w-axes-head { display: grid; gap: 0.9rem; max-width: 62ch; }
@@ -1126,8 +792,8 @@
    768px the cells are 80px wide while "Recruitment & selection" needs 134px,
    and CARPENTER — the one word that has to read identically five times or the
    figure loses its argument — rendered as CARPENT in three of the four.
-   `.w-models` directly below already drops to two columns at 1100px; this is
-   the same content and needs the same breakpoint.
+   The section of four cards that used to sit below this and shared the
+   breakpoint has been removed; the breakpoint stands on the measurement.
 
    Never stack these into one column and never go 2×2. A single column of four
    is the hierarchy misreading, drawn; 2×2 puts 03 and 04 below 01 and 02,
