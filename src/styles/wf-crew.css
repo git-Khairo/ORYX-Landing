@@ -1,0 +1,408 @@
+/* ══ Workforce: the crew that assembles as you scroll ═══════════════════
+   One worker on a site plan, then eleven more stepping into marked positions,
+   the supervisor last. A tall section with a sticky frame, built the way
+   Transport's load is built: the scroll through it IS the crew filling up, so
+   the drawing has to stay on screen while it happens.
+
+   ── One number ───────────────────────────────────────────────────────
+   `--p` (0 to 1) is written onto `.wc` by `useSmoothProgress`. Nothing below
+   reads it directly. Everything reads `--q`, which is `--p` when the scene is
+   running and a flat 1 when it is not.
+
+   That indirection is the safety. The hook writes `--p` unconditionally, even
+   for a visitor who asked for no motion, so a rule that read `--p` would go on
+   hiding people from them. `--q` has two ways to be 1: the hook never ran (the
+   fallback in `var(--p, 1)`), or the scene has been switched off (the flat
+   rules at the foot of this file). Either way the complete crew is drawn.
+
+   ── No opacity ───────────────────────────────────────────────────────
+   People arrive by transform alone: a short slide and a scale up from their
+   own feet. At rest the transform is the identity, so the end state is what
+   the markup draws with no styles applied to it at all. */
+.wc {
+  --q: var(--p, 1);
+  height: 170vh;
+  height: 170svh;
+  border-top: 1px solid var(--line);
+}
+
+/* `top` and the height both clear the navigation, which is itself sticky. A
+   frame pinned at 0 and 100svh tall parks its heading underneath the bar. */
+.wc-sticky {
+  position: sticky;
+  top: var(--w-nav-h, 3.4rem);
+  height: calc(100vh - var(--w-nav-h, 3.4rem));
+  height: calc(100svh - var(--w-nav-h, 3.4rem));
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: var(--sec-gap) var(--gutter);
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.4fr);
+  /* The middle row is the only one that flexes, and it is allowed to reach
+     zero: on a short screen the drawing gets smaller, the words do not. */
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  grid-template-areas:
+    'head  scene'
+    'count scene'
+    'roles roles';
+  gap: var(--sec-gap) clamp(1.5rem, 4vw, 4rem);
+}
+
+/* ── Heading ── */
+.wc-head { grid-area: head; display: grid; gap: 0.7rem; align-content: start; min-width: 0; }
+.wc-line {
+  font-size: var(--step-0);
+  line-height: 1.5;
+  color: var(--text-2);
+  max-width: 38ch;
+  text-wrap: pretty;
+}
+
+/* ── The counter ──
+   The loudest thing in the frame, because the head count is the whole story:
+   1, then 2, up to 12. Set in the page's heavy caps, sand for the figure and
+   white for what it is called. */
+.wc-count {
+  grid-area: count;
+  align-self: end;
+  min-width: 0;
+  display: grid;
+  grid-template-areas: 'cap' 'n' 'label';
+  justify-items: start;
+}
+.wc-cap {
+  grid-area: cap;
+  font-size: var(--step--2);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+.wc-n {
+  grid-area: n;
+  display: block;
+  /* Two digits wide from the start, in tabular figures, so nothing beside or
+     below it shifts when 9 becomes 10. */
+  min-width: 2ch;
+  font-family: var(--font-display);
+  font-size: clamp(4.5rem, 20vh, 12rem);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+  line-height: 0.86;
+  color: var(--sand);
+  animation: wc-settle 0.42s var(--ease-out);
+}
+.wc-label {
+  grid-area: label;
+  justify-self: stretch;
+  margin-top: 0.9rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid var(--line-sand);
+  /* Room for two lines at all times. "A complete project crew" wraps in this
+     column and "A flex pool" does not, and without the reserve the figure
+     above jumps by a line when the label changes. */
+  min-height: calc(2em + 0.8rem);
+  font-family: var(--font-display);
+  font-size: var(--step-2);
+  font-weight: 800;
+  letter-spacing: var(--track-display);
+  text-transform: uppercase;
+  line-height: 1;
+  color: var(--text);
+  text-wrap: balance;
+  animation: wc-settle 0.42s var(--ease-out);
+}
+/* A change of figure lands rather than swaps. Movement only. */
+@keyframes wc-settle {
+  from { transform: translateY(0.16em); }
+  to { transform: none; }
+}
+
+/* ── The plate ──
+   A sunk panel ruled with a grid: the drawing sits on a sheet, and the grid
+   fills the panel whatever shape the layout gives it. */
+.wc-scene {
+  grid-area: scene;
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  border: 1px solid var(--line);
+  background-color: var(--sunk);
+  background-image:
+    linear-gradient(to right, color-mix(in srgb, var(--line) 60%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in srgb, var(--line) 60%, transparent) 1px, transparent 1px);
+  background-size: 32px 32px;
+  background-position: -1px -1px;
+}
+/* Two sand corner ticks, the way a drawing sheet marks its frame. */
+.wc-scene::before,
+.wc-scene::after {
+  content: '';
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  pointer-events: none;
+}
+.wc-scene::before {
+  top: -1px;
+  left: -1px;
+  border-top: 1px solid var(--sand);
+  border-left: 1px solid var(--sand);
+}
+.wc-scene::after {
+  right: -1px;
+  bottom: -1px;
+  border-right: 1px solid var(--sand);
+  border-bottom: 1px solid var(--sand);
+}
+/* Out of flow, so the drawing's own proportions can never push the frame
+   taller than the screen. It takes whatever the grid has left. */
+.wc-scene svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: clamp(0.4rem, 1.4vw, 1.2rem);
+}
+.wc-scene svg * { stroke-linecap: square; stroke-linejoin: miter; }
+
+/* ── The site ── */
+.wc-build { fill: none; stroke: var(--line); stroke-width: 1.2; }
+.wc-tube { fill: none; stroke: var(--line); stroke-width: 1.5; }
+.wc-deck { fill: none; stroke: var(--text-3); stroke-width: 2; }
+.wc-ground { fill: none; stroke: var(--text-3); stroke-width: 2; }
+.wc-tag,
+.wc-num {
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  fill: var(--text-3);
+  stroke: none;
+}
+.wc-num { text-anchor: middle; font-variant-numeric: tabular-nums; }
+
+/* ── A position ──
+   `--s` is where this person's window opens, set per position by the
+   component. `--l` is their own progress through it, 0 to 1, and `--r` is what
+   is left. Squaring `--r` is the ease: fast in, slow to settle. */
+.wc-pos {
+  --l: clamp(0, (var(--q, 1) - var(--s, -1)) / var(--wc-dur, 0.11), 1);
+  --r: calc(1 - var(--l));
+}
+.wc-mark { fill: none; stroke: var(--line-sand); stroke-width: 1.2; }
+/* The mark fills from its centre as the person lands on it. */
+.wc-fill {
+  fill: none;
+  stroke: var(--sand);
+  stroke-width: 2.6;
+  transform: scaleX(var(--l));
+  transform-origin: 0 0;
+}
+/* The origin is the feet: the component draws every figure around 0,0 and
+   places it with an outer group, so this needs no `transform-box`.
+   No transition. `--q` is already eased frame by frame, and a transition on
+   top of a value that changes every frame only adds lag. */
+.wc-person {
+  transform:
+    translateX(calc(var(--r) * var(--r) * 46px))
+    scale(calc(1 - var(--r) * var(--r)));
+  transform-origin: 0 0;
+}
+
+/* ── A person ──
+   The ORYX kit is black, which would vanish here, so it is drawn as black
+   shapes edged in light line and trimmed in sand. */
+.wc-leg,
+.wc-hat { fill: var(--oryx-black); stroke: var(--text-2); stroke-width: 1.5; }
+.wc-shirt,
+.wc-head { fill: var(--sunk); stroke: var(--text-2); stroke-width: 1.5; }
+.wc-brim { fill: none; stroke: var(--text-2); stroke-width: 2.2; }
+.wc-badge { fill: var(--sand); stroke: none; }
+.wc-vest { fill: var(--oryx-black); stroke: var(--sand); stroke-width: 1.4; }
+.wc-strip { fill: none; stroke: var(--sand); stroke-width: 2.4; }
+
+/* The supervisor: the one white shape in the drawing. */
+/* A dark edge, not a white one: with white on white the sleeves and the body
+   ran together into one slab. */
+.wc-fig--lead .wc-shirt { fill: var(--oryx-white); stroke: var(--sunk); }
+.wc-collar { fill: none; stroke: var(--oryx-black); stroke-width: 1.4; }
+.wc-tablet { fill: var(--oryx-black); stroke: var(--sand); stroke-width: 1.4; }
+.wc-tablet-l { fill: none; stroke: var(--sand); stroke-width: 1.2; }
+
+/* ── The roles ──
+   The same twelve as words, lit as each position fills. Unlit is a quieter
+   colour, never a lower opacity: a role that has not arrived yet is still
+   text somebody may want to read, and `--text-3` holds 4.5:1 on this ground. */
+.wc-roles {
+  grid-area: roles;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+}
+.wc-role {
+  position: relative;
+  min-width: 0;
+  background: var(--ground);
+  padding: 0.6rem 0.7rem 0.55rem;
+  display: flex;
+  align-items: baseline;
+  gap: 0.55em;
+  font-size: var(--step--2);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  line-height: 1.25;
+  color: var(--text-3);
+  transition: color 0.4s var(--ease-out);
+}
+/* A sand rule drawn across the top of the cell when its position is taken. */
+.wc-role::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 2px;
+  background: var(--fill-strong);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.5s var(--ease-out);
+}
+.wc-role.is-on { color: var(--text); }
+.wc-role.is-on::before { transform: scaleX(1); }
+.wc-role-n { font-variant-numeric: tabular-nums; color: var(--text-3); transition: color 0.4s var(--ease-out); }
+.wc-role.is-on .wc-role-n { color: var(--sand-text); }
+/* Breaks a word only if it would otherwise leave its cell. The names come
+   from the register, and a longer one must wrap badly before it overflows. */
+.wc-role-k { min-width: 0; overflow-wrap: anywhere; }
+/* White for the white shirt, so the last cell reads as the different one. */
+.wc-role--lead::before { background: var(--oryx-white); }
+
+/* ── One column ───────────────────────────────────────────────────────
+   Below this the two-column frame leaves the drawing too narrow to read, so
+   it stacks: words, counter on one line, drawing, roles. */
+@media (max-width: 900px) {
+  .wc-sticky {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto minmax(0, 1fr) auto;
+    grid-template-areas: 'head' 'count' 'scene' 'roles';
+    row-gap: clamp(0.6rem, 1.8vh, 1.1rem);
+  }
+  .wc-head { gap: 0.45rem; }
+  .wc-line { max-width: 52ch; }
+
+  /* The figure beside its label, not above it: stacked, the counter cost the
+     drawing a fifth of a phone screen. */
+  .wc-count {
+    align-self: auto;
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas:
+      'n cap'
+      'n label';
+    column-gap: 0.9rem;
+    align-items: center;
+  }
+  .wc-cap { align-self: end; }
+  .wc-n { font-size: clamp(3rem, 9vh, 4.6rem); line-height: 0.9; }
+  .wc-label {
+    align-self: start;
+    margin-top: 0.15rem;
+    padding-top: 0;
+    border-top: 0;
+    min-height: 0;
+    font-size: var(--step-1);
+    line-height: 1.05;
+  }
+
+  .wc-roles { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+/* ── Phones ───────────────────────────────────────────────────────────
+   The motion is kept: twelve transforms are cheap. What goes is the fine
+   detail, which at this scale is a fraction of a pixel wide and only muddies
+   the drawing, and the line weights come up so the figures still read. */
+@media (max-width: 760px) {
+  .wc { height: 140vh; height: 140svh; }
+}
+@media (max-width: 560px) {
+  .wc-sticky { padding-block: 0.8rem; }
+  .wc-line { font-size: var(--step--1); }
+
+  .wc-detail { display: none; }
+  .wc-build,
+  .wc-tube { stroke-width: 2.4; }
+  .wc-deck,
+  .wc-ground { stroke-width: 3; }
+  .wc-mark { stroke-width: 2; }
+  .wc-fill { stroke-width: 4; }
+  .wc-leg,
+  .wc-hat,
+  .wc-shirt,
+  .wc-head { stroke-width: 2.4; }
+  .wc-brim { stroke-width: 3.2; }
+  .wc-vest { stroke-width: 2.2; }
+  .wc-strip { stroke-width: 3.2; }
+
+  /* Three across. The position numbers go: the matching numbers in the
+     drawing are already hidden at this size, so they would point at nothing,
+     and the width they took is what lets a two-word role sit on two lines. */
+  .wc-roles { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .wc-role { padding: 0.45rem 0.5rem 0.4rem; font-size: 0.66rem; letter-spacing: 0.03em; }
+  .wc-role-n { display: none; }
+
+  /* Two lines held open here as well. At this width "A complete project
+     crew" wraps beside the figure, and an unreserved second line would resize
+     the drawing under it at the exact moment the crew completes. */
+  .wc-label { min-height: 2.1em; }
+}
+
+/* ══ When the scene does not move ═══════════════════════════════════════
+   Three ways in, one result: the section collapses to an ordinary block and
+   shows the complete crew of twelve with every role lit.
+
+   1. `.world.is-still` is set by the shell for reduced motion;
+   2. `.is-flat` is set by the component, for reduced motion and for a viewport
+     too short to hold the sticky frame, such as a phone on its side;
+   3. the media query says the same thing again without any JavaScript at all.
+
+   Last in the file on purpose: the height here has to beat the phone height
+   above, and the two have the same specificity.
+
+   The counter is text and cannot be set from here. The component renders 12
+   under the same query; keep the two in step. */
+.world.is-still .wc,
+.wc.is-flat { --q: 1; height: auto; }
+
+.world.is-still .wc-sticky,
+.wc.is-flat .wc-sticky {
+  position: static;
+  height: auto;
+  padding-block: var(--sec);
+}
+.world.is-still .wc-scene svg,
+.wc.is-flat .wc-scene svg {
+  position: static;
+  height: auto;
+  max-height: 80svh;
+}
+.world.is-still .wc-person,
+.wc.is-flat .wc-person,
+.world.is-still .wc-fill,
+.wc.is-flat .wc-fill { transform: none; }
+.world.is-still .wc-n,
+.world.is-still .wc-label,
+.wc.is-flat .wc-n,
+.wc.is-flat .wc-label { animation: none; }
+
+@media (prefers-reduced-motion: reduce), (max-height: 540px) {
+  .wc { --q: 1; height: auto; }
+  .wc-sticky { position: static; height: auto; padding-block: var(--sec); }
+  .wc-scene svg { position: static; height: auto; max-height: 80svh; }
+  .wc-person,
+  .wc-fill { transform: none; }
+  .wc-n,
+  .wc-label { animation: none; }
+}

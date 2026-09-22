@@ -386,36 +386,36 @@
    Twelve is divisible by both 4 and 3, so the first four span three columns
    each and the last three span four. Two full rows, every cell in a row the
    same width, nothing left over. */
+/* ── The works programme ─────────────────────────────────────────────
+   A programme chart: number and name on the left, and a bar on the right that
+   starts one step later than the bar above it, so the seven read as a job
+   stepping down the sheet. `--n` is the number of steps and `--i` this one's
+   place, both from the component. Each bar spans two slots of a grid of
+   `--n + 1`, which is what makes the overlap between neighbours. */
 .r-steps {
   display: grid;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
   gap: 1px;
   background: var(--line-sand);
   border: 1px solid var(--line-sand);
 }
 .r-steps li {
-  grid-column: span 3;
   min-width: 0;
   background: color-mix(in srgb, var(--sunk) 62%, transparent);
-  padding: clamp(1.4rem, 3.5vh, 2rem) clamp(1.1rem, 1.8vw, 1.5rem);
+  transition-delay: calc(var(--i, 0) * 60ms);
+}
+.r-prog-btn {
+  width: 100%;
   display: grid;
-  gap: 0.6rem;
-  align-content: start;
-  transition-delay: calc(var(--i, 0) * 80ms);
+  grid-template-columns: auto minmax(9rem, 16rem) minmax(0, 1fr) auto;
+  align-items: center;
+  gap: clamp(0.7rem, 1.6vw, 1.2rem);
+  padding: clamp(0.7rem, 1.8vh, 1rem) clamp(0.9rem, 1.8vw, 1.4rem);
+  text-align: left;
+  color: var(--text);
+  transition: background 0.25s var(--ease-out);
 }
-/* 4 + 3 at full width; 2 + 2 + 2 + 1 when the cells get tight; one column on a
-   phone. Every breakpoint keeps whole rows. */
-.r-steps li:nth-child(n + 5) { grid-column: span 4; }
-@media (max-width: 1100px) {
-  .r-steps li,
-  .r-steps li:nth-child(n + 5) { grid-column: span 6; }
-  .r-steps li:last-child { grid-column: span 12; }
-}
-@media (max-width: 620px) {
-  .r-steps li,
-  .r-steps li:nth-child(n + 5) { grid-column: span 12; }
-}
-
+.r-prog-btn:hover,
+.r-prog-btn:focus-visible { background: color-mix(in srgb, var(--sunk) 100%, transparent); }
 .r-step-n {
   justify-self: start;
   padding: 0.25rem 0.5rem;
@@ -428,14 +428,76 @@
 }
 .r-step-k {
   font-family: var(--font-display);
-  font-size: var(--step-2);
+  font-size: var(--step-0);
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: var(--track-display-lg);
-  line-height: 1.05;
+  line-height: 1.1;
   color: var(--text);
 }
-.r-step-d { font-size: var(--step--1); line-height: 1.55; color: var(--text-2); }
+.r-prog-track {
+  position: relative;
+  display: block;
+  height: 14px;
+  min-width: 0;
+  /* Faint slot lines, one per step, the ruled columns of the chart. */
+  background-image: repeating-linear-gradient(
+    to right,
+    var(--line) 0 1px,
+    transparent 1px calc(100% / (var(--n, 7) + 1))
+  );
+}
+/* Both the outline bar and the brushed mark sit in the same two slots. */
+.r-prog-bar,
+.r-prog-track .r-step-mark {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(var(--i, 0) * 100% / (var(--n, 7) + 1));
+  width: calc(2 * 100% / (var(--n, 7) + 1));
+}
+.r-prog-bar {
+  border: 1px dashed var(--line-sand);
+  background: color-mix(in srgb, var(--sand) 12%, transparent);
+}
+.r-prog-chev { color: var(--text-3); transition: transform 0.3s var(--ease-out); }
+.r-steps li[data-open] .r-prog-chev { transform: rotate(180deg); }
+
+/* The sentence about a step. Closed to zero height rather than removed, so
+   it can open with a movement and the list does not jump. `aria-hidden`
+   follows the state in the markup. */
+.r-step-d {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.35s var(--ease-out);
+}
+.r-step-d > p {
+  overflow: hidden;
+  min-height: 0;
+  padding: 0 clamp(0.9rem, 1.8vw, 1.4rem);
+  font-size: var(--step--1);
+  line-height: 1.55;
+  color: var(--text-2);
+  max-width: 62ch;
+}
+.r-steps li[data-open] .r-step-d { grid-template-rows: 1fr; }
+.r-steps li[data-open] .r-step-d > p { padding-bottom: clamp(0.8rem, 2vh, 1rem); }
+/* A pointer that can hover gets the sentence without a tap as well. */
+@media (hover: hover) {
+  .r-steps li:hover .r-step-d { grid-template-rows: 1fr; }
+  .r-steps li:hover .r-step-d > p { padding-bottom: clamp(0.8rem, 2vh, 1rem); }
+}
+@media (max-width: 620px) {
+  /* Number, name and chevron on the first row; the bar on its own row under
+     them, full width. */
+  .r-prog-btn {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-rows: auto auto;
+    row-gap: 0.5rem;
+  }
+  .r-prog-chev { grid-column: 3; grid-row: 1; }
+  .r-prog-track { grid-column: 1 / -1; grid-row: 2; }
+}
 
 /* The route's own breakpoints live with its grid above — this one was left
    over from the four-step version and re-declared the track list to two
@@ -838,7 +900,18 @@
   background: var(--line);
   border: 1px solid var(--line-sand);
 }
-.r-tool { background: var(--tone); padding: clamp(1.2rem, 3vh, 1.7rem); display: grid; gap: 0.35rem; align-content: start; }
+.r-tool {
+  margin: 0;
+  background: var(--tone);
+  padding: clamp(1rem, 2.6vh, 1.4rem);
+  display: grid;
+  gap: clamp(0.8rem, 2vh, 1.2rem);
+  align-content: start;
+}
+/* The drawing above its caption and not beside it: beside, it was a third of
+   the card and its labels went under eight pixels. */
+.r-tool .r-draw { max-width: 30rem; justify-self: center; }
+.r-tool figcaption { display: grid; gap: 0.35rem; align-content: start; }
 .r-tool-k {
   font-family: var(--font-display);
   font-weight: 500;
@@ -855,6 +928,29 @@
   color: var(--sand-text);
 }
 .r-tool-d { font-size: var(--step--1); line-height: 1.55; color: var(--text-2); }
+
+/* The drawings. Ink is the page's own line and text colours; sand only as the
+   fill of the passport tabs and the meter's levels. */
+.r-draw { width: 100%; height: auto; overflow: visible; }
+.r-draw-ink { fill: none; stroke: var(--text-2); stroke-width: 1.2; stroke-linecap: square; stroke-linejoin: miter; }
+.r-draw-page { fill: var(--raise); stroke: var(--line); }
+.r-draw-cover { fill: var(--sunk); stroke: var(--text-2); }
+.r-draw-sheet { fill: var(--raise); stroke: var(--line-sand); }
+.r-draw-rule { stroke: var(--line); }
+.r-draw-t, .r-draw-s, .r-draw-tab-t {
+  fill: var(--text);
+  stroke: none;
+  font-family: var(--font-mono);
+  letter-spacing: 0.12em;
+}
+.r-draw-t { font-size: 11px; font-weight: 700; }
+.r-draw-s { font-size: 8px; fill: var(--text-2); }
+.r-draw-note { fill: var(--text-3); letter-spacing: 0.08em; }
+.r-draw-tab { fill: color-mix(in srgb, var(--sand) 34%, var(--raise)); stroke: var(--line-sand); stroke-width: 1; }
+.r-draw-tab-t { font-size: 8px; fill: var(--text); letter-spacing: 0.03em; }
+.r-draw-lvl { stroke: none; fill: var(--sand); }
+.r-draw-lvl--3 { fill: var(--fill-strong); }
+
 .r-tools-note {
   grid-column: 1 / -1;
   background: var(--raise);
@@ -885,11 +981,30 @@
   border: 1px solid var(--line);
 }
 .r-clients li {
+  position: relative;
+  min-width: 0;
+  min-height: clamp(8.5rem, 22vh, 11rem);
+  overflow: hidden;
   background: var(--tone);
-  padding: clamp(1rem, 2.6vh, 1.4rem);
+  transition-delay: calc(var(--i, 0) * 60ms);
+}
+.r-client {
+  width: 100%;
+  height: 100%;
   display: grid;
-  gap: 0.35rem;
-  align-content: start;
+  align-content: space-between;
+  gap: 0.6rem;
+  padding: clamp(1rem, 2.6vh, 1.4rem);
+  text-align: left;
+  color: var(--text);
+}
+.r-client-i {
+  display: grid;
+  place-items: center;
+  width: 2.6rem;
+  height: 2.6rem;
+  border: 1px solid var(--line-sand);
+  color: var(--fill-strong);
 }
 .r-client-k {
   font-family: var(--font-display);
@@ -900,7 +1015,41 @@
   color: var(--text);
   line-height: 1.15;
 }
-.r-client-d { font-size: var(--step--1); line-height: 1.5; color: var(--text-2); }
+.r-client-more {
+  font-family: var(--font-mono);
+  font-size: var(--step--2);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+/* The sentence slides up over the tile, so the grid keeps its height and the
+   other tiles do not move. */
+.r-client-d {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  align-content: center;
+  padding: clamp(1rem, 2.6vh, 1.4rem);
+  background: var(--raise);
+  border-top: 2px solid var(--fill-strong);
+  font-size: var(--step--1);
+  line-height: 1.5;
+  color: var(--text);
+  transform: translateY(101%);
+  transition: transform 0.35s var(--ease-out);
+  pointer-events: none;
+}
+.r-clients li[data-open] .r-client-d { transform: none; }
+@media (hover: hover) {
+  .r-clients li:hover .r-client-d { transform: none; }
+}
+@media (max-width: 760px) {
+  .r-clients { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 460px) {
+  .r-clients { grid-template-columns: minmax(0, 1fr); }
+  .r-clients li { min-height: 7rem; }
+}
 
 /* ── Trust, and the five questions ────────────────────────────────────
    The source calls these "answers written to close the gap between promise
@@ -915,32 +1064,53 @@
 .r-trust-say,
 .r-faq { max-width: var(--maxw); margin-inline: auto; }
 .r-trust-say { display: grid; gap: 0.9rem; max-width: 60ch; margin-bottom: var(--sec-gap); }
-.r-trust-line {
-  font-family: var(--font-display);
-  font-weight: 500;
-  font-size: var(--step-3);
-  text-transform: uppercase;
-  letter-spacing: var(--track-display-lg);
-  line-height: 1.02;
-  color: var(--text);
-}
-.r-trust-d { font-size: var(--step-0); line-height: 1.55; color: var(--text-2); max-width: 52ch; }
+.r-trust-say h3 { font-size: var(--step-3); color: var(--text); }
+.r-trust-line { font-size: var(--step-0); line-height: 1.55; color: var(--text-2); max-width: 52ch; }
+
+/* One question open at a time. The answer keeps its approved wording and
+   closes to zero height rather than being removed. */
 .r-faq {
   display: grid;
   gap: 1px;
   background: var(--line);
   border: 1px solid var(--line);
 }
-.r-faq > div {
-  background: var(--tone);
+.r-q { background: var(--tone); }
+.r-q h4 { margin: 0; }
+.r-q h4 button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
   padding: clamp(0.9rem, 2.4vh, 1.2rem) clamp(1rem, 2vw, 1.4rem);
-  display: grid;
-  grid-template-columns: minmax(0, 20rem) minmax(0, 1fr);
-  gap: 0.3rem 1.6rem;
-  align-items: baseline;
+  text-align: left;
+  font-size: var(--step-0);
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--text);
+  transition: background 0.25s var(--ease-out);
 }
-.r-faq dt { font-size: var(--step-0); font-weight: 600; color: var(--text); line-height: 1.35; }
-.r-faq dd { font-size: var(--step--1); line-height: 1.55; color: var(--text-2); }
+.r-q h4 button:hover,
+.r-q h4 button:focus-visible { background: var(--sunk); }
+.r-q h4 .icon { flex: none; color: var(--fill-strong); transition: transform 0.3s var(--ease-out); }
+.r-q[data-open] h4 .icon { transform: rotate(180deg); }
+.r-a {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.35s var(--ease-out);
+}
+.r-a > p {
+  overflow: hidden;
+  min-height: 0;
+  padding: 0 clamp(1rem, 2vw, 1.4rem);
+  font-size: var(--step--1);
+  line-height: 1.55;
+  color: var(--text-2);
+  max-width: 62ch;
+}
+.r-q[data-open] .r-a { grid-template-rows: 1fr; }
+.r-q[data-open] .r-a > p { padding-bottom: clamp(0.9rem, 2.4vh, 1.2rem); }
 
 /* ── The cross-link ───────────────────────────────────────────────────
    The source requires the separation to be explicit: Property Care delivers
@@ -966,6 +1136,26 @@
   color: var(--sand-text);
 }
 .r-foot-ask .r-cross-d { font-size: var(--step--1); line-height: 1.55; color: var(--text-2); }
+.r-cross-go {
+  justify-self: start;
+  margin-top: 0.3rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 0.9rem;
+  border: 1px solid var(--line-sand);
+  font-family: var(--font-mono);
+  font-size: var(--step--2);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text);
+  transition: background 0.25s var(--ease-out), color 0.25s var(--ease-out);
+}
+.r-cross-go:hover,
+.r-cross-go:focus-visible { background: var(--fill-strong); border-color: var(--fill-strong); color: var(--oryx-white); }
+/* The band's labels are set in the display face at Workforce's heavy weight;
+   this page's face has no 800 and reads best at its own heading weight. */
+.world--renovation .pband-k { font-weight: 600; }
 
 @media (max-width: 900px) {
   .r-clients { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -988,3 +1178,388 @@
   line-height: 1.5;
   color: var(--text-2);
 }
+
+/* ══ A little life ═══════════════════════════════════════════════════════
+   The sheet draws itself as it is read. Everything below is decoration laid
+   over the page above it, and all of it keeps one contract:
+
+   THE END STATE IS THE DEFAULT. Plain CSS, with no class added by anything,
+   shows every line drawn, every picture at full colour and every step plain.
+   The un-drawn states exist only under `is-wait`, a class that
+   `useSheetLife` adds to an element it has SEEN to be off screen, and they
+   are fenced twice: inside `prefers-reduced-motion: no-preference`, and
+   behind `.world--renovation:not(.is-still)`. So a stalled animation clock, a
+   failed observer or a visitor who asked for stillness all get the finished
+   sheet.
+
+   Entrances are transforms and stroke offsets. No content is faded in. */
+
+/* ── The tape measure ─────────────────────────────────────────────────
+   Reading progress as the ruler on the bottom edge of the header strip. It is
+   a grid row of `.r-nav` itself, so it is in the flow (it cannot sit on top of
+   content) and it is inside the height that `--r-nav-h` reports. */
+.r-tape {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  position: relative;
+  min-width: 0;
+  /* 14px of ruler under a 1px rule. */
+  height: 15px;
+  overflow: hidden;
+  border-top: 1px solid var(--line-sand);
+}
+/* Inset by half the marker's width, so the marker is whole at 0 and at 100
+   and its point still lands exactly on the tick it is reading. */
+.r-tape-in { position: absolute; inset: 0 7px; }
+.r-tape-scale {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  overflow: visible;
+  shape-rendering: crispEdges;
+}
+.r-tape-scale line {
+  stroke: var(--line-sand);
+  stroke-width: 1;
+  stroke-linecap: square;
+}
+.r-tape-scale .is-five,
+.r-tape-scale .is-ten { stroke: var(--text-3); }
+.r-tape-scale text {
+  fill: var(--text-3);
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: 0.04em;
+}
+/* The length of tape already pulled out. */
+.r-tape-run {
+  position: absolute;
+  inset: 0;
+  transform-origin: 0 50%;
+  transform: scaleX(var(--scrolled, 0));
+  background: color-mix(in srgb, var(--fill-strong) 10%, transparent);
+}
+/* The marker. A full-width box moved by its own width, because a percentage
+   in a translate means the element's own size: that is what lets one number,
+   `--scrolled`, place it with no JavaScript and no layout. No transition, for
+   the reason the Transport scene gives: the value already changes every
+   frame, and easing on top of that only adds lag. */
+.r-tape-at {
+  position: absolute;
+  inset: 0;
+  transform: translateX(calc(var(--scrolled, 0) * 100%));
+  pointer-events: none;
+}
+.r-tape-at::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -4.5px;
+  width: 9px;
+  height: 6px;
+  background: var(--fill-strong);
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+}
+.r-tape-at::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -0.5px;
+  width: 1px;
+  background: var(--fill-strong);
+}
+@media (max-width: 820px) {
+  /* A hundred ticks across a narrow bar are a few pixels apart and read as a
+     grey band. Every other one goes. */
+  .r-tape-scale .is-odd { display: none; }
+}
+@media (max-width: 620px) {
+  .r-tape-scale text { display: none; }
+}
+
+/* The header is a little taller now, and the four section links used to land
+   their headings underneath it. This is what `--r-nav-h` is measured for. */
+.r-fork,
+.r-sched,
+.r-process,
+.r-trust { scroll-margin-top: var(--r-nav-h, 0px); }
+
+/* ── Dimension marks ──────────────────────────────────────────────────
+   A thin line with a slash at each end, standing in the gutter beside a
+   section's heading block, with the section's number on top. The gutter is
+   the only free space every width has, so the offset is cut from it: 10px on
+   a phone (where the gutter is 19px), up to 24px on a desk. */
+.r-fork-head,
+.r-sched-head,
+.r-scrub-intro,
+.r-process-head,
+.r-who-head,
+.r-trust-say { position: relative; }
+
+.r-dim {
+  --dim-x: clamp(10px, calc(var(--gutter) * 0.5), 24px);
+  --dim-top: 1.05rem;
+  position: absolute;
+  top: 0.2rem;
+  bottom: 0.2rem;
+  left: calc(-1 * var(--dim-x));
+  width: 1px;
+  pointer-events: none;
+}
+.r-dim b {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  translate: -50% 0;
+  font-family: var(--font-mono);
+  font-size: var(--r-label);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-3);
+  white-space: nowrap;
+}
+.r-dim i {
+  position: absolute;
+  top: var(--dim-top);
+  bottom: 0;
+  left: 0;
+  width: 1px;
+  background: var(--line-sand);
+  transform-origin: 50% 0;
+  transition: transform 0.9s var(--ease-inout) 0.15s;
+}
+/* The end slashes. Forty-five degrees is the drafting convention; an arrow
+   head would mean direction, and this only means extent. */
+.r-dim::before,
+.r-dim::after {
+  content: '';
+  position: absolute;
+  left: -4px;
+  width: 9px;
+  height: 1px;
+  background: var(--text-3);
+  transform: rotate(-45deg);
+  transition: transform 0.3s var(--ease-out);
+}
+.r-dim::before { top: var(--dim-top); }
+.r-dim::after { bottom: 0; transition-delay: 0.95s; }
+
+@media (max-width: 620px) {
+  /* No room for a figure in a 19px gutter. The line and its slashes stay. */
+  .r-dim { --dim-top: 0px; }
+  .r-dim b { display: none; }
+}
+
+/* ── The heading rule ─────────────────────────────────────────────────
+   The kicker's hairline, pulled out from the text like the first stroke of a
+   pen. Only where a heading block opts in with `data-draw`. */
+.world--renovation [data-draw] .world-kicker::after {
+  transform-origin: 0 50%;
+  transition: transform 0.8s var(--ease-out) 0.1s;
+}
+
+/* ── Corner marks ─────────────────────────────────────────────────────
+   Four Ls just outside a block. 7px out is inside the narrowest gutter and
+   inside the fork's column gap, so they never reach another block or the
+   edge of the page. */
+.r-framed { position: relative; min-width: 0; }
+.r-trust .r-framed { max-width: var(--maxw); margin-inline: auto; }
+.r-fork-stage { position: relative; }
+
+.r-corners {
+  position: absolute;
+  inset: -7px;
+  pointer-events: none;
+}
+.r-corners i {
+  position: absolute;
+  width: 13px;
+  height: 13px;
+}
+.r-corners i::before,
+.r-corners i::after {
+  content: '';
+  position: absolute;
+  background: var(--text-3);
+  transition: transform 0.5s var(--ease-out);
+  /* One corner after another, clockwise, the way a hand goes round a box. */
+  transition-delay: calc(var(--c, 0) * 110ms);
+}
+.r-corners i::before { left: 0; right: 0; height: 1px; }
+.r-corners i::after {
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  transition-delay: calc(var(--c, 0) * 110ms + 160ms);
+}
+/* Each stroke grows OUT of its corner, so the origin is the corner. */
+.r-corners i:nth-child(1) { top: 0; left: 0; --c: 0; }
+.r-corners i:nth-child(1)::before { top: 0; transform-origin: 0 50%; }
+.r-corners i:nth-child(1)::after { left: 0; transform-origin: 50% 0; }
+.r-corners i:nth-child(2) { top: 0; right: 0; --c: 1; }
+.r-corners i:nth-child(2)::before { top: 0; transform-origin: 100% 50%; }
+.r-corners i:nth-child(2)::after { right: 0; transform-origin: 50% 0; }
+.r-corners i:nth-child(3) { bottom: 0; right: 0; --c: 2; }
+.r-corners i:nth-child(3)::before { bottom: 0; transform-origin: 100% 50%; }
+.r-corners i:nth-child(3)::after { right: 0; transform-origin: 50% 100%; }
+.r-corners i:nth-child(4) { bottom: 0; left: 0; --c: 3; }
+.r-corners i:nth-child(4)::before { bottom: 0; transform-origin: 0 50%; }
+.r-corners i:nth-child(4)::after { left: 0; transform-origin: 50% 100%; }
+
+/* ── Steps that get ticked off ────────────────────────────────────────
+   The mark sits on the programme bar, exactly over the dashed outline, and
+   fills it with the brush as the step is passed.
+
+   Hidden outright until a step is done. `visibility` is the guarantee; the
+   clip and the dash offset are only how it arrives. */
+
+.r-step-mark {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  min-width: 0;
+  visibility: hidden;
+}
+/* Sand, as a fill, which is the one thing sand is allowed to be on this
+   ground. Two ragged shapes: the loaded stroke and the dry streak under it. */
+.r-step-brush {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  clip-path: inset(0 100% 0 0);
+}
+.r-step-brush::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 3px;
+  background: color-mix(in srgb, var(--sand) 74%, transparent);
+  clip-path: polygon(
+    0 38%, 2% 6%, 11% 0, 27% 12%, 44% 2%, 63% 14%, 81% 4%, 95% 16%,
+    100% 48%, 97% 84%, 86% 100%, 69% 86%, 50% 98%, 31% 84%, 14% 96%, 3% 82%
+  );
+}
+.r-step-brush::after {
+  content: '';
+  position: absolute;
+  left: 6%;
+  right: 16%;
+  bottom: 0;
+  height: 2px;
+  background: color-mix(in srgb, var(--sand) 56%, transparent);
+  clip-path: polygon(0 50%, 8% 0, 60% 20%, 100% 0, 96% 100%, 40% 80%, 5% 100%);
+}
+.r-step-tick {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  overflow: visible;
+  fill: none;
+  stroke: var(--fill-strong);
+  stroke-width: 2.2;
+  stroke-linecap: square;
+  stroke-linejoin: miter;
+}
+/* `pathLength="1"` on the path, so the dash is the whole tick. The gap is
+   twice as long and the resting offset sits just inside it: at exactly 1 a
+   zero-length dash is left at the start, and a square cap paints that as a
+   dot. */
+.r-step-tick path { stroke-dasharray: 1 2; stroke-dashoffset: 1.02; }
+
+/* ══ The states that move ════════════════════════════════════════════════
+   Everything that is ever un-drawn is in here, and nowhere else. */
+@media (prefers-reduced-motion: no-preference) {
+  /* `transition: none` on every waiting state: un-drawing happens off screen
+     and must be instant. The drawing-in uses the transition on the base rule,
+     which is the style that applies once `is-wait` comes off. */
+  .world--renovation:not(.is-still) [data-draw].is-wait .world-kicker::after {
+    transform: scaleX(0);
+    transition: none;
+  }
+  .world--renovation:not(.is-still) [data-draw].is-wait .r-dim i {
+    transform: scaleY(0);
+    transition: none;
+  }
+  .world--renovation:not(.is-still) [data-draw].is-wait .r-dim::before,
+  .world--renovation:not(.is-still) [data-draw].is-wait .r-dim::after {
+    transform: rotate(-45deg) scaleX(0);
+    transition: none;
+  }
+  .world--renovation:not(.is-still) .r-corners.is-wait i::before {
+    transform: scaleX(0);
+    transition: none;
+  }
+  .world--renovation:not(.is-still) .r-corners.is-wait i::after {
+    transform: scaleY(0);
+    transition: none;
+  }
+
+  /* ── Steps ── */
+  .world--renovation:not(.is-still) .r-steps li.is-done .r-step-mark { visibility: visible; }
+  .world--renovation:not(.is-still) .r-steps li.is-done .r-step-brush {
+    clip-path: inset(0 0 0 0);
+    transition: clip-path 0.8s var(--ease-inout) var(--tick-d, 0ms);
+  }
+  .world--renovation:not(.is-still) .r-steps li.is-done .r-step-tick path {
+    stroke-dashoffset: 0;
+    /* After the stroke has arrived: the brush is the work, the tick signs
+       it off. */
+    transition: stroke-dashoffset 0.45s var(--ease-out) calc(var(--tick-d, 0ms) + 0.7s);
+  }
+
+  /* ── Cards develop like a print ───────────────────────────────────────
+     Pale, flat and nearly grey, like a draft print, settling into the picture
+     `shared.css` defines. The first two functions are the same two in the
+     same order as the shared rule, so the lists interpolate; `grayscale` is
+     the extra one on the end and eases to nothing.
+
+     The waiting state outranks the shared hover on purpose: a card nobody can
+     see has no hover. Once `is-wait` is gone nothing here touches `filter`,
+     so the hover in `shared.css` works exactly as it did. */
+  .world--renovation:not(.is-still) .cards.is-wait .card-img img {
+    filter: contrast(0.52) brightness(1.34) grayscale(0.92);
+    transition: none;
+  }
+  /* Only for the length of the develop (the class is taken off again by
+     `useSheetLife`). Left in place, this slow staggered timing would also be
+     the timing of every hover afterwards. */
+  .world--renovation:not(.is-still) .cards.is-developing .card-img img {
+    transition:
+      transform 0.7s var(--ease-out),
+      filter 1.5s cubic-bezier(0.4, 0, 0.2, 1) calc(var(--n, 0) * 95ms);
+  }
+}
+/* Position in the grid, for the stagger. A custom property, so it costs
+   nothing anywhere it is not read. */
+.world--renovation .cards > li:nth-child(1) { --n: 0; }
+.world--renovation .cards > li:nth-child(2) { --n: 1; }
+.world--renovation .cards > li:nth-child(3) { --n: 2; }
+.world--renovation .cards > li:nth-child(4) { --n: 3; }
+.world--renovation .cards > li:nth-child(5) { --n: 4; }
+.world--renovation .cards > li:nth-child(6) { --n: 5; }
+.world--renovation .cards > li:nth-child(7) { --n: 6; }
+.world--renovation .cards > li:nth-child(8) { --n: 7; }
+.world--renovation .cards > li:nth-child(9) { --n: 8; }
+
+@media (prefers-reduced-motion: no-preference) and (max-width: 620px) {
+  /* Two columns of small pictures: a shorter develop and a tighter stagger,
+     so a phone is not running nine long filter transitions at once. */
+  .world--renovation:not(.is-still) .cards.is-developing .card-img img {
+    transition:
+      transform 0.7s var(--ease-out),
+      filter 1s cubic-bezier(0.4, 0, 0.2, 1) calc(var(--n, 0) * 50ms);
+  }
+}
+
+/* ── The opening frame is dark, the page is light ─────────────────────────
+   Renovation's text colours are chosen for cream paper, and the opening film
+   is a dark photograph. The eyebrow and the promise line took the page's deep
+   brown accent and were all but invisible over it, measured at about 1.6:1.
+   Over the film they take the light sand the two dark pages use. */
+.r-open .world-eyebrow,
+.r-open .world-promise { color: #d4b98d; }

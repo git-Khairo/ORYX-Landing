@@ -136,17 +136,6 @@
   line-height: 0.98;
 }
 
-/* The display spans get the same treatment. These were un-capitalised for
-   Fraunces, which is exactly the setting a serif needs and exactly the wrong
-   one here. */
-.world--workforce .w-ax-k,
-.world--workforce .w-ax-lk {
-  font-family: var(--font-display);
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: var(--track-display);
-}
-
 /* ═══ 03 · Renovation — "Programme" ═════════════════════════════════════
    The light one, and it is the right page for it: this is drawings,
    specifications and finished interiors, all of which live on paper. Cream

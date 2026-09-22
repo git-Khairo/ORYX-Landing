@@ -9,6 +9,7 @@ import { SoundToggle } from '../Sound'
 import { Social } from '../../sections/Footer'
 import Sheet from '../Sheet'
 import Icon from '../Icon'
+import PhotoBand from '../PhotoBand'
 
 /**
  * Renovation — "The Sheet."
@@ -49,10 +50,122 @@ import Icon from '../Icon'
  * for each, are documented in full at the top of the Renovation block in
  * `copy.js`. Read it before adding anything here.
  */
-export default function RenovationWorld({ service, onClose, onRequest }) {
+/* ═══ A little life ═══════════════════════════════════════════════════
+   The sheet draws itself as it is read: heading rules, dimension marks and
+   corner marks are pulled in by a pen, the nine pictures develop like a print,
+   and the seven steps get ticked off.
+
+   Why this does not hang off `is-in`: `useReveal` carries a backstop that
+   marks EVERYTHING revealed after two and a half seconds, which is right for
+   content and wrong for decoration. Anything below the fold would have drawn
+   itself long before anybody scrolled down to watch it.
+
+   So this keeps its own observer, and the contract is the same as the rest of
+   the project: the END state is the default. Every line is drawn and every
+   picture is at full colour in the plain CSS. An element is only un-drawn
+   (`is-wait`) by this observer's own first report, and only when that report
+   says it is off screen. If the observer never fires, nothing is ever hidden.
+   If it fires once, it demonstrably works and will fire again on the way in.
+
+   Reduced motion skips all of it, and the stylesheet ignores these classes
+   under `.is-still` as well, in case the setting changes mid-visit. */
+function useSheetLife(anchor) {
+  useEffect(() => {
+    const scroller = anchor.current?.closest('.world-scroll')
+    const world = scroller?.closest('.world')
+    if (!scroller || !world) return
+    if (typeof IntersectionObserver !== 'function') return
+    if (world.classList.contains('is-still')) return
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return
+
+    const marks = [...scroller.querySelectorAll('[data-draw]')]
+    const steps = [...scroller.querySelectorAll('.r-steps > li')]
+    const timers = new Set()
+    const reported = new WeakSet()
+
+    /* The pictures need a slow, staggered filter transition once, and the
+       quick one from `shared.css` for hover ever after. A class that lives
+       for the length of the develop is the only way to have both. */
+    const develop = (el) => {
+      el.classList.add('is-developing')
+      const t = setTimeout(() => {
+        el.classList.remove('is-developing')
+        timers.delete(t)
+      }, 2800)
+      timers.add(t)
+    }
+
+    const draw = new IntersectionObserver(
+      (entries) => {
+        const view = scroller.getBoundingClientRect()
+        entries.forEach((e) => {
+          const el = e.target
+          const first = !reported.has(el)
+          reported.add(el)
+
+          if (e.isIntersecting) {
+            draw.unobserve(el)
+            if (!el.classList.contains('is-wait')) return
+            if (el.matches('.cards')) develop(el)
+            el.classList.remove('is-wait')
+            return
+          }
+          if (!first) return
+          /* Already on screen, only inside the trigger margin: leave it drawn.
+             Un-drawing something a visitor can see would be a flicker. */
+          const r = e.boundingClientRect
+          if (r.top < view.bottom && r.bottom > view.top) {
+            draw.unobserve(el)
+            return
+          }
+          el.classList.add('is-wait')
+        })
+      },
+      /* The same margin `useReveal` uses, so a line starts drawing as the
+         block it belongs to arrives. */
+      { root: scroller, rootMargin: '0px 0px -12% 0px', threshold: 0 },
+    )
+    marks.forEach((el) => draw.observe(el))
+
+    /* A step is done once its top has climbed past the middle of the screen.
+       Steps that cross together (a whole row does, on a desktop) are ticked
+       one after another, in reading order. One way only: a tick that came
+       off again on the way back up would read as the job being undone. */
+    const tick = new IntersectionObserver(
+      (entries) => {
+        let n = 0
+        entries.forEach((e) => {
+          if (!e.isIntersecting) return
+          tick.unobserve(e.target)
+          e.target.style.setProperty('--tick-d', `${n * 170}ms`)
+          e.target.classList.add('is-done')
+          n += 1
+        })
+      },
+      { root: scroller, rootMargin: '0px 0px -42% 0px', threshold: 0 },
+    )
+    steps.forEach((el) => tick.observe(el))
+
+    return () => {
+      draw.disconnect()
+      tick.disconnect()
+      timers.forEach(clearTimeout)
+      marks.forEach((el) => el.classList.remove('is-wait', 'is-developing'))
+    }
+  }, [anchor])
+}
+
+export default function RenovationWorld({ service, onClose, onRequest, onSwitch }) {
   const { world } = service
   const shots = gallery[service.id] || []
   const nav = useMeasured('--r-nav-h')
+
+  /* Which service popup is open. It used to live inside the schedule; the
+     photo band further down opens the same popups, so it sits here and both
+     are handed the opener. */
+  const [sheetId, setSheetId] = useState(null)
+  const openedSvc = sheetId ? svcs.find((x) => x.id === sheetId) : null
+  useSheetLife(nav)
 
   return (
     <WorldShell service={service} onClose={onClose}>
@@ -66,6 +179,11 @@ export default function RenovationWorld({ service, onClose, onRequest }) {
           four links used to point at the same anchor while a third pointed at
           a section that no longer exists. */}
       <header className="r-nav" ref={nav}>
+        {/* First in the markup and last on screen (the CSS places it in the
+            grid's second row). It cannot go last in the markup: the meta cell
+            is styled through `:last-child`, and a sibling after it would take
+            its left rule away. */}
+        <Tape />
         <button type="button" className="r-nav-cell r-nav-mark" onClick={onClose}>
           <i aria-hidden="true" />
           <span>
@@ -116,12 +234,13 @@ export default function RenovationWorld({ service, onClose, onRequest }) {
       <Fork world={world} />
 
       {/* ── The schedule ──────────────────────────────────────────────── */}
-      <Schedule onRequest={onRequest} />
+      <Schedule onOpen={setSheetId} />
 
       {/* ── The scrub ─────────────────────────────────────────────────
           The one claim on this page a visitor can check by hand. */}
       <section className="r-scrub-block">
-        <div className="r-scrub-intro">
+        <div className="r-scrub-intro" data-draw>
+          <Dim n="3.3" />
           <p className="world-kicker" data-reveal>Before, and after</p>
           <p className="world-lede" data-reveal>{world.lede}</p>
         </div>
@@ -144,75 +263,164 @@ export default function RenovationWorld({ service, onClose, onRequest }) {
           of step three does. That is what makes it a route rather than a list
           of things that happen to be done. */}
       <section className="r-process" id="r-route">
-        <div className="r-process-head">
+        <div className="r-process-head" data-draw>
+          <Dim n="3.4" />
           <p className="world-kicker" data-reveal>How a project runs</p>
           <h3 data-reveal>Seven steps on every project</h3>
           <p className="world-lede" data-reveal>{world.routeLine}</p>
         </div>
-        <ol className="r-steps" role="list">
-          {route.map((s, i) => (
-            <li key={s.n} data-reveal style={{ '--i': i }}>
-              <span className="r-step-n">{s.n}</span>
-              <span className="r-step-k">{s.k}</span>
-              <span className="r-step-d">{s.d}</span>
-            </li>
-          ))}
-        </ol>
+        {/* The wrapper exists to carry the corner marks: a list may only hold
+            list items, so the marks cannot go inside it. */}
+        <div className="r-framed">
+          <Programme steps={route} />
+          <Corners />
+        </div>
 
-        {/* The two named methods. Named, described, and explicitly not sold as
-            software — the source permits the names and forbids the product. */}
+        {/* The two named methods, drawn. Named, and explicitly not sold as
+            software: the source permits the names and forbids the product, so
+            these are a booklet and a paper scale, with the descriptions turned
+            into the labels on them. */}
         <div className="r-tools">
-          {tools.map((t) => (
-            <div className="r-tool" key={t.k} data-reveal>
-              <p className="r-tool-k">{t.k}</p>
-              <p className="r-tool-nl">In Dutch: {t.nl}</p>
-              <p className="r-tool-d">{t.d}</p>
-            </div>
+          {tools.map((t, i) => (
+            <figure className="r-tool" key={t.k} data-reveal style={{ '--i': i }}>
+              {i === 0 ? <Passport /> : <Meter phases={world.beats} />}
+              <figcaption>
+                <p className="r-tool-k">{t.k}</p>
+                <p className="r-tool-nl">In Dutch: {t.nl}</p>
+                <p className="r-tool-d">{t.d}</p>
+              </figcaption>
+            </figure>
           ))}
           <p className="r-tools-note">{world.toolsNote}</p>
         </div>
       </section>
 
-      {/* ── Who arrives, and what they ask ────────────────────────────── */}
+      {/* ── The services, in pictures ──────────────────────────────────
+          A break in the reading: the nine service photographs drifting past,
+          each opening its popup. */}
+      <PhotoBand
+        items={svcs.map((x) => ({ id: x.id, label: x.name, icon: x.id, img: cardImage(`renovation/${x.id}`) }))}
+        onOpen={setSheetId}
+        label="The nine services in pictures"
+      />
+
+      {/* ── Who we work for ────────────────────────────────────────────
+          Six tiles: an icon and a name each, and the sentence about them only
+          on hover or tap. Six paragraphs in a row were the wall this replaced. */}
       <section className="r-who">
-        <div className="r-who-head">
+        <div className="r-who-head" data-draw>
+          <Dim n="3.5" />
           <p className="world-kicker" data-reveal>Clients</p>
           <h3 data-reveal>Who we work for</h3>
         </div>
-        <ul className="r-clients" role="list">
-          {clients.map((c, i) => (
-            <li key={c.k} data-reveal style={{ '--i': i }}>
-              <span className="r-client-k">{c.k}</span>
-              <span className="r-client-d">{c.d}</span>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      {/* ── Trust ─────────────────────────────────────────────────────
-          The publication discipline, stated as the page's own rule rather than
-          as an apology, and then the FAQ — which the source describes as
-          "answers written to close the gap between promise and evidence".
-          Every one of them narrows a claim, which is precisely why they can be
-          published while the claims matrix is still open. */}
-      <section className="r-trust" id="r-trust">
-        <div className="r-trust-say">
-          <p className="world-kicker" data-reveal>What we promise</p>
-          <p className="r-trust-line" data-reveal>{world.trust.line}</p>
-          <p className="r-trust-d" data-reveal>{world.trust.d}</p>
+        <div className="r-framed">
+          <Clients items={clients} />
+          <Corners />
         </div>
-        <dl className="r-faq">
-          {faq.map((f, i) => (
-            <div key={f.q} data-reveal style={{ '--i': i }}>
-              <dt>{f.q}</dt>
-              <dd>{f.a}</dd>
-            </div>
-          ))}
-        </dl>
       </section>
 
-      <RenovationFooter service={service} onClose={onClose} onRequest={onRequest} />
+      {/* ── Straight answers ───────────────────────────────────────────
+          The promise in one line, then the five questions the source wrote to
+          close the gap between promise and evidence. The answers are the
+          approved wording and stay word for word; they open one at a time
+          rather than standing as a wall. */}
+      <section className="r-trust" id="r-trust">
+        <div className="r-trust-say" data-draw>
+          <Dim n="3.6" />
+          <p className="world-kicker" data-reveal>What we promise</p>
+          <h3 data-reveal>Straight answers</h3>
+          <p className="r-trust-line" data-reveal>{world.trust.line}</p>
+        </div>
+        <div className="r-framed">
+          <Answers items={faq} />
+          <Corners />
+        </div>
+      </section>
+
+      <RenovationFooter service={service} onClose={onClose} onRequest={onRequest} onSwitch={onSwitch} />
+
+      {openedSvc && (
+        <ServiceSheet
+          svc={openedSvc}
+          onClose={() => setSheetId(null)}
+          onRequest={() => onRequest('renovation', openedSvc.id)}
+        />
+      )}
     </WorldShell>
+  )
+}
+
+/* ═══ The tape measure ════════════════════════════════════════════════
+   Reading progress, as the ruler along the bottom edge of the header strip.
+
+   It lives INSIDE the header on purpose. `--r-nav-h` is measured from that
+   element, so the tape is counted in it and anything that offsets itself from
+   the bar clears the tape as well, with nothing to remember.
+
+   The scale is an inline SVG and not a repeating gradient: a hundred
+   percentage stops land on fractions of a pixel, and a gradient paints those
+   as ticks of uneven weight. `crispEdges` snaps each line to a whole pixel.
+
+   Nothing here runs JavaScript. The marker and the run behind it read
+   `--scrolled`, which the shell already writes on every scroll frame. */
+const TICKS = Array.from({ length: 101 }, (_, i) => i)
+const TENS = [10, 20, 30, 40, 50, 60, 70, 80, 90]
+
+function Tape() {
+  return (
+    <div className="r-tape" aria-hidden="true">
+      <div className="r-tape-in">
+        <span className="r-tape-run" />
+        <svg className="r-tape-scale" width="100%" height="100%" focusable="false">
+          {TICKS.map((i) => {
+            const kind = i % 10 === 0 ? 'is-ten' : i % 5 === 0 ? 'is-five' : ''
+            /* Odd ticks are dropped on narrow screens, where a hundred of them
+               would be under four pixels apart. */
+            const odd = i % 2 ? 'is-odd' : ''
+            return (
+              <line
+                key={i}
+                className={`${kind} ${odd}`.trim() || undefined}
+                x1={`${i}%`}
+                x2={`${i}%`}
+                y1="0"
+                y2={kind === 'is-ten' ? 9 : kind === 'is-five' ? 6 : 3.5}
+              />
+            )
+          })}
+          {TENS.map((n) => (
+            <text key={n} x={`${n}%`} dx="3" y="11.5">{n}</text>
+          ))}
+        </svg>
+        <span className="r-tape-at" />
+      </div>
+    </div>
+  )
+}
+
+/* ═══ Dimension mark ═════════════════════════════════════════════════
+   The thin line with a slash at each end that a drawing uses to say how big
+   something is. It stands in the gutter beside a section's heading block and
+   measures it, and the figure on it is the section's number on this sheet
+   (sheet 03, so 3.1 to 3.6). Decoration only: a screen reader never meets it. */
+function Dim({ n }) {
+  return (
+    <span className="r-dim" aria-hidden="true">
+      <b>{n}</b>
+      <i />
+    </span>
+  )
+}
+
+/* ═══ Corner marks ═══════════════════════════════════════════════════
+   Four small L shapes just outside a block, the way a detail is registered on
+   a sheet. Each is two strokes that grow out of the corner, so the block looks
+   pencilled in rather than faded in. */
+function Corners() {
+  return (
+    <span className="r-corners" aria-hidden="true" data-draw>
+      <i /><i /><i /><i />
+    </span>
   )
 }
 
@@ -245,7 +453,8 @@ function Fork({ world }) {
   return (
     <section className="r-fork" id="r-scenarios" data-scenario={live}>
       <div className="r-fork-inner">
-        <div className="r-fork-head">
+        <div className="r-fork-head" data-draw>
+          <Dim n="3.1" />
           <p className="world-kicker" data-reveal>The decision</p>
           <h3 data-reveal>{world.forkHead}</h3>
           <p className="world-lede" data-reveal>{world.forkLede}</p>
@@ -291,6 +500,7 @@ function Fork({ world }) {
 
         <figure className="r-fork-stage">
           <Section scenarios={world.scenarios} />
+          <Corners />
         </figure>
 
         {/* All three panels occupy one grid cell, so the box is always as tall
@@ -503,14 +713,13 @@ const CONDS = {
   qualified: { k: 'Qualified specialist', d: 'Carried out or supervised by a qualified specialist where required.' },
 }
 
-function Schedule({ onRequest }) {
-  const [openId, setOpenId] = useState(null)
+function Schedule({ onOpen }) {
   const uid = useId().replace(/:/g, '')
-  const cur = svcs.find((s) => s.id === openId) || null
 
   return (
     <section className="r-sched" id="r-schedule" aria-labelledby={`${uid}-h`}>
-      <div className="r-sched-head" data-reveal>
+      <div className="r-sched-head" data-reveal data-draw>
+        <Dim n="3.2" />
         <p className="world-kicker">Schedule of works</p>
         <h3 id={`${uid}-h`}>Nine services</h3>
         <p className="world-lede">
@@ -518,12 +727,14 @@ function Schedule({ onRequest }) {
         </p>
       </div>
 
-      <ul className="cards" role="list" data-reveal>
+      {/* `data-draw` is what lets the nine pictures develop like a print as the
+          grid arrives. See `useSheetLife`. */}
+      <ul className="cards" role="list" data-reveal data-draw>
         {svcs.map((s) => {
           const img = cardImage(`renovation/${s.id}`)
           return (
             <li key={s.id}>
-              <button type="button" className="card" onClick={() => setOpenId(s.id)} aria-haspopup="dialog">
+              <button type="button" className="card" onClick={() => onOpen(s.id)} aria-haspopup="dialog">
                 <span className="card-img">
                   {img && <img src={img.src} alt="" loading="lazy" />}
                   <span className="card-n">{s.no}</span>
@@ -549,13 +760,6 @@ function Schedule({ onRequest }) {
         are confirmed for each project or carried out by a qualified specialist.
       </p>
 
-      {cur && (
-        <ServiceSheet
-          svc={cur}
-          onClose={() => setOpenId(null)}
-          onRequest={() => onRequest('renovation', cur.id)}
-        />
-      )}
     </section>
   )
 }
@@ -644,6 +848,111 @@ function Scrub({ before, after }) {
 
   useEffect(() => () => frame.current && cancelAnimationFrame(frame.current), [])
 
+  /* ── The slider shows itself ───────────────────────────────────────
+     A before/after that sits still looks like a photograph with a line on it.
+     So the first time it is properly on screen the handle leans once to each
+     side and comes back to where it started, about 1.6 seconds in all, and
+     then never again.
+
+     `at` is React state, so the nudge animates that state and not a CSS
+     property: the image clip, the handle and the range input all read the one
+     value and cannot disagree. The latest value is mirrored into a ref so the
+     nudge starts from wherever the handle really is.
+
+     It gives way at once. A touch, a drag, focus or a key press cancels it
+     mid-swing and leaves the handle where the visitor put it. Under reduced
+     motion it is not set up at all. */
+  const atNow = useRef(at)
+  atNow.current = at
+  const nudge = useRef({ raf: 0, timer: 0, guard: 0, io: null, spent: false })
+
+  const stopNudge = useCallback(() => {
+    const n = nudge.current
+    n.spent = true
+    if (n.raf) cancelAnimationFrame(n.raf)
+    if (n.timer) clearTimeout(n.timer)
+    if (n.guard) clearTimeout(n.guard)
+    n.io?.disconnect()
+    n.raf = 0
+    n.timer = 0
+    n.guard = 0
+    n.io = null
+  }, [])
+
+  useEffect(() => {
+    const el = box.current
+    const n = nudge.current
+    if (!el || n.spent) return
+    const scroller = el.closest('.world-scroll')
+    if (!scroller || typeof IntersectionObserver !== 'function') return
+    if (el.closest('.world')?.classList.contains('is-still')) return
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return
+
+    const run = () => {
+      n.timer = 0
+      const from = atNow.current
+      /* Nine points each way, less if the handle is parked near an edge, so
+         the swing is always symmetrical and always lands back on `from`. */
+      const amp = Math.max(0, Math.min(9, from, 100 - from))
+      let t0 = 0
+      const step = (now) => {
+        if (!t0) t0 = now
+        const t = Math.min(1, (now - t0) / 1600)
+        /* Eased time through one full sine: out to the right, back through
+           the start, out to the left, home. The ease gives it a standing
+           start and a soft landing, which a bare sine does not have. A sine
+           ease and not a cubic one: cubic bunches both peaks into the middle
+           and the swing across becomes a flick, while this puts them at one
+           third and two thirds of the way. */
+        const u = (1 - Math.cos(Math.PI * t)) / 2
+        if (t < 1) {
+          setAt(from + amp * Math.sin(u * Math.PI * 2))
+          n.raf = requestAnimationFrame(step)
+        } else {
+          n.raf = 0
+          setAt(from)
+        }
+      }
+      n.raf = requestAnimationFrame(step)
+      /* Frames stop arriving in a tab that is not being painted, and the swing
+         would then sit wherever it had got to. A plain timer still fires there,
+         so it takes the handle home if the frames never finish the job. */
+      n.guard = setTimeout(() => {
+        n.guard = 0
+        if (!n.raf) return
+        cancelAnimationFrame(n.raf)
+        n.raf = 0
+        setAt(from)
+      }, 2100)
+    }
+
+    const io = new IntersectionObserver(
+      ([e]) => {
+        if (!e.isIntersecting || n.spent) return
+        io.disconnect()
+        n.io = null
+        n.spent = true
+        /* A beat after it arrives, so the nudge is not lost under the
+           section's own entrance. */
+        n.timer = setTimeout(run, 500)
+      },
+      { root: scroller, threshold: 0.5 },
+    )
+    n.io = io
+    io.observe(el)
+
+    return () => {
+      io.disconnect()
+      if (n.raf) cancelAnimationFrame(n.raf)
+      if (n.timer) clearTimeout(n.timer)
+      if (n.guard) clearTimeout(n.guard)
+      n.raf = 0
+      n.timer = 0
+      n.guard = 0
+      n.io = null
+    }
+  }, [])
+
   if (!before || !after) return null
 
   return (
@@ -655,6 +964,7 @@ function Scrub({ before, after }) {
       /* Dragging anywhere on the image works, not only on the handle — a
          6px target is a mouse-only interaction pretending to be a general one. */
       onPointerDown={(e) => {
+        stopNudge()
         e.currentTarget.setPointerCapture(e.pointerId)
         move(e.clientX)
       }}
@@ -679,9 +989,200 @@ function Scrub({ before, after }) {
         max="100"
         step="0.1"
         value={at}
-        onChange={(e) => setAt(Number(e.target.value))}
+        onChange={(e) => {
+          stopNudge()
+          setAt(Number(e.target.value))
+        }}
+        /* Focus and keys belong to the visitor from the first moment. */
+        onFocus={stopNudge}
+        onKeyDown={stopNudge}
         aria-label="Reveal the finished space"
       />
+    </div>
+  )
+}
+
+/* ═══ The works programme ════════════════════════════════════════════
+   The seven steps as a programme chart, the drawing a contractor hands a
+   client: each step a bar that starts a little after the one before it and
+   steps down the sheet. At rest a step is its number and its name; the
+   sentence about it opens on tap, or on hover where there is a pointer.
+
+   The list keeps the `r-steps` class and each bar keeps the `r-step-mark`,
+   because that is what `useSheetLife` ticks off as the visitor scrolls. */
+function Programme({ steps }) {
+  const [open, setOpen] = useState(null)
+  const uid = useId().replace(/:/g, '')
+  return (
+    <ol className="r-steps r-prog" role="list" style={{ '--n': steps.length }}>
+      {steps.map((st, i) => {
+        const isOpen = open === i
+        /* `data-open`, never a class: the reveal system adds `is-in` to this
+           element from outside React, and a React-written className would wipe
+           it and hide the row for good. The same goes for the client tiles and
+           the answers below. */
+        return (
+          <li key={st.n} data-reveal style={{ '--i': i }} data-open={isOpen ? '' : undefined}>
+            <button
+              type="button"
+              className="r-prog-btn"
+              aria-expanded={isOpen}
+              aria-controls={`${uid}-${i}`}
+              onClick={() => setOpen(isOpen ? null : i)}
+            >
+              <span className="r-step-n">{st.n}</span>
+              <span className="r-step-k">{st.k}</span>
+              <span className="r-prog-track" aria-hidden="true">
+                <span className="r-prog-bar" />
+                <span className="r-step-mark">
+                  <i className="r-step-brush" />
+                  <svg className="r-step-tick" viewBox="0 0 24 24" focusable="false">
+                    <path d="M3.5 12 C6 14 8 16.5 9.5 19 C12 13 15.5 8 20.5 4" pathLength="1" />
+                  </svg>
+                </span>
+              </span>
+              <Icon name="chevron" size={14} className="r-prog-chev" />
+            </button>
+            <div className="r-step-d" id={`${uid}-${i}`} aria-hidden={!isOpen}>
+              <p>{st.d}</p>
+            </div>
+          </li>
+        )
+      })}
+    </ol>
+  )
+}
+
+/* The Property Passport as a booklet with tabbed pages: what goes in it,
+   written on the tabs. Decorative; the caption beside it carries the words. */
+const PASSPORT_TABS = ['Inspections', 'Photos', 'Works', 'Materials', 'Decisions', 'Warranties', 'Maintenance']
+function Passport() {
+  return (
+    <svg className="r-draw r-draw--passport" viewBox="0 0 300 200" aria-hidden="true" focusable="false">
+      <g className="r-draw-ink">
+        {[0, 1, 2].map((k) => (
+          <rect key={k} x={40 + k * 6} y={26 - k * 6} width="150" height="150" className="r-draw-page" />
+        ))}
+        <rect x="52" y="14" width="150" height="150" className="r-draw-cover" />
+        <path d="M118 60 l9 20 l9 -20" />
+        <path d="M121 84 h12" />
+        <text x="127" y="112" textAnchor="middle" className="r-draw-t">PROPERTY</text>
+        <text x="127" y="126" textAnchor="middle" className="r-draw-t">PASSPORT</text>
+        <text x="127" y="146" textAnchor="middle" className="r-draw-s">OBJECTPASPOORT</text>
+      </g>
+      <g className="r-draw-tabs">
+        {PASSPORT_TABS.map((t, i) => (
+          <g key={t} transform={`translate(202 ${20 + i * 20})`}>
+            <path d="M0 0 h72 v16 h-72 z" className="r-draw-tab" />
+            <text x="8" y="11" className="r-draw-tab-t">{t}</text>
+          </g>
+        ))}
+      </g>
+    </svg>
+  )
+}
+
+/* The Disruption Meter as a scale drawn on paper: who is affected down the
+   side, the four phases across the top, and a hand-drawn level in each cell.
+   The levels are an illustration of the idea and say so. The source approves
+   the name and forbids presenting it as software, so nothing here is a gauge,
+   a needle or a number. */
+const METER_ROWS = ['Residents', 'Staff', 'Operations']
+const METER_LEVELS = [
+  [1, 2, 3, 1],
+  [1, 1, 3, 2],
+  [2, 2, 3, 1],
+]
+function Meter({ phases = [] }) {
+  const cols = phases.slice(0, 4)
+  const x0 = 100, cw = 60, y0 = 46, rh = 34
+  return (
+    <svg className="r-draw r-draw--meter" viewBox="0 0 360 200" aria-hidden="true" focusable="false">
+      <g className="r-draw-ink">
+        <rect x="18" y="14" width="330" height="158" className="r-draw-sheet" />
+        {cols.map((p, c) => (
+          <text key={p} x={x0 + c * cw + cw / 2} y="36" textAnchor="middle" className="r-draw-s">{p.toUpperCase()}</text>
+        ))}
+        {METER_ROWS.map((r, i) => (
+          <g key={r}>
+            <text x="28" y={y0 + i * rh + 21} className="r-draw-s">{r.toUpperCase()}</text>
+            <path d={`M${x0} ${y0 + i * rh + 30} H${x0 + cols.length * cw}`} className="r-draw-rule" />
+            {cols.map((p, c) => {
+              const lvl = METER_LEVELS[i]?.[c] ?? 1
+              return Array.from({ length: lvl }, (_, k) => (
+                <rect key={k} x={x0 + c * cw + 12 + k * 12} y={y0 + i * rh + 8} width="8" height="16" className={`r-draw-lvl r-draw-lvl--${lvl}`} />
+              ))
+            })}
+          </g>
+        ))}
+        <text x="28" y="164" className="r-draw-s r-draw-note">ILLUSTRATION ONLY. THE VIEW IS BUILT PER PROPERTY.</text>
+      </g>
+    </svg>
+  )
+}
+
+/* Six tiles for the six kinds of client. Icon and name at rest; the sentence
+   about them slides up over the tile on tap, or on hover where there is a
+   pointer. The icon for each is matched by position in the source list. */
+const CLIENT_ICONS = ['building', 'people', 'civic', 'office', 'property', 'heritage']
+function Clients({ items }) {
+  const [open, setOpen] = useState(null)
+  const uid = useId().replace(/:/g, '')
+  return (
+    <ul className="r-clients" role="list">
+      {items.map((c, i) => {
+        const isOpen = open === i
+        return (
+          <li key={c.k} data-reveal style={{ '--i': i }} data-open={isOpen ? '' : undefined}>
+            <button
+              type="button"
+              className="r-client"
+              aria-expanded={isOpen}
+              aria-controls={`${uid}-${i}`}
+              onClick={() => setOpen(isOpen ? null : i)}
+            >
+              <span className="r-client-i"><Icon name={CLIENT_ICONS[i] || 'building'} size={24} /></span>
+              <span className="r-client-k">{c.k}</span>
+              <span className="r-client-more">{isOpen ? 'Close' : 'What we do for them'}</span>
+            </button>
+            <div className="r-client-d" id={`${uid}-${i}`} aria-hidden={!isOpen}>
+              <p>{c.d}</p>
+            </div>
+          </li>
+        )
+      })}
+    </ul>
+  )
+}
+
+/* The five questions, one open at a time. The first is open on arrival so the
+   block does not read as empty. The answers are the approved wording. */
+function Answers({ items }) {
+  const [open, setOpen] = useState(0)
+  const uid = useId().replace(/:/g, '')
+  return (
+    <div className="r-faq">
+      {items.map((f, i) => {
+        const isOpen = open === i
+        return (
+          <div key={f.q} data-reveal style={{ '--i': i }} className="r-q" data-open={isOpen ? '' : undefined}>
+            <h4>
+              <button
+                type="button"
+                aria-expanded={isOpen}
+                aria-controls={`${uid}-${i}`}
+                onClick={() => setOpen(isOpen ? null : i)}
+              >
+                <span>{f.q}</span>
+                <Icon name="chevron" size={16} />
+              </button>
+            </h4>
+            <div className="r-a" id={`${uid}-${i}`} aria-hidden={!isOpen}>
+              <p>{f.a}</p>
+            </div>
+          </div>
+        )
+      })}
     </div>
   )
 }
@@ -695,7 +1196,7 @@ function Scrub({ before, after }) {
  * the source says every route on the site should end at, and the cross-link to
  * Workforce that keeps the two offers from blurring.
  */
-function RenovationFooter({ service, onClose, onRequest }) {
+function RenovationFooter({ service, onClose, onRequest, onSwitch }) {
   const year = new Date().getFullYear()
   return (
     <footer className="r-foot">
@@ -716,6 +1217,11 @@ function RenovationFooter({ service, onClose, onRequest }) {
         <div className="r-cross">
           <p className="r-cross-k">{service.world.cross.k}</p>
           <p className="r-cross-d">{service.world.cross.d}</p>
+          {onSwitch && (
+            <button type="button" className="r-cross-go" onClick={() => onSwitch('workforce')}>
+              {service.world.cross.cta} <Icon name="arrow" size={14} />
+            </button>
+          )}
         </div>
       </div>
 

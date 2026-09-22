@@ -325,16 +325,6 @@ export const services = [
       ],
       stripNote: 'We list a role only where we can recruit, select and support people for it. The list is still under review, so these numbers may come down.',
 
-      /* The two axes. This is the page's structural argument, and the figure
-         beside it exists to stop a reader treating the four service lines as a
-         fifth level of the sector tree. Source wording, condensed. */
-      axes: {
-        kicker: 'How to read this',
-        line: 'The job and the contract are separate choices',
-        d: 'Every role belongs to a group, and every group belongs to a sector. How we supply the person is a separate choice, and it is the same in every sector.',
-        note: 'The same role can be supplied as temporary staff, on secondment, as a permanent hire or inside a project team. The job stays the same and only the contract changes.',
-        },
-
       /* METHOD, source page 5. Three triplets, in the source's own order.
          They are cadence rather than process — the previous page ran a
          seven-step journey (Source, Screen, Verify, Match, Deploy, Monitor,
@@ -511,8 +501,7 @@ export const services = [
          promised, which is exactly why they can be published while the claims
          matrix is still open. */
       trust: {
-        line: 'We show evidence before we make promises.',
-        d: 'We do not publish a certification, standard, response-time, capacity or availability claim unless we hold current evidence for it. We publish only what ORYX can actually deliver.',
+        line: 'We show evidence before we make promises, and publish only what ORYX can actually deliver.',
       },
 
       /* The cross-link the source requires. "ORYX Property Care delivers and
@@ -521,8 +510,8 @@ export const services = [
          cross-link between them is people, not contracted works." */
       cross: {
         k: 'Need tradespeople instead?',
-        d: 'This page is work ORYX delivers and coordinates as complete packages, with one scope, programme and handover record. Supplying skilled people for your own team to manage is a different service, ORYX Workforce.',
-        cta: 'ORYX Workforce',
+        d: 'This page is work ORYX delivers as complete packages. Skilled people for your own team to manage is ORYX Workforce.',
+        cta: 'Go to Workforce',
       },
 
       /* The intake every route on the site is meant to end at. */

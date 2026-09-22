@@ -1,4 +1,4 @@
-import { useEffect, useId, useMemo, useState } from 'react'
+import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import WorldShell, { Media } from './WorldShell'
 import { useMeasured } from '../../lib/useMeasured'
 import { film } from '../../content/media'
@@ -6,6 +6,10 @@ import { sectors, roles, serviceLines, totals } from '../../content/workforce'
 import { ctaFor, emailFor } from '../../content/requests'
 import { cardImage } from '../../lib/cardImage'
 import { useEscape } from '../../lib/useOverlay'
+import { useSeen, seenClass } from '../../lib/useSeen'
+import { usePrefersReduced } from '../../lib/usePrefersReduced'
+import CrewScene from './workforce/CrewScene'
+import PhotoBand from '../PhotoBand'
 import { SoundToggle } from '../Sound'
 import { Social } from '../../sections/Footer'
 import Sheet from '../Sheet'
@@ -25,14 +29,11 @@ import Icon from '../Icon'
  * centre of gravity is a register you can search, and everything around it
  * exists to make that register mean something.
  *
- * ── The argument the page has to make ────────────────────────────────
- * The source opens by rejecting the reading its own shape invites: *two axes,
- * not one hierarchy*. Sector → group → role nests. Service line does not — it
- * says how a role is delivered, not what industry it belongs to. A reader who
- * has just browsed a three-level tree and then meets four service lines will
- * read those four as a fourth level unless something stops them. `Axes` is that
- * something, and it is why it sits between the two sections rather than
- * anywhere prettier.
+ * ── The idea the page has to get across ──────────────────────────────
+ * The job and the way of hiring are two separate choices: any role can be
+ * supplied as temporary staff, on secondment, as a permanent hire or inside a
+ * project team. A diagram used to argue that in text. The request builder now
+ * lets the visitor make the two choices, which says the same thing faster.
  *
  * ── What may not be said ─────────────────────────────────────────────
  * The source's final page is a publication gate that clears five claims out of
@@ -43,6 +44,13 @@ import Icon from '../Icon'
 export default function WorkforceWorld({ service, onClose, onRequest }) {
   const { world } = service
   const nav = useMeasured('--w-nav-h')
+
+  /* Which sector popup is open, and which role in it is marked. It used to
+     live inside the register. The photo strip further down opens the same
+     popups, so the state sits here and both are handed the opener. */
+  const [sheet, setSheet] = useState(null)
+  const openSector = (id, mark = null) => setSheet({ id, mark })
+  const openedSector = sheet ? sectors.find((s) => s.id === sheet.id) : null
 
   return (
     <WorldShell service={service} onClose={onClose}>
@@ -59,8 +67,9 @@ export default function WorkforceWorld({ service, onClose, onRequest }) {
           </button>
 
           <nav className="w-nav-links" aria-label="Workforce sections">
-            <a href="#w-sectors">Register</a>
-            <a href="#w-axes">How it works</a>
+            <a href="#w-crew">Crew</a>
+            <a href="#w-sectors">Sectors</a>
+            <a href="#w-ways">Ways to hire</a>
             <a href="#w-method">Method</a>
             <a href="#w-trust">Trust</a>
           </nav>
@@ -102,11 +111,17 @@ export default function WorkforceWorld({ service, onClose, onRequest }) {
             the condition on which printing them at all is honest. */}
         <dl className="w-strip" data-reveal>
           {world.strip.map((f) => (
-            <div key={f.l}><dt>{f.l}</dt><dd>{f.n}</dd></div>
+            <div key={f.l}><dt>{f.l}</dt><dd><CountUp value={f.n} /></dd></div>
           ))}
         </dl>
         <p className="w-strip-note" data-reveal>{world.stripNote}</p>
       </header>
+
+      {/* ── The promise, drawn ────────────────────────────────────────
+          "From one skilled worker to a complete project crew", shown as one
+          worker becoming twelve as the page scrolls. It comes straight after
+          the opening because it is the opening's own sentence made visible. */}
+      <CrewScene />
 
       {/* ── The register ──────────────────────────────────────────────
           The signature. Twelve sectors, forty-one groups and every one of the
@@ -114,13 +129,17 @@ export default function WorkforceWorld({ service, onClose, onRequest }) {
           apart. "We staff construction" is a claim anyone can make; "Formwork
           carpenter — formwork, striking, supports and concrete preparation" is
           not. */}
-      <Register onRequest={onRequest} />
+      <Register onOpenSector={openSector} popupOpen={Boolean(sheet)} />
 
-      {/* ── The two axes ──────────────────────────────────────────────
-          The one place the four ways of supplying people are laid out. A
-          separate "Four ways to work with us" section used to follow it and
-          said the same thing again as four cards, so it was removed. */}
-      <Axes copy={world.axes} />
+      {/* ── Four ways to hire ─────────────────────────────────────────
+          The job and the way of hiring are two separate choices, and any role
+          can be supplied four ways. A diagram argued that in text, then a
+          three-step request builder had the visitor act it out, and neither
+          earned its space. Four situations do the same job in a glance. */}
+      <Situations onRequest={onRequest} />
+
+      {/* ── The sectors, in pictures ──────────────────────────────────── */}
+      <SectorBand onOpen={openSector} />
 
       {/* ── Method ────────────────────────────────────────────────────
           Three triplets from the source, in its order. Cadence rather than
@@ -135,17 +154,7 @@ export default function WorkforceWorld({ service, onClose, onRequest }) {
           </div>
         </div>
 
-        <ol className="w-steps" role="list">
-          {world.method.map((m, i) => (
-            <li key={m.k} data-reveal style={{ '--i': i }}>
-              <span className="w-step-n">{String(i + 1).padStart(2, '0')}</span>
-              <span className="w-step-body">
-                <span className="w-step-k">{m.k}</span>
-                <span className="w-step-d">{m.d}</span>
-              </span>
-            </li>
-          ))}
-        </ol>
+        <MethodSteps steps={world.method} />
       </section>
 
       {/* ── Trust ─────────────────────────────────────────────────────
@@ -166,14 +175,19 @@ export default function WorkforceWorld({ service, onClose, onRequest }) {
           <p className="w-trust-d" data-reveal>{world.trust.d}</p>
         </div>
 
-        <ul className="w-holds" role="list">
-          {world.trust.holds.map((h, i) => (
-            <li key={h} data-reveal style={{ '--i': i }}>{h}</li>
-          ))}
-        </ul>
+        <Holds holds={world.trust.holds} />
       </section>
 
       <WorkforceFooter service={service} onClose={onClose} onRequest={onRequest} />
+
+      {openedSector && (
+        <SectorSheet
+          sector={openedSector}
+          mark={sheet.mark}
+          onClose={() => setSheet(null)}
+          onRequest={() => onRequest('workforce', openedSector.id)}
+        />
+      )}
     </WorldShell>
   )
 }
@@ -202,9 +216,7 @@ export default function WorkforceWorld({ service, onClose, onRequest }) {
 const STATUS = { req: 'On request', qc: 'Qualification required' }
 const SHOWN = 6
 
-function Register({ onRequest }) {
-  const [openId, setOpenId] = useState(null)
-  const [mark, setMark] = useState(null)
+function Register({ onOpenSector, popupOpen }) {
   const [q, setQ] = useState('')
   const uid = useId().replace(/:/g, '')
 
@@ -244,7 +256,7 @@ function Register({ onRequest }) {
   }, [index, query, searching])
 
   /* Escape clears the search before it closes the page. */
-  useEscape(Boolean(q) && !openId, () => setQ(''))
+  useEscape(Boolean(q) && !popupOpen, () => setQ(''))
 
   const status = searching
     ? `${hits.length} role${hits.length === 1 ? '' : 's'} matching ${q.trim()}`
@@ -255,11 +267,7 @@ function Register({ onRequest }) {
     return () => clearTimeout(t)
   }, [status])
 
-  const openSector = (sid, roleId = null) => {
-    setMark(roleId)
-    setOpenId(sid)
-  }
-  const cur = sectors.find((s) => s.id === openId) || null
+  const openSector = onOpenSector
 
   return (
     <section className="w-reg-wrap" id="w-sectors" aria-labelledby={`${uid}-h`} data-reveal>
@@ -344,14 +352,6 @@ function Register({ onRequest }) {
         })}
       </ul>
 
-      {cur && (
-        <SectorSheet
-          sector={cur}
-          mark={mark}
-          onClose={() => setOpenId(null)}
-          onRequest={() => onRequest('workforce', cur.id)}
-        />
-      )}
     </section>
   )
 }
@@ -425,131 +425,209 @@ const count = (s) => s.groups.reduce((n, g) => n + g.roles.length, 0)
 
 
 
-/**
- * The two axes.
- *
- * The one genuinely new illustration on the page, and the only one whose job is
- * an argument rather than an atmosphere. It exists because the section under it
- * will otherwise be misread as a fourth level of the section above it.
- *
- * ── Why it is not scroll-driven ──────────────────────────────────────
- * A figure whose entire claim is *these two things do not nest* has to be taken
- * in at once. Revealing it a piece at a time performs a sequence, and a
- * sequence is exactly the reading it exists to correct. It arrives as one
- * object and then holds still.
- *
- * ── Why there is no SVG ──────────────────────────────────────────────
- * Every string in it is data whose length nobody controls: 48-character sector
- * names, 45-character group names, "Project teams & flex pools". SVG `<text>`
- * does not wrap, and an earlier attempt needed about 1 150 units of width for
- * the four service-line labels inside a 1 120-unit box. That was never a
- * coordinate problem to be solved with a bigger viewBox — it was the wrong
- * element for a label whose length is data. There is nothing here to draw that
- * is not a border, a grid gap or two rules: three nested boxes, four sibling
- * cells, a divider with a cross on it. Removing the SVG also removes the
- * temptation to draw a connector — which is banned, because a node with four
- * lines fanning out from it *is* the drawing of a tree.
- *
- * ── The acceptance test ──────────────────────────────────────────────
- * The chosen role's name appears five times in identical type from a single CSS
- * rule: once at the bottom of the nest, once in each of the four service lines.
- * Children of a node differ from each other and from their parent; five
- * identical strings are one object seen five times. Nothing is drawn between
- * them. The nest indents and narrows; the four cells are equal and full height.
- * Two labelled rails sit at ninety degrees. Cover the caption and the figure
- * has still made its argument.
- */
-function Axes({ copy }) {
-  /* A real role, pulled from the register rather than typed here, so the figure
-     cannot drift from the data it is describing. Chosen for length: "Carpenter"
-     is nine characters and stays on one line in the narrowest cell the layout
-     ever produces, which is what lets all five instances read as one shape. */
-  const sector = sectors.find((s) => s.id === 'property')
-  const group = sector?.groups.find((g) => g.roles.includes('carpenter'))
-  const role = roles.carpenter?.[0]
+/* The twelve sectors as a drifting band of their photographs. */
+function SectorBand({ onOpen }) {
+  const items = sectors.map((sec) => ({
+    id: sec.id,
+    label: sec.short,
+    icon: sec.id,
+    img: cardImage(`workforce/${sec.id}`),
+  }))
+  return <PhotoBand items={items} onOpen={onOpen} label="The twelve sectors in pictures" />
+}
 
-  /* Three lookups by hard-coded id. If a sector, a group or a role is ever
-     renamed in the data, the figure loses its example — but it must not take
-     the whole world down with it, which an unguarded `roles.carpenter[0]`
-     would. Rendering nothing is recoverable; a blank page is not. */
-  if (!sector || !group || !role) return null
+/* ═══ Four ways to hire ══════════════════════════════════════════════
+   Each of the four service lines, introduced by the situation it answers.
+   The situations are written here and not in the content file: they are the
+   page's own framing of the four lines, and the lines themselves are read from
+   the data, so a renamed line renames its tile.
 
+   Plain situations only. Nothing here says how fast ORYX responds or that
+   anyone is standing by, which the claims rules forbid. */
+const SITUATIONS = [
+  { n: '01', say: 'Two people are off sick this week.', img: 'cleaning' },
+  { n: '02', say: 'A nine-month project needs a fitter.', img: 'technical' },
+  { n: '03', say: 'We want to hire someone, not borrow them.', img: 'manufacturing' },
+  { n: '04', say: 'A whole crew for a new site.', img: 'property' },
+]
+
+function Situations({ onRequest }) {
+  const tiles = SITUATIONS.map((sit) => ({ ...sit, line: serviceLines.find((l) => l.n === sit.n) })).filter((t) => t.line)
   return (
-    <section className="w-axes" id="w-axes">
-      <div className="w-axes-head">
-        <p className="world-kicker" data-reveal>{copy.kicker}</p>
-        <h3 data-reveal>{copy.line}</h3>
-        <p className="world-line" data-reveal>{copy.d}</p>
+    <section className="w-ways" id="w-ways">
+      <div className="w-ways-head">
+        <p className="world-kicker" data-reveal>Four ways to hire</p>
+        <h3 data-reveal>Which one sounds like your week?</h3>
+        <p className="world-line" data-reveal>
+          Any role in the register can be supplied in any of these four ways.
+          The job stays the same, and only the way you hire changes.
+        </p>
       </div>
 
-      <figure className="w-axes-fig" data-reveal>
-        <span className="sr-only">
-          A sector contains groups, and a group contains roles. Each of the four
-          service lines below delivers that same role under a different
-          contract, so they are not a fourth level of the hierarchy.
-        </span>
-
-        <p className="w-ax-axl w-ax-axl--y" aria-hidden="true">
-          What the work is <i />
-        </p>
-
-        {/* Genuinely nested lists, indented by a stepped left rule. That
-            containment grammar appears nowhere else in this stylesheet, so it
-            cannot be confused with the peer grammar on the other side. The nest
-            carries no ordinals at all — the indent does the counting, so no
-            number inside the figure can be mistaken for a depth. */}
-        <ol className="w-ax-nest" role="list">
-          <li className="w-ax-lvl">
-            <span className="w-ax-lvl-h" style={{ '--i': 0 }}>
-              <span className="w-ax-n">Sector <em>{sector.groups.length} groups</em></span>
-              <span className="w-ax-k">{sector.short}</span>
-            </span>
-            <ol role="list">
-              <li className="w-ax-lvl">
-                <span className="w-ax-lvl-h" style={{ '--i': 1 }}>
-                  <span className="w-ax-n">Group <em>{group.roles.length} roles</em></span>
-                  <span className="w-ax-k">{group.name}</span>
+      <ul className="w-ways-grid" role="list">
+        {tiles.map((t, i) => {
+          const img = cardImage(`workforce/${t.img}`)
+          return (
+            <li key={t.n} data-reveal style={{ '--i': i }}>
+              {/* The whole tile is the button, so the request form opens with
+                  this way of hiring already noted. Spans throughout, because a
+                  button may hold phrasing content only. */}
+              <button
+                type="button"
+                className="w-way"
+                onClick={() => onRequest('workforce', '', `How: ${t.line.k}`)}
+              >
+                <span className="w-way-img">
+                  {img && <img src={img.src} alt="" loading="lazy" />}
+                  <span className="w-way-n">{t.n}</span>
                 </span>
-                <ol role="list">
-                  <li className="w-ax-lvl is-leaf">
-                    <span className="w-ax-lvl-h" style={{ '--i': 2 }}>
-                      <span className="w-ax-n">Role</span>
-                      <span className="w-ax-k">{role}</span>
-                    </span>
-                  </li>
-                </ol>
-              </li>
-            </ol>
-          </li>
-        </ol>
-
-        {/* A divider with a cross on it, in `--line` and never in sand: sand
-            here would read as a connection, and the one thing that must not be
-            drawn between these two halves is a line joining them. */}
-        <span className="w-ax-seam" aria-hidden="true" />
-
-        <p className="w-ax-axl w-ax-axl--x" aria-hidden="true">
-          How it is delivered <i />
-        </p>
-
-        {/* A flat list of four siblings — "list, 4 items", at no depth. */}
-        <ol className="w-ax-lines" role="list">
-          {serviceLines.map((l) => (
-            <li className="w-ax-line" key={l.n}>
-              <span className="w-ax-ln">{l.n}</span>
-              <span className="w-ax-lk">{l.k}</span>
-              <span className="w-ax-ld">{l.fit}</span>
-              <span className="w-ax-role">{role}</span>
+                <span className="w-way-body">
+                  <span className="w-way-say">{t.say}</span>
+                  <span className="w-way-k">{t.line.k}</span>
+                  <span className="w-way-d">{t.line.d}</span>
+                  <span className="w-way-go">{ctaFor('workforce')} this way<Icon name="arrow" size={14} /></span>
+                </span>
+              </button>
             </li>
-          ))}
-        </ol>
-
-        <figcaption className="w-ax-cap">
-          <b>{totals.roles} roles <span aria-hidden="true">×</span><span className="sr-only">by</span> {serviceLines.length} service lines.</b>{' '}
-          {copy.note}
-        </figcaption>
-      </figure>
+          )
+        })}
+      </ul>
     </section>
+  )
+}
+
+/* A figure that counts up to itself the first time it is seen.
+
+   The real number is what a screen reader gets, always. The visible one starts
+   as the real number too, so if nothing ever runs the strip is simply correct.
+   It is driven by a timer and not by `requestAnimationFrame`: a frame callback
+   does not fire in a tab that is not being painted, and a count stranded at 40
+   of 307 would be a wrong number printed on the page. The last step sets the
+   true value outright, whatever the steps before it managed. */
+function CountUp({ value }) {
+  const target = parseInt(value, 10)
+  const ref = useRef(null)
+  const state = useSeen(ref, { margin: '-4%' })
+  const [shown, setShown] = useState(value)
+
+  useEffect(() => {
+    if (state !== 'seen' || Number.isNaN(target)) return
+    const DURATION = 1300
+    const t0 = performance.now()
+    const id = setInterval(() => {
+      const k = Math.min(1, (performance.now() - t0) / DURATION)
+      setShown(String(Math.round(target * (1 - (1 - k) ** 3))))
+      if (k === 1) { clearInterval(id); setShown(value) }
+    }, 32)
+    return () => { clearInterval(id); setShown(value) }
+  }, [state, target, value])
+
+  return (
+    <span ref={ref}>
+      <span className="sr-only">{value}</span>
+      <span aria-hidden="true">{state === 'wait' ? '0' : shown}</span>
+    </span>
+  )
+}
+
+/* The three method steps, with a line that fills as they are read.
+
+   Measured against the list and not the section, which is the lesson from
+   Transport's route: a section is taller than its list, so a line tied to the
+   section finishes early and then sits there. One scroll listener, throttled
+   to a frame, writes one number onto the list and one index into state.
+
+   Until that listener has run the steps are all lit, which is also how they
+   stay for a visitor who prefers reduced motion. "Not yet reached" is a style
+   that only exists once the list is being tracked. */
+function MethodSteps({ steps }) {
+  const list = useRef(null)
+  const reduced = usePrefersReduced()
+  const [live, setLive] = useState(null)
+
+  useEffect(() => {
+    const ol = list.current
+    const scroller = ol?.closest('.world-scroll')
+    if (!ol || !scroller || reduced) return
+    let frame = 0
+    const update = () => {
+      frame = 0
+      const r = ol.getBoundingClientRect()
+      const h = scroller.clientHeight
+      const span = 0.25 * h + r.height
+      const p = span > 0 ? Math.min(1, Math.max(0, (0.8 * h - r.top) / span)) : 1
+      ol.style.setProperty('--run', p.toFixed(4))
+      setLive(Math.min(steps.length - 1, Math.floor(p * steps.length * 1.0001)) - (p === 0 ? 1 : 0))
+    }
+    const onScroll = () => { if (!frame) frame = requestAnimationFrame(update) }
+    scroller.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('resize', onScroll)
+    update()
+    return () => {
+      scroller.removeEventListener('scroll', onScroll)
+      window.removeEventListener('resize', onScroll)
+      if (frame) cancelAnimationFrame(frame)
+    }
+  }, [steps.length, reduced])
+
+  const tracking = live !== null
+  return (
+    <ol className={`w-steps ${tracking ? 'is-tracking' : ''}`} role="list" ref={list}>
+      <span className="w-steps-line" aria-hidden="true"><i /></span>
+      {steps.map((m, i) => (
+        /* `data-lit`, never a class. The page's reveal system marks an element
+           as shown by ADDING the class `is-in` to it from outside React. When
+           React changes a `className` it writes the whole attribute, which
+           wiped that mark: the step faded back out the moment it lit, and the
+           reveal observer had already stopped watching it, so it never came
+           back, scrolling up included. A data attribute leaves the class list
+           alone. Never put a changing `className` on a `data-reveal` element. */
+        <li key={m.k} data-reveal style={{ '--i': i }} data-lit={!tracking || i <= live ? '' : undefined}>
+          <span className="w-step-n">{String(i + 1).padStart(2, '0')}</span>
+          <span className="w-step-body">
+            <span className="w-step-k">{m.k}</span>
+            <span className="w-step-d">{m.d}</span>
+          </span>
+        </li>
+      ))}
+    </ol>
+  )
+}
+
+/* The four things ORYX holds itself to, as a checklist that ticks itself, and
+   beside it a document being stamped. The sentences are unchanged. Finished is
+   the resting state: ticked and stamped unless the list is known to be off
+   screen and waiting to be seen. */
+function Holds({ holds }) {
+  const ref = useRef(null)
+  const state = useSeen(ref)
+  return (
+    <div className={`w-holds-wrap ${seenClass(state)}`} ref={ref}>
+      <ul className="w-holds" role="list">
+        {holds.map((h, i) => (
+          <li key={h} style={{ '--i': i }}>
+            <svg className="w-hold-box" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+              <rect x="1.5" y="1.5" width="17" height="17" />
+              <path d="M5 10.5l3.4 3.4L15.2 6.4" pathLength="1" />
+            </svg>
+            <span>{h}</span>
+          </li>
+        ))}
+      </ul>
+
+      <svg className="w-doc" viewBox="0 0 220 150" aria-hidden="true" focusable="false">
+        <path className="w-doc-sheet" d="M18 8h130l34 34v100H18z" />
+        <path className="w-doc-fold" d="M148 8v34h34" />
+        <circle className="w-doc-photo" cx="48" cy="46" r="13" />
+        <path className="w-doc-photo" d="M30 76c2-10 9-14 18-14s16 4 18 14" />
+        <path className="w-doc-rule" d="M80 36h52M80 50h40M80 64h58M32 96h118M32 110h96M32 124h108" />
+        <g className="w-doc-stamp">
+          <rect x="76" y="84" width="140" height="42" />
+          <text x="146" y="101" textAnchor="middle">CHECKED FOR</text>
+          <text x="146" y="117" textAnchor="middle">THIS ASSIGNMENT</text>
+        </g>
+      </svg>
+    </div>
   )
 }
 

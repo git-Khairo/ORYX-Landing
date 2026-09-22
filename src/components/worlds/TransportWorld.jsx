@@ -102,16 +102,29 @@ export default function TransportWorld({ service, onClose, onRequest }) {
           as Transport from across the room, before a word is read. */}
       <NetworkMap map={world.map} />
 
+      {/* Road markings between the main sections. Decoration only: ten pixels
+          of tarmac whose centre line slides as the page is scrolled. There is
+          none under the opening frame, because the manifest hangs off its foot
+          there, and none beside the client tape, which is already a dark band
+          of its own. */}
+      <Lane />
+
       {/* ── The route ─────────────────────────────────────────────────── */}
       {/* A generated ORYX picture takes over from the stock still as soon as
           one is dropped in `src/assets/cards/transport/`. */}
       <Route stops={world.route} lede={world.lede} shot={cardImage('transport/route') || shots[0]} />
+
+      {/* Outside the loading scene, not in it. The scene is sticky and has a
+          road of its own. */}
+      <Lane />
 
       {/* ── What it is, as a load ─────────────────────────────────────
           The four things this service is, as four crates going onto a lorry
           that then drives out of frame. A four-up card grid said "reference
           table"; this says what the service actually does with them. */}
       <Load items={world.definition} />
+
+      <Lane />
 
       {/* ── How it runs ───────────────────────────────────────────────
           The page shows what happens on the day but never says how a job
@@ -132,15 +145,17 @@ export default function TransportWorld({ service, onClose, onRequest }) {
         </ol>
       </section>
 
+      <Lane />
+
       {/* ── The board ─────────────────────────────────────────────────
           Figures set as a departure board, which is the one place on this site
           where a row of numerals is the native form rather than a stylistic
           choice. */}
       <section className="t-board" id="t-coverage">
         <ul className="t-figs">
-          {world.figures.map((f) => (
+          {world.figures.map((f, j) => (
             <li key={f.l} data-reveal>
-              <span className="t-fig-n">{f.n}</span>
+              <SplitFlap value={f.n} order={j} />
               <span className="t-fig-l">{f.l}</span>
             </li>
           ))}
@@ -280,6 +295,132 @@ function TransportFooter({ service, onClose, onRequest }) {
 }
 
 /**
+ * Mark an element the first time the visitor actually reaches it.
+ *
+ * `useReveal` cannot be the trigger for anything that is meant to be watched.
+ * Its backstop adds `is-in` to every element two and a half seconds after the
+ * page opens, which is right for its job, content must never be lost, but it
+ * means that by the time anyone scrolls this far the class has been there for
+ * a while and whatever hung off it has already played to an empty room.
+ *
+ * So this adds `is-seen` when the element really crosses into view, and keeps
+ * the same promise a different way: the resting styles are the finished ones,
+ * and nothing here ever hides anything on its own account.
+ *
+ * `arm` is for entrances that need a starting pose, an undrawn line or a stamp
+ * still in the air. The pose is the class `is-armed`, and the only thing that
+ * ever sets it is the observer's own callback. An observer that never reports
+ * never arms anything, so a dead one costs the animation and not the drawing.
+ * One that has reported once is alive, and will report the crossing too. The
+ * trigger is a line across the scroller and not a share of the element, since
+ * a share is what goes unreached on an element taller than the screen.
+ */
+function useSeen(ref, { arm = false, margin = '-12%' } = {}) {
+  useEffect(() => {
+    const el = ref.current
+    const root = el?.closest('.world-scroll')
+    if (!el || !root || typeof IntersectionObserver === 'undefined') return
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        const e = entries[entries.length - 1]
+        if (!e.isIntersecting) {
+          if (arm) el.classList.add('is-armed')
+          return
+        }
+        if (arm) {
+          /* Already in view on the first report, so it was never armed. Take
+             the pose and commit it with a style flush before letting go, or
+             there is no starting value to move from. A flush and not a frame
+             callback: a frame that never comes would leave it armed. */
+          el.classList.add('is-armed')
+          void el.getBoundingClientRect()
+          el.classList.remove('is-armed')
+        }
+        el.classList.add('is-seen')
+        io.disconnect()
+      },
+      { root, rootMargin: `0px 0px ${margin} 0px`, threshold: 0 },
+    )
+    io.observe(el)
+    return () => {
+      io.disconnect()
+      /* Armed only ever while an observer is alive to disarm it. */
+      el.classList.remove('is-armed')
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+}
+
+/**
+ * Road markings, as a divider.
+ *
+ * An empty element on purpose. The dashes are a CSS background and their slide
+ * reads `--scrolled`, which WorldShell already writes on the root, so a strip
+ * of road costs no JavaScript and no listener of its own.
+ */
+function Lane() {
+  return <div className="t-lane" aria-hidden="true" />
+}
+
+/**
+ * A figure set as split-flap tiles, the way a departure board sets one.
+ *
+ * Two copies of the value, and the split matters. The real one is plain text a
+ * screen reader gets at all times; the tiles are a drawing of it and are hidden
+ * from assistive technology, because read aloud they would be "one, zero,
+ * zero, per cent" plus every digit each tile turns through.
+ *
+ * Each tile holds its final character in normal flow and hangs the characters
+ * it turns through above it, out of sight. At rest nothing is transformed, so
+ * the tile shows the right character with no animation at all. The flip is CSS
+ * hung off `is-seen`, and it is never armed: a starting pose for a figure would
+ * be a wrong figure, and no entrance is worth the risk of one being left up.
+ * The board turns through its drum from the true value back to the true value,
+ * which is what a real one does when it refreshes.
+ */
+function SplitFlap({ value, order = 0 }) {
+  const text = String(value)
+  const el = useRef(null)
+  useSeen(el)
+  return (
+    <span className="t-fig-n" ref={el}>
+      <span className="sr-only">{text}</span>
+      <span className="t-flaps" aria-hidden="true">
+        {[...text].map((ch, i) => {
+          /* Later tiles turn for longer and start later, so a figure settles
+             from left to right and the three figures settle in order. */
+          const turns = 4 + i * 2 + order
+          return (
+            <span
+              className="t-flap"
+              key={i}
+              style={{ '--n': turns, '--d': `${order * 140 + i * 90}ms` }}
+            >
+              <span className="t-flap-reel">
+                <span className="t-flap-run">
+                  {flapRun(ch, turns).map((c, k) => <span key={k}>{c}</span>)}
+                </span>
+                <span className="t-flap-set">{ch}</span>
+              </span>
+            </span>
+          )
+        })}
+      </span>
+    </span>
+  )
+}
+
+/* The characters a tile turns through on its way to `ch`. A real board does
+   not shuffle, it advances through its drum in order, so a digit counts up to
+   itself. Anything that is not a digit is treated as the card after the 9.
+   Fixed rather than random, so two renders can never disagree. */
+function flapRun(ch, turns) {
+  const end = /\d/.test(ch) ? Number(ch) : 10
+  return Array.from({ length: turns }, (_, k) => String((((end - turns + k) % 10) + 10) % 10))
+}
+
+/**
  * The load: four crates, a lorry, and a departure.
  *
  * Drawn rather than photographed, because no stock library has the four things
@@ -377,11 +518,64 @@ function Load({ items }) {
  * palette nobody chose. The grid behind it is the only thing suggesting
  * geography, and that is enough — this is a diagram of a service, not an atlas.
  *
- * The route draws itself once on reveal and a marker runs it on a loop, so the
- * section reads as live without pretending to be live data.
+ * The route draws itself once on reveal and a small ORYX van drives it on a
+ * loop, so the section reads as a network in use without pretending to be live
+ * data. The van is a drawing of the service, not a position report.
+ *
+ * The van follows the route with CSS `offset-path`, fed the same path string
+ * the route is drawn from, so the two cannot disagree. It is CSS rather than
+ * SVG `animateMotion` because CSS can be told to stop: reduced motion, the
+ * `is-still` flag and an off-screen map all park or pause it from the
+ * stylesheet, where a SMIL animation would need script to be halted.
+ *
+ * Each pin pulses as the van reaches it. Van and pins run the same duration and
+ * start from the same class change, so all a pin needs is how far along the
+ * route it sits, which is measured once on mount.
+ *
+ * The draw-in and the van both start from `is-seen`, not from `is-in`. See
+ * `useSeen` for why: the map is a screen below the fold, and hung off `is-in`
+ * the route had usually finished drawing before anyone arrived to watch.
  */
 function NetworkMap({ map }) {
+  const figure = useRef(null)
+  const track = useRef(null)
+  const nodes = map?.nodes || []
+
+  /* Guessed from x first, so the pins are already close to right on the first
+     paint and stay sensible if the measurement below cannot run. */
+  const [at, setAt] = useState(() => guessStops(nodes))
+
+  useSeen(figure, { arm: true, margin: '-16%' })
+
+  useEffect(() => {
+    const measured = track.current && measureStops(track.current, nodes)
+    if (measured) setAt(measured)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [map])
+
+  /* The loop is paused while the map is off screen. It is one small group, but
+     an animation nobody can see should not be asking for frames. Van and pins
+     pause and resume from the same class, so they cannot drift apart.
+     `classList`, not React state: `useReveal` and `useSeen` put their classes
+     on this same figure the same way, and a className written by React would
+     wipe them. */
+  useEffect(() => {
+    const el = figure.current
+    const root = el?.closest('.world-scroll')
+    if (!el || !root || typeof IntersectionObserver === 'undefined') return
+    const io = new IntersectionObserver(
+      ([e]) => el.classList.toggle('is-away', !e.isIntersecting),
+      { root, threshold: 0 },
+    )
+    io.observe(el)
+    return () => io.disconnect()
+  }, [])
+
   if (!map) return null
+
+  const hubIndex = Math.max(0, nodes.findIndex((n) => n.s === 'Home hub'))
+  const hub = nodes[hubIndex]
+
   return (
     <section className="t-map-block" id="t-network">
       <div className="t-map-head">
@@ -391,7 +585,7 @@ function NetworkMap({ map }) {
         </p>
       </div>
 
-      <figure className="t-map" data-reveal>
+      <figure className="t-map" data-reveal ref={figure}>
         <svg viewBox="0 0 1180 340" role="img" aria-label="Route network linking Paris, Luxembourg, Brussels, Amsterdam and Berlin">
           <defs>
             <pattern id="t-grid" width="40" height="40" patternUnits="userSpaceOnUse">
@@ -402,13 +596,44 @@ function NetworkMap({ map }) {
           <rect className="t-map-grid" width="1180" height="340" fill="url(#t-grid)" />
 
           {/* Laid twice: a dim full-length track so the whole network is
-              always legible, and the drawn route on top of it. */}
-          <path className="t-map-track" d={map.path} />
+              always legible, and the drawn route on top of it. The track is
+              also the one that gets measured, because it carries no
+              `pathLength` to confuse a reading in real units. */}
+          <path className="t-map-track" d={map.path} ref={track} />
           <path className="t-map-route" d={map.path} pathLength="1" />
-          <path className="t-map-runner" d={map.path} pathLength="1" />
 
-          {map.nodes.map((n, i) => (
-            <g className="t-map-node" key={n.k} style={{ '--i': i }}>
+          {/* The van. Drawn around its own origin and facing +x, because that
+              origin is the point `offset-path` carries along the route and +x
+              is the direction `offset-rotate: auto` turns to face. It sits
+              before the pins in the markup so it passes behind them: a pin
+              that pulses as the van arrives has to stay in view to be seen
+              doing it.
+
+              `--route` is the path from the data. `--hub` is how far along it
+              the home hub sits, which is where the van parks when motion is
+              off; `--hx` and `--hy` say the same thing in plain coordinates
+              for a browser with no `offset-path`. */}
+          <g
+            className="t-map-van"
+            aria-hidden="true"
+            style={{
+              '--route': `path('${map.path}')`,
+              '--hub': at[hubIndex] ?? 0,
+              '--hx': `${hub?.x ?? 0}px`,
+              '--hy': `${hub?.y ?? 0}px`,
+            }}
+          >
+            <g className="t-map-van-body">
+              <path className="t-van-shell" d="M-17 5 V-8 H8 L14 -1 L17 0 V5 Z" />
+              <path className="t-van-stripe" d="M-11 4.4 H-5 L3 -7.4 H-3 Z" />
+              <path className="t-van-glass" d="M8.6 -6.4 L12.6 -1.6 H8.6 Z" />
+              <circle className="t-van-wheel" cx="-9" cy="5" r="3" />
+              <circle className="t-van-wheel" cx="10" cy="5" r="3" />
+            </g>
+          </g>
+
+          {nodes.map((n, i) => (
+            <g className="t-map-node" key={n.k} style={{ '--i': i, '--at': at[i] ?? 0 }}>
               <circle cx={n.x} cy={n.y} r="6" />
               {/* Stacked clear of the pin: the sub-label baseline used to land
                   on the circle itself, so the two lines and the node all
@@ -421,6 +646,49 @@ function NetworkMap({ map }) {
       </figure>
     </section>
   )
+}
+
+/* How far along the route each city sits, 0 to 1, read off x alone. Close
+   enough for a first paint on a route that runs left to right. */
+function guessStops(nodes) {
+  if (nodes.length < 2) return nodes.map(() => 0)
+  const x0 = nodes[0].x
+  const span = nodes[nodes.length - 1].x - x0 || 1
+  return nodes.map((n) => Math.min(1, Math.max(0, (n.x - x0) / span)))
+}
+
+/* The same fractions, measured. The cities lie on the path but the path does
+   not say where, so it is walked: one coarse pass shared by every city, then a
+   fine pass around each city's nearest coarse point. A few hundred
+   `getPointAtLength` calls, once. Returns null where the geometry API is
+   missing, and the guess above stands. */
+function measureStops(path, nodes) {
+  const total = path.getTotalLength?.() || 0
+  if (!total || !nodes.length) return null
+
+  const COARSE = 160
+  const step = total / COARSE
+  const pts = Array.from({ length: COARSE + 1 }, (_, k) => path.getPointAtLength(k * step))
+  const gap = (p, n) => (p.x - n.x) ** 2 + (p.y - n.y) ** 2
+
+  return nodes.map((n) => {
+    let k = 0
+    pts.forEach((p, j) => {
+      if (gap(p, n) < gap(pts[k], n)) k = j
+    })
+    const from = Math.max(0, (k - 1) * step)
+    const to = Math.min(total, (k + 1) * step)
+    let best = k * step
+    let bestGap = gap(pts[k], n)
+    for (let l = from; l <= to; l += step / 16) {
+      const g = gap(path.getPointAtLength(l), n)
+      if (g < bestGap) {
+        bestGap = g
+        best = l
+      }
+    }
+    return Number((best / total).toFixed(4))
+  })
 }
 
 /**
@@ -529,12 +797,43 @@ function Route({ stops, lede, shot }) {
   )
 }
 
-/** The proof of delivery, which stamps itself once it is on screen. Every other
- *  page claims its accountability in a sentence; this one shows the artefact. */
+/* The recipient's signature: an abstract scrawl, deliberately nobody's name.
+   One continuous stroke, so it can be drawn from one end to the other the way
+   a pen would travel: a tall first loop, a run of humps, a second tall letter,
+   then the underline swept back beneath it and out to the right. */
+const SIGNATURE =
+  'M10 50 C 16 22, 30 6, 40 16 C 50 28, 30 62, 20 58 C 10 52, 40 34, 56 36 ' +
+  'C 66 38, 54 56, 64 52 C 74 48, 76 34, 84 38 C 92 42, 82 56, 94 50 ' +
+  'C 104 44, 104 30, 114 36 C 124 42, 110 58, 124 52 C 140 44, 146 20, 156 10 ' +
+  'C 162 4, 166 14, 160 28 C 154 44, 146 62, 158 56 C 170 50, 178 40, 192 40 ' +
+  'C 160 52, 110 66, 58 70 C 120 74, 190 66, 232 50'
+
+/** The proof of delivery, which is signed and then stamped once it is on
+ *  screen. Every other page claims its accountability in a sentence; this one
+ *  shows the artefact.
+ *
+ *  The order is the order it happens in at a door: the signature is written
+ *  first and the stamp comes down as the pen lifts. Both hang off one class on
+ *  the signature, and the sequence between them is two delays in the
+ *  stylesheet. It is the signature that is watched and not the figure, because
+ *  it sits at the foot of a tall photograph: triggered by the figure's top edge
+ *  it would be written and stamped before it had scrolled into view.
+ *
+ *  The signature is laid twice, a wide dark stroke under a thin light one. The
+ *  photograph behind it runs from a bright floor to black workwear inside the
+ *  width of the scrawl, and ink in either tone alone disappears over half of
+ *  it. It comes before the stamp in the markup so the stamp lands over its
+ *  tail on a narrow screen, as a real one would. */
 function Pod({ shot }) {
+  const sign = useRef(null)
+  useSeen(sign, { arm: true, margin: '-8%' })
   return (
     <figure className="t-pod" data-reveal>
       {shot && <img src={shot.src} alt={shot.alt || ''} loading="lazy" />}
+      <svg className="t-pod-sign" ref={sign} viewBox="0 0 240 80" aria-hidden="true" focusable="false">
+        <path className="t-pod-sign-halo" d={SIGNATURE} pathLength="1" />
+        <path className="t-pod-sign-ink" d={SIGNATURE} pathLength="1" />
+      </svg>
       <figcaption className="t-pod-stamp" aria-hidden="true">
         <span className="t-pod-mark">Delivered</span>
         <span className="t-pod-meta">Signed 11:20 / Proof returned</span>

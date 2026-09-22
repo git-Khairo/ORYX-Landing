@@ -72,6 +72,12 @@ export default function RequestPage({ preset, onClose }) {
       base.service = preset.service
       base.sub = preset.sub || (same ? base.sub : '')
     }
+    /* A note handed in by the page that opened the form, such as the role and
+       the way of hiring chosen in the Workforce request builder. It goes first
+       and anything already typed is kept underneath it. */
+    if (preset?.note && !base.note.includes(preset.note)) {
+      base.note = base.note ? `${preset.note}\n\n${base.note}` : preset.note
+    }
     return base
   })
   /* Never the hidden trap field. If an autofill tool ever wrote into it, a

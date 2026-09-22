@@ -537,3 +537,88 @@
   .card-go span { display: none; }
   .card-i { width: 1.9rem; height: 1.9rem; }
 }
+
+/* ══ The sectors, in pictures ════════════════════════════════════════════
+   A slow band of the twelve sector photographs between the request builder and
+   the method. Two identical runs and a translate of exactly half, the same
+   construction as Transport's client tape, so the loop has no seam. */
+.pband {
+  border-block: 1px solid var(--line);
+  background: var(--sunk);
+  padding: clamp(0.8rem, 2vh, 1.2rem) 0;
+  overflow: hidden;
+}
+.pband-rail {
+  display: flex;
+  width: max-content;
+  animation: pband 80s linear infinite;
+}
+.pband:hover .pband-rail,
+.pband:focus-within .pband-rail { animation-play-state: paused; }
+.pband-run {
+  display: flex;
+  gap: clamp(0.5rem, 1vw, 0.8rem);
+  padding-right: clamp(0.5rem, 1vw, 0.8rem);
+  list-style: none;
+  margin: 0;
+}
+.pband-tile {
+  position: relative;
+  display: block;
+  width: clamp(11rem, 19vw, 16rem);
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: var(--raise);
+  transition: border-color 0.3s var(--ease-out);
+}
+.pband-tile img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.82);
+  transition: transform 0.7s var(--ease-out), filter 0.4s var(--ease-out);
+}
+.pband-tile::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(13, 13, 12, 0.82), rgba(13, 13, 12, 0) 60%);
+}
+.pband-tile:hover,
+.pband-tile:focus-visible { border-color: var(--sand); }
+.pband-tile:hover img,
+.pband-tile:focus-visible img { transform: scale(1.06); filter: brightness(1); }
+.pband-k {
+  position: absolute;
+  left: 0.7rem;
+  right: 0.7rem;
+  bottom: 0.6rem;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-display);
+  font-size: var(--step--1);
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: var(--track-display);
+  text-transform: uppercase;
+  text-align: left;
+  color: #f4f1e8;
+}
+.pband-k .icon { color: var(--sand); }
+@keyframes pband {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+/* Without motion it is a row that can be pushed along by hand, and the second
+   run, which exists only to close the loop, is not needed at all. */
+.world.is-still .pband { overflow-x: auto; }
+.world.is-still .pband-rail { animation: none; }
+.world.is-still .pband-run[aria-hidden='true'] { display: none; }
+@media (prefers-reduced-motion: reduce) {
+  .pband { overflow-x: auto; }
+  .pband-rail { animation: none; }
+  .pband-run[aria-hidden='true'] { display: none; }
+}

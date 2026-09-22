@@ -17,6 +17,8 @@ import './styles/work.css'
 import './styles/world-shell.css'
 import './styles/world-transport.css'
 import './styles/world-workforce.css'
+/* The Workforce crew scene keeps its styles beside it by name. */
+import './styles/wf-crew.css'
 import './styles/world-renovation.css'
 /* Last, so the per-service identities win any tie with the shared world
    styles they are overriding. */
@@ -59,10 +61,14 @@ export default function App() {
     else setReq({})
   }
 
-  const request = (serviceId, subId) =>
+  const request = (serviceId, subId, note) =>
     setReq({
       service: services.some((s) => s.id === serviceId) ? serviceId : '',
       sub: subId || '',
+      /* Only ever a string. The service buttons pass their click event through
+         as an extra argument in places, and an event object must not end up in
+         a text field. */
+      note: typeof note === 'string' ? note : '',
     })
 
   return (
@@ -92,6 +98,7 @@ export default function App() {
           service={service}
           onClose={() => setOpenId(null)}
           onRequest={request}
+          onSwitch={open}
         />
       )}
 

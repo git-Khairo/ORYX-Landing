@@ -338,7 +338,45 @@
   .w-stick { position: static; }
 }
 
-.w-steps { display: grid; }
+.w-steps { display: grid; position: relative; }
+/* The line the steps are read along. It sits in the number column and fills
+   from the top as the list is scrolled through. `--run` is written by
+   MethodSteps; until it is, the line is simply full. */
+.w-steps-line {
+  position: absolute;
+  left: 1.05rem;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--line);
+  pointer-events: none;
+}
+.w-steps-line i {
+  position: absolute;
+  inset: 0;
+  background: var(--sand);
+  transform-origin: top;
+  transform: scaleY(var(--run, 1));
+}
+.w-steps li { position: relative; }
+.w-steps .w-step-n {
+  position: relative;
+  z-index: 1;
+  align-self: start;
+  justify-self: start;
+  padding: 0.3rem 0.35rem;
+  margin-top: 0.1rem;
+  background: var(--tone);
+  border: 1px solid var(--sand);
+  color: var(--sand-text);
+  transition: background 0.4s var(--ease-out), color 0.4s var(--ease-out), border-color 0.4s var(--ease-out);
+}
+/* Not reached yet. This style only exists once the list is being tracked, so
+   an unscripted or reduced-motion page shows all three steps lit. */
+.w-steps.is-tracking li:not([data-lit]) .w-step-n { border-color: var(--line); color: var(--text-3); }
+.w-steps.is-tracking li:not([data-lit]) .w-step-k { color: var(--text-2); }
+.w-steps.is-tracking li[data-lit] .w-step-n { background: var(--sand); color: var(--oryx-black); }
+.w-step-k { transition: color 0.4s var(--ease-out); }
 .w-steps li {
   display: grid;
   grid-template-columns: 3.2rem minmax(0, 1fr);
@@ -409,19 +447,59 @@
   line-height: 1.55;
   color: var(--text-2);
 }
-/* A sand tick down the left of each hold. These are restraints, so they are
-   marked rather than bulleted — the mark says "this is a condition", where a
-   bullet would say "this is a feature". */
-.w-holds li::before {
-  content: '';
-  position: absolute;
-  left: clamp(0.9rem, 2vw, 1.3rem);
-  top: calc(clamp(0.9rem, 2.4vh, 1.2rem) + 0.55em);
-  width: 5px;
-  height: 5px;
-  border-right: 1.5px solid var(--sand);
-  border-bottom: 1.5px solid var(--sand);
-  transform: rotate(-45deg);
+/* A box with a tick in it, drawn in SVG so the tick can write itself. These
+   are restraints, so they are marked as conditions that have been checked and
+   not bulleted like features. The old CSS chevron is gone with this. */
+.w-holds li { display: grid; grid-template-columns: auto 1fr; gap: 0.75rem; align-items: start;
+  padding-left: clamp(0.9rem, 2vw, 1.3rem); }
+.w-hold-box { width: 1.05rem; height: 1.05rem; margin-top: 0.22em; overflow: visible; }
+.w-hold-box rect { fill: none; stroke: var(--line-sand); stroke-width: 1.5; }
+.w-hold-box path {
+  fill: none;
+  stroke: var(--sand);
+  stroke-width: 2.2;
+  stroke-linecap: square;
+  stroke-linejoin: miter;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+}
+
+/* The list and the document it is checked against, side by side. */
+.w-holds-wrap { display: grid; gap: clamp(1rem, 2.4vh, 1.6rem); align-content: start; min-width: 0; }
+.w-doc { width: min(100%, 17rem); height: auto; justify-self: end; overflow: visible; }
+.w-doc-sheet { fill: var(--raise); stroke: var(--line); stroke-width: 1.5; }
+.w-doc-fold { fill: none; stroke: var(--line); stroke-width: 1.5; }
+.w-doc-photo { fill: none; stroke: var(--text-3); stroke-width: 1.5; }
+.w-doc-rule { fill: none; stroke: var(--line); stroke-width: 3; stroke-linecap: square; }
+.w-doc-stamp { transform-box: fill-box; transform-origin: center; transform: rotate(-7deg); }
+.w-doc-stamp rect { fill: color-mix(in srgb, var(--sunk) 80%, transparent); stroke: var(--sand); stroke-width: 2; }
+.w-doc-stamp text {
+  fill: var(--sand);
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+/* Waiting, then seen. `is-wait` is only ever set when the list is known to be
+   off screen, so un-ticking it there hides nothing from anyone. */
+@media (prefers-reduced-motion: no-preference) {
+  .world:not(.is-still) .w-holds-wrap.is-wait .w-hold-box path { stroke-dashoffset: 1; }
+  .world:not(.is-still) .w-holds-wrap.is-wait .w-doc-stamp { transform: rotate(-7deg) scale(1.9); visibility: hidden; }
+  .world:not(.is-still) .w-holds-wrap.is-seen .w-hold-box path {
+    animation: w-tick 0.42s var(--ease-out) both;
+    animation-delay: calc(0.25s + var(--i, 0) * 0.28s);
+  }
+  .world:not(.is-still) .w-holds-wrap.is-seen .w-doc-stamp {
+    animation: w-stamp 0.34s cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+    animation-delay: 1.55s;
+  }
+}
+@keyframes w-tick { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+@keyframes w-stamp {
+  from { transform: rotate(-7deg) scale(1.9); visibility: hidden; }
+  1% { visibility: visible; }
+  to { transform: rotate(-7deg) scale(1); visibility: visible; }
 }
 
 /* 4 → 2 → 1. Never three: three columns leave one of four cards alone on a
@@ -550,269 +628,131 @@
   .w-hit .icon { grid-row: 1 / span 2; grid-column: 2; }
 }
 
-/* ══ The two axes ═══════════════════════════════════════════════════════
-   The only illustration on this page whose job is an argument.
+@media (max-width: 900px) {
+  /* The drawn document is a flourish, and beside a list that is now full
+     width it would only push the footer further away. */
+  .w-doc { display: none; }
+}
 
-   It has to stop a reader treating the four service lines below it as a fourth
-   level of the register above it. That is a real risk and not a theoretical
-   one: the reader has just spent a minute inside a three-level tree.
-
-   ── Everything here is HTML ───────────────────────────────────────────
-   No SVG. Every string in the figure is data whose length nobody controls —
-   48-character sector names, 45-character group names, "Project teams & flex
-   pools" — and SVG `<text>` does not wrap. An earlier attempt needed about
-   1 150 units of width for four labels inside a 1 120-unit box; that was never
-   a coordinate problem to be fixed with a bigger viewBox, it was the wrong
-   element for a label whose length is data. There is nothing to draw that is
-   not a border or a grid gap.
-
-   ── What must never be added ──────────────────────────────────────────
-   A connector. A node with four lines fanning out of it *is* the drawing of a
-   tree, which is the one reading this figure exists to prevent. The seam
-   between the halves is a divider with a cross on it, drawn in `--line` and
-   never in sand, because sand here would read as a link. */
-.w-axes {
+/* ══ Four ways to hire ═══════════════════════════════════════════════════
+   Four tiles, one per service line, each led by the situation it answers.
+   Photograph on top, then the situation in the display face, then the line's
+   name and one sentence. The whole tile is a button. */
+.w-ways {
   max-width: var(--maxw);
   margin: 0 auto;
   padding: var(--sec) var(--gutter);
   display: grid;
   gap: var(--sec-gap);
-  border-top: 1px solid var(--line);
 }
-.w-axes-head { display: grid; gap: 0.9rem; max-width: 62ch; }
-.w-axes-head h3 { font-size: var(--step-3); color: var(--text); }
-
-.w-axes-fig {
+.w-ways-head { display: grid; gap: 0.8rem; max-width: 60ch; }
+.w-ways-head h3 { font-size: var(--step-3); color: var(--text); }
+.w-ways-grid {
+  list-style: none;
   margin: 0;
+  padding: 0;
   display: grid;
-  grid-template-columns:
-    2.4rem                            /* the vertical rail          */
-    minmax(15rem, 20rem)              /* the nest                   */
-    clamp(1.4rem, 3vw, 2.6rem)        /* the seam                   */
-    minmax(0, 1fr);                   /* the four service lines     */
-  grid-template-areas:
-    '.    .    .    xcap'
-    'ycap nest seam lines';
-  row-gap: 0.85rem;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(0.6rem, 1.2vw, 1rem);
 }
-
-/* Two labelled rails at ninety degrees — identical construction, identical
-   chevron. The figure does not merely avoid looking like a tree; it asserts a
-   second dimension, in geometry and in words. */
-.w-ax-axl {
-  display: flex;
-  align-items: center;
-  gap: 0.7rem;
-  font-family: var(--font);
+.w-ways-grid li { display: grid; transition-delay: calc(var(--i, 0) * 80ms); }
+.w-way {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  text-align: left;
+  border: 1px solid var(--line);
+  background: var(--raise);
+  color: var(--text);
+  overflow: hidden;
+  transition: border-color 0.3s var(--ease-out), transform 0.3s var(--ease-out);
+}
+.w-way:hover,
+.w-way:focus-visible { border-color: var(--sand); transform: translateY(-3px); }
+.w-way-img {
+  position: relative;
+  display: block;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background: var(--sunk);
+}
+.w-way-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.86);
+  transition: transform 0.7s var(--ease-out), filter 0.4s var(--ease-out);
+}
+.w-way:hover .w-way-img img,
+.w-way:focus-visible .w-way-img img { transform: scale(1.06); filter: brightness(1); }
+.w-way-img::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(13, 13, 12, 0.7), rgba(13, 13, 12, 0) 55%);
+}
+.w-way-n {
+  position: absolute;
+  left: 0.8rem;
+  bottom: 0.65rem;
+  z-index: 1;
+  font-size: var(--step--2);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: #f4f1e8;
+}
+.w-way-body {
+  display: grid;
+  gap: 0.5rem;
+  align-content: start;
+  padding: 0.95rem 1rem 1.1rem;
+}
+/* The situation, set as speech: a real sentence someone says, in the heavy
+   display face so it is the first thing read. */
+.w-way-say {
+  font-family: var(--font-display);
+  font-size: var(--step-1);
+  font-weight: 800;
+  line-height: 1.12;
+  letter-spacing: var(--track-display);
+  text-transform: uppercase;
+  color: var(--text);
+  text-wrap: balance;
+}
+.w-way-say::before { content: '\201C'; color: var(--sand); }
+.w-way-say::after { content: '\201D'; color: var(--sand); }
+.w-way-k {
+  margin-top: 0.3rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--line-sand);
   font-size: var(--step--2);
   font-weight: 700;
   letter-spacing: var(--track-label);
   text-transform: uppercase;
   color: var(--sand-text);
-  white-space: nowrap;
 }
-.w-ax-axl::after { content: ''; flex: 1; background: var(--line-sand); }
-.w-ax-axl i {
-  width: 6px;
-  height: 6px;
-  border-right: 1.5px solid var(--sand);
-  border-bottom: 1.5px solid var(--sand);
-  flex: none;
-}
-.w-ax-axl--y {
-  grid-area: ycap;
-  align-self: stretch;
-  min-height: 8rem;
-  /* Never `sideways-lr`: Safari does not support it and falls back to
-     horizontal, which lays the label across a forty-pixel column. */
-  writing-mode: vertical-rl;
-  padding-right: 0.7rem;
-}
-.w-ax-axl--y::after { width: 1px; }
-.w-ax-axl--y i { transform: rotate(45deg); }
-.w-ax-axl--x { grid-area: xcap; padding-bottom: 0.2rem; }
-.w-ax-axl--x::after { height: 1px; }
-.w-ax-axl--x i { transform: rotate(-45deg); }
-
-.w-ax-seam { grid-area: seam; align-self: stretch; position: relative; }
-.w-ax-seam::before {
-  content: '';
-  position: absolute;
-  left: 50%; top: 0; bottom: 0;
-  width: 1px;
-  background: var(--line);
-}
-.w-ax-seam::after {
-  content: '';
-  position: absolute;
-  left: 50%; top: 50%;
-  width: 13px; height: 13px;
-  transform: translate(-50%, -50%);
-  background:
-    linear-gradient(var(--sand), var(--sand)) center / 1.5px 13px no-repeat,
-    linear-gradient(var(--sand), var(--sand)) center / 13px 1.5px no-repeat,
-    var(--tone);
-}
-
-/* The nest. Stepped left rules, used nowhere else in this stylesheet, so the
-   containment grammar cannot be confused with the peer grammar opposite. No
-   ordinals anywhere in it — the indent does the counting, so no number inside
-   the figure can be mistaken for a depth. */
-.w-ax-nest { grid-area: nest; max-width: 30rem; }
-.w-ax-lvl-h { display: grid; gap: 0.22rem; }
-.w-ax-lvl ol .w-ax-lvl {
-  margin: 0.85rem 0 0 0.9rem;
-  padding-left: 1.1rem;
-  border-left: 1px solid var(--line);
-}
-.w-ax-n {
-  font-family: var(--font);
+.w-way-d { font-size: var(--step--1); line-height: 1.5; color: var(--text-2); }
+.w-way-go {
+  margin-top: 0.4rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
   font-size: var(--step--2);
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: var(--track-label);
   text-transform: uppercase;
-  color: var(--text-2);
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
+  color: var(--text-3);
+  transition: color 0.3s var(--ease-out);
 }
-.w-ax-n em { font-style: normal; font-variant-numeric: tabular-nums; }
-.w-ax-k {
-  font-size: var(--step-0);
-  line-height: 1.15;
-  color: var(--text-2);
-  text-wrap: balance;
-}
+.w-way-go .icon { transition: transform 0.3s var(--ease-out); }
+.w-way:hover .w-way-go { color: var(--sand-text); }
+.w-way:hover .w-way-go .icon { transform: translateX(4px); }
 
-/* The four service lines, in the page's own peer grammar — 1px gaps over
-   `--line` inside a 1px border, exactly as the strip, the models and the holds
-   are built. The reader has met that notation four times already on this page
-   and it has meant "a set of equals" every time. */
-.w-ax-lines {
-  grid-area: lines;
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 1px;
-  background: var(--line);
-  border: 1px solid var(--line);
-  /* Do NOT add `align-items: start`. The four role names bottom-align through
-     the 1fr air row below, so their four sand rules land on one shared
-     baseline — one line crossing the axis. `align-items: start` silently
-     destroys that and takes the argument with it. */
+@media (max-width: 1000px) {
+  .w-ways-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
-.w-ax-line {
-  background: var(--tone);
-  padding: clamp(1.1rem, 2.6vh, 1.5rem) clamp(0.9rem, 1.6vw, 1.3rem);
-  display: grid;
-  /* Four children — ordinal, name, fit, role — so four tracks. The `1fr` sits
-     on the *fit* line and absorbs every cell's slack, which pushes the role to
-     the bottom of all four cells at once. Five tracks for four children put
-     the air after the role instead of before it and left the four names
-     staggered by up to 42px, which quietly cost the figure its argument. */
-  grid-template-rows: auto auto 1fr auto;
-  gap: 0.45rem;
-}
-.w-ax-ln {
-  font-family: var(--font);
-  font-size: var(--step--2);
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  color: var(--text-2);
-  font-variant-numeric: tabular-nums;
-}
-.w-ax-lk {
-  font-size: var(--step-0);
-  line-height: 1.1;
-  color: var(--text);
-  text-wrap: balance;
-}
-.w-ax-ld { font-size: var(--step--1); line-height: 1.5; color: var(--text-2); }
-
-/* THE RULE THAT CARRIES THE ARGUMENT.
-   The role name appears five times — once at the foot of the nest, once in
-   each of the four service lines — and the eye has to read them as one object
-   seen five times. It will not if the type differs by so much as a step. One
-   selector list, deliberately: do not split it. */
-.w-ax-lvl.is-leaf .w-ax-k,
-.w-ax-role {
-  font-family: var(--font-display);
-  font-size: var(--step-0);
-  font-weight: 800;
-  letter-spacing: var(--track-display);
-  text-transform: uppercase;
-  color: var(--sand);
-  line-height: 1.15;
-}
-.w-ax-role {
-  margin-top: 0.9rem;
-  padding-top: 0.75rem;
-  border-top: 1px solid var(--line-sand);
-}
-
-.w-ax-cap {
-  grid-column: 1 / -1;
-  margin-top: 0.4rem;
-  font-size: var(--step--1);
-  line-height: 1.6;
-  color: var(--text-2);
-  max-width: 76ch;
-}
-.w-ax-cap b { color: var(--text); font-weight: 700; }
-
-@media (max-width: 1180px) {
-  /* Stepped together, never separately — the five instances of the role have
-     to stay the same size as each other. */
-  .w-ax-lk,
-  .w-ax-lvl.is-leaf .w-ax-k,
-  .w-ax-role { font-size: var(--step--1); }
-}
-
-@media (max-width: 719px) {
-  .w-axes-fig {
-    grid-template-columns: 2.4rem minmax(0, 1fr);
-    grid-template-areas:
-      'ycap nest'
-      'seam seam'
-      'xcap xcap'
-      'lines lines';
-    row-gap: 0;
-  }
-  .w-ax-seam {
-    height: clamp(2rem, 6vh, 3rem);
-    margin: clamp(1.1rem, 3vh, 1.6rem) 0;
-  }
-  .w-ax-seam::before { left: 0; right: 0; top: 50%; bottom: auto; width: auto; height: 1px; }
-
-}
-
-/* The swipe rail starts at 1100px, NOT at the 719px reflow.
-   `minmax(0, 1fr)` lets a track shrink below its own min-content, and
-   `.w-ax-line` paints an opaque ground, so between 720px and about 1060px each
-   cell's text ran underneath the next cell and was cut mid-word: measured at
-   768px the cells are 80px wide while "Recruitment & selection" needs 134px,
-   and CARPENTER — the one word that has to read identically five times or the
-   figure loses its argument — rendered as CARPENT in three of the four.
-   The section of four cards that used to sit below this and shared the
-   breakpoint has been removed; the breakpoint stands on the measurement.
-
-   Never stack these into one column and never go 2×2. A single column of four
-   is the hierarchy misreading, drawn; 2×2 puts 03 and 04 below 01 and 02,
-   which is a descent. Four across, or a rail you swipe — nothing else. */
-@media (max-width: 1100px) {
-  .w-ax-lines {
-    grid-template-columns: none;
-    grid-auto-flow: column;
-    grid-auto-columns: clamp(15rem, 74vw, 22rem);
-    gap: 0.6rem;
-    background: none;
-    border: 0;
-    overflow-x: auto;
-    overscroll-behavior-x: contain;
-    scroll-snap-type: x mandatory;
-    margin-inline: calc(var(--gutter) * -1);
-    padding-inline: var(--gutter);
-    scrollbar-width: none;
-  }
-  .w-ax-lines::-webkit-scrollbar { display: none; }
-  .w-ax-line { border: 1px solid var(--line); scroll-snap-align: start; }
+@media (max-width: 520px) {
+  .w-ways-grid { grid-template-columns: minmax(0, 1fr); }
+  .w-way { grid-template-columns: 38% minmax(0, 1fr); grid-template-rows: none; }
+  .w-way-img { aspect-ratio: auto; height: 100%; min-height: 9rem; }
+  .w-way-d { display: none; }
 }

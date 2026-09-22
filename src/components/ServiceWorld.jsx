@@ -23,10 +23,10 @@ const WORLDS = {
   renovation: RenovationWorld,
 }
 
-export default function ServiceWorld({ service, onClose, onRequest }) {
+export default function ServiceWorld({ service, onClose, onRequest, onSwitch }) {
   const World = WORLDS[service.id]
   /* A service without a world is a content error, not a rendering one — better
      to open nothing than to fall back to a generic page and hide the mistake. */
   if (!World) return null
-  return <World service={service} onClose={onClose} onRequest={onRequest} />
+  return <World service={service} onClose={onClose} onRequest={onRequest} onSwitch={onSwitch} />
 }

@@ -291,51 +291,144 @@
 
 /* Draws itself once, when the section is reached. `pathLength` is normalised to
    1 by the dash values below, so the same numbers work whatever the path's real
-   length is — no measuring in JS. */
+   length is, with no measuring in JS.
+
+   The drawn route is the resting state. The undrawn one is a pose, `is-armed`,
+   that only a live observer can put the map into. It was the other way round:
+   undrawn by default, with every city name invisible until a class arrived.
+
+   The draw-in itself has not changed, only what starts it. It used to hang off
+   `is-in`, which the reveal hook's backstop sets on the whole page a couple of
+   seconds after it opens, so for a map a screen below the fold the route had
+   drawn itself before anyone got there. It now starts from `is-seen`. See
+   `useSeen` in TransportWorld.jsx. */
 .t-map-route {
   fill: none;
   stroke: var(--sand);
   stroke-width: 2;
   stroke-linecap: round;
   stroke-dasharray: 1;
-  stroke-dashoffset: 1;
+  stroke-dashoffset: 0;
   transition: stroke-dashoffset 2.4s var(--ease-out) 0.15s;
-}
-.t-map.is-in .t-map-route { stroke-dashoffset: 0; }
-
-/* A short bright dash running the route on a loop — the consignment, moving. */
-.t-map-runner {
-  fill: none;
-  stroke: var(--oryx-white);
-  stroke-width: 3;
-  stroke-linecap: round;
-  stroke-dasharray: 0.035 0.965;
-  opacity: 0;
-}
-.t-map.is-in .t-map-runner {
-  opacity: 0.9;
-  animation: t-run 6s linear 2.2s infinite;
-}
-@keyframes t-run {
-  from { stroke-dashoffset: 1; }
-  to { stroke-dashoffset: 0; }
 }
 
 .t-map-node circle {
   fill: var(--tone);
   stroke: var(--sand);
   stroke-width: 2;
-  opacity: 0;
+  /* The pulse below scales the pin about its own centre, not the map's. */
+  transform-box: fill-box;
+  transform-origin: center;
   transition: opacity 0.5s var(--ease-out);
   transition-delay: calc(0.3s + var(--i) * 0.32s);
 }
 .t-map-node text {
-  opacity: 0;
   transition: opacity 0.6s var(--ease-out);
   transition-delay: calc(0.42s + var(--i) * 0.32s);
 }
-.t-map.is-in .t-map-node circle,
-.t-map.is-in .t-map-node text { opacity: 1; }
+
+/* `transition: none` on the way in. Taking the pose is not an event: without
+   this the route would spend 2.4s visibly undrawing itself whenever it was
+   armed, and anyone quick down the page would catch it running backwards. */
+@media (prefers-reduced-motion: no-preference) {
+  .world:not(.is-still) .t-map.is-armed .t-map-route {
+    stroke-dashoffset: 1;
+    transition: none;
+  }
+  .world:not(.is-still) .t-map.is-armed .t-map-node circle,
+  .world:not(.is-still) .t-map.is-armed .t-map-node text {
+    opacity: 0;
+    transition: none;
+  }
+}
+
+/* ── The van on the map ──
+   A small ORYX van driving the route on a loop, in place of the bright dash
+   that used to run it. Decoration: it says the network is in use, it does not
+   report where anything is.
+
+   `--lap` is one run from the first city to the last, and the pins read it too,
+   which is what keeps them in step. `--van-k` is the van's size. These are SVG
+   user units, so on a narrow screen the whole map shrinks and a van drawn at
+   one size would be nine pixels long on a phone. */
+.t-map {
+  --lap: 9s;
+  --van-k: 1;
+}
+@media (max-width: 1000px) { .t-map { --van-k: 1.4; } }
+@media (max-width: 700px) { .t-map { --van-k: 2; } }
+
+/* At rest the van is parked on the route just short of the home hub, nose to
+   the pin. That is the state with no animation at all, so it is what reduced
+   motion and `is-still` get, and what is left if the loop never starts.
+   `--hub` is the hub's fraction of the route, measured by the component. */
+.t-map-van {
+  transform-origin: 0 0;
+  offset-path: var(--route);
+  offset-rotate: auto;
+  offset-distance: calc(var(--hub, 0.72) * 100% - 27px * var(--van-k));
+}
+/* No `offset-path`: the same parking place from plain coordinates, level. */
+@supports not (offset-path: path('M0 0 H1')) {
+  .t-map-van { transform: translate(calc(var(--hx) - 27px * var(--van-k)), var(--hy)); }
+}
+
+.t-map-van-body {
+  transform-origin: 0 0;
+  scale: var(--van-k);
+}
+/* Oryx Black on a near-black map is invisible, so the shell carries a thin
+   light outline. Square ends and mitred corners, like every drawn line here. */
+.t-van-shell,
+.t-van-wheel {
+  fill: var(--oryx-black);
+  stroke: var(--oryx-white);
+  stroke-width: 1.1;
+  stroke-linecap: square;
+  stroke-linejoin: miter;
+}
+.t-van-stripe { fill: var(--sand); }
+.t-van-glass { fill: var(--text-3); }
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Waits out the route's own draw-in at the first city, then runs. `backwards`
+     holds the first keyframe through that wait, which keeps the van from
+     sitting at the hub and then jumping to the start of its run. */
+  .world:not(.is-still) .t-map.is-seen .t-map-van {
+    animation: t-van var(--lap) linear 2.2s infinite backwards;
+  }
+  /* The loop has a seam, the last city back to the first. The van shrinks into
+     the last pin and grows out of the first one, so the seam reads as an
+     arrival and a departure and not as a jump cut. */
+  .world:not(.is-still) .t-map.is-seen .t-map-van-body {
+    animation: t-van-pop var(--lap) linear 2.2s infinite backwards;
+  }
+  /* One pulse per lap, delayed by the pin's share of the lap. Same duration and
+     same starting gun as the van, so there is nothing to synchronise. */
+  .world:not(.is-still) .t-map.is-seen .t-map-node circle {
+    animation: t-pin var(--lap) linear calc(2.2s + var(--at, 0) * var(--lap)) infinite;
+  }
+  /* Off screen, everything holds its place together. See `NetworkMap`. */
+  .world:not(.is-still) .t-map.is-away .t-map-van,
+  .world:not(.is-still) .t-map.is-away .t-map-van-body,
+  .world:not(.is-still) .t-map.is-away .t-map-node circle {
+    animation-play-state: paused;
+  }
+}
+@keyframes t-van {
+  from { offset-distance: 0%; }
+  to { offset-distance: 100%; }
+}
+@keyframes t-van-pop {
+  0% { scale: 0; }
+  3%, 97% { scale: var(--van-k); }
+  100% { scale: 0; }
+}
+@keyframes t-pin {
+  0% { transform: scale(1); fill: var(--tone); }
+  2.5% { transform: scale(1.9); fill: var(--sand); }
+  9%, 100% { transform: scale(1); fill: var(--tone); }
+}
 
 .t-map-k {
   fill: var(--oryx-white);
@@ -366,6 +459,43 @@
   .t-map-k { font-size: 40px; transform: translateY(8px); }
   .t-map-node circle { r: 9px; }
 }
+
+/* ── Road markings ────────────────────────────────────────────────────
+   The divider between the main sections: a strip of tarmac with a dashed centre
+   line. Ten pixels, borders included, because these pages were made more
+   compact on request and a divider has no business undoing that.
+
+   The dashes slide as the page is read. `--scrolled` (0 to 1) is already
+   written on the root by WorldShell for the navigation's progress bar, so the
+   movement is one `calc()` and no script. The line is a pseudo-element wider
+   than the strip and it is moved with a transform, not by animating
+   `background-position`, so a scroll frame moves a layer and repaints nothing.
+   1440px of travel is thirty whole dash periods: enough to be seen over one
+   screen of scrolling, slow enough to stay in the corner of the eye. */
+.t-lane {
+  position: relative;
+  height: 10px;
+  overflow: hidden;
+  background: var(--sunk);
+  border-block: 1px solid var(--line);
+}
+.t-lane::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: calc(100% + 1440px);
+  height: 2px;
+  margin-top: -1px;
+  background: linear-gradient(90deg, var(--line-sand) 0 28px, transparent 28px) 0 0 / 48px 2px repeat-x;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .world:not(.is-still) .t-lane::before {
+    transform: translate3d(calc(var(--scrolled, 0) * -1440px), 0, 0);
+  }
+}
+/* The loading scene opens on a rule of its own. Beside a lane that is two. */
+.t-lane + .t-load { border-top: 0; }
 
 /* ── The route ────────────────────────────────────────────────────────── */
 .t-route {
@@ -737,11 +867,97 @@
 }
 .t-figs li { background: var(--tone); padding: clamp(1rem, 2.6vh, 1.5rem); display: grid; gap: 0.4rem; }
 .t-fig-n {
+  /* A block with its own positioning context, so the screen-reader copy of the
+     value, which is absolutely positioned, stays inside the figure it names. */
+  position: relative;
+  display: block;
   font-family: var(--font-display);
   font-size: var(--step-3);
   color: var(--sand);
   font-variant-numeric: tabular-nums;
   line-height: 1;
+}
+
+/* ── Split-flap tiles ──
+   One tile per character. A tile is a window exactly one line tall; inside it
+   the final character sits in normal flow and the characters it turns through
+   hang above it, clipped away. With nothing transformed the window shows the
+   final character, so that is what reduced motion, `is-still` and an observer
+   that never fires all get. See `SplitFlap`.
+
+   Set a touch under the figure size with a tight line, so a row of tiles with
+   their borders comes out about four pixels taller than the bare numeral did. */
+.t-flaps {
+  display: flex;
+  gap: 3px;
+  font-size: 0.92em;
+  /* The tiles hold every digit they turn through. Selecting a figure should
+     copy the figure, which the screen-reader copy beside this supplies. */
+  -webkit-user-select: none;
+  user-select: none;
+}
+.t-flap {
+  --s: 90ms; /* one turn of the drum */
+  position: relative;
+  /* `content-box`, so the window is one line tall inside its border and each
+     turn of the reel lands exactly on a character. */
+  box-sizing: content-box;
+  display: block;
+  height: 1.16em;
+  padding-inline: 0.12em;
+  overflow: hidden;
+  background: var(--sunk);
+  border: 1px solid var(--line);
+}
+/* The split across the middle of the flap, cut through the numeral in the
+   tile's own ground. */
+.t-flap::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  top: 50%;
+  height: 1px;
+  background: var(--sunk);
+}
+.t-flap-reel { position: relative; display: block; }
+.t-flap-run {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.t-flap-run > span,
+.t-flap-set {
+  display: block;
+  height: 1.16em;
+  line-height: 1.16em;
+  text-align: center;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Two animations per tile. The tile folds shut and open once per turn, and
+     the reel behind it jumps one character per turn. The reel starts half a
+     turn late, so every jump happens at the instant the tile is folded shut and
+     the change of character is never seen, only the flap. `--n` turns means
+     `--n` jumps and `--n` folds, and the last fold opens on the real value. */
+  .world:not(.is-still) .t-fig-n.is-seen .t-flap {
+    animation: t-flap-fold var(--s) ease-in-out var(--d, 0ms) var(--n, 4);
+  }
+  .world:not(.is-still) .t-fig-n.is-seen .t-flap-reel {
+    animation: t-flap-turn calc(var(--n, 4) * var(--s)) steps(var(--n, 4), start)
+      calc(var(--d, 0ms) + var(--s) / 2) backwards;
+  }
+}
+@keyframes t-flap-fold {
+  0%, 100% { transform: scaleY(1); }
+  50% { transform: scaleY(0.1); }
+}
+/* From the top of the run down to rest. A percentage here is the reel's own
+   height, which is one character, because the run above it is out of flow. */
+@keyframes t-flap-turn {
+  from { transform: translateY(calc(var(--n, 4) * 100%)); }
+  to { transform: translateY(0); }
 }
 .t-fig-l { font-size: var(--step--2); color: var(--text-3); letter-spacing: 0.02em; }
 
@@ -926,6 +1142,49 @@
    competing with the services for the same column. */
 .t-pod { position: relative; overflow: hidden; }
 .t-pod img { width: 100%; aspect-ratio: 21 / 9; object-fit: cover; }
+
+/* The signature, written before the stamp comes down. Both resting states are
+   the finished ones, a full signature and a landed stamp. The unsigned,
+   unstamped card is a pose, `is-armed` on the signature, which only a live
+   observer can set and which it clears as the signature scrolls into view.
+   See `useSeen` in TransportWorld.jsx.
+
+   Dash 1 and gap 2 on a path normalised to length 1. An offset of exactly 1
+   would leave the square cap of the hidden dash showing as a dot where the pen
+   starts, so the hidden state is pushed a little further back than that. */
+.t-pod-sign {
+  position: absolute;
+  left: 5%;
+  bottom: 10%;
+  width: clamp(118px, 24%, 300px);
+  height: auto;
+  overflow: visible;
+  pointer-events: none;
+}
+.t-pod-sign path {
+  fill: none;
+  stroke-linecap: square;
+  stroke-linejoin: miter;
+  stroke-dasharray: 1 2;
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 1.1s var(--ease-inout) 0.25s;
+}
+/* On a phone the photograph is about 140px tall and the stamp takes two thirds
+   of its width, so along the foot the two would share the same ground and the
+   stamp would land on half the signature. It moves up to the clear corner:
+   signed above, stamped below, the way the two sit on a delivery note. */
+@media (max-width: 480px) {
+  .t-pod-sign { top: 9%; bottom: auto; width: 112px; }
+}
+.t-pod-sign-halo { stroke: var(--sunk); stroke-width: 5; }
+.t-pod-sign-ink { stroke: var(--oryx-white); stroke-width: 2; }
+
+/* The stamp waits for the pen. The signature finishes 1.35s after it is seen
+   and the stamp starts down at 1.3s, so it lands as the last stroke completes.
+   It used to swing from -22 degrees in plain view the moment the card arrived,
+   and held there for over a second it would just be a crooked label. So it is
+   out of sight until it drops. It is a drawing, hidden from assistive
+   technology, and its resting state is the landed one. */
 .t-pod-stamp {
   position: absolute;
   right: 5%;
@@ -936,9 +1195,25 @@
   border: 2px solid var(--sand);
   background: color-mix(in srgb, var(--sunk) 74%, transparent);
   rotate: -6deg;
-  transition: rotate 0.7s var(--ease-out), opacity 0.7s var(--ease-out);
+  transition:
+    rotate 0.55s var(--ease-out) 1.3s,
+    scale 0.55s var(--ease-out) 1.3s,
+    opacity 0.18s linear 1.3s;
 }
-.t-pod:not(.is-in) .t-pod-stamp { rotate: -22deg; }
+/* The stamp reads the pose off the signature, its older sibling, so one class
+   runs both. `transition: none` going in, for the reason given on the map. */
+@media (prefers-reduced-motion: no-preference) {
+  .world:not(.is-still) .t-pod-sign.is-armed path {
+    stroke-dashoffset: 1.05;
+    transition: none;
+  }
+  .world:not(.is-still) .t-pod-sign.is-armed ~ .t-pod-stamp {
+    rotate: -22deg;
+    scale: 1.35;
+    opacity: 0;
+    transition: none;
+  }
+}
 .t-pod-mark {
   font-family: var(--font-display);
   font-size: var(--step-1);
