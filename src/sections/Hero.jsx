@@ -297,9 +297,7 @@ function PlayedSequence({ onFinish }) {
       />
 
       {/* The end card's own ground: the horns at the left edge, fading into
-          black, with the mark's construction lines drawn over them in sand.
-          It is the last thing the film says, held still. Decorative, so it
-          may fade in; nothing a visitor needs depends on it arriving. */}
+          black. It is the last thing the film says, held still. */}
       {centred && <EndPlate />}
 
       {/* The shot's text is announced once, not letter by letter. */}
@@ -375,49 +373,14 @@ function PlayedSequence({ onFinish }) {
 }
 
 /**
- * The plate behind the end card.
- *
- * A still of the horns, cropped hard to the left edge and taken almost to
- * black, with the mark's own construction lines laid over it in sand: the two
- * arms of the V, the diagonal cuts across each horn, and the chevron under
- * them, every one carried on past its ends the way a draughtsman's lines are.
- *
- * The coordinates are in the mark's own space, `mark.png` at 900 by 2163, read
- * off the file: the horns run from the top corners down to their junction at
- * about (450, 1420), the three cuts on each horn sit at roughly a fifth, a
- * third and a half of the way down, and the chevron goes from the junction
- * down-right to (665, 1735), back down-left to (240, 1985) and finishes with
- * the short foot up to (160, 1770). Re-aim the drawing after a logo change by
- * editing these numbers and nothing else.
+ * The plate behind the end card: a still of the horns, cropped hard to the
+ * left edge and taken almost to black, dissolving into the ground. Decorative,
+ * so it may fade in; nothing a visitor needs depends on it arriving.
  */
-const MARK_LINES = [
-  /* The two arms: an outer and an inner edge each, meeting at the junction. */
-  'M-40 -260 L560 1900',
-  'M150 -260 L470 1330',
-  'M940 -260 L340 1900',
-  'M750 -260 L430 1330',
-  /* The cuts across the left horn, then the right. */
-  'M-140 330 L330 900',
-  'M-120 680 L400 1290',
-  'M-80 1000 L470 1640',
-  'M1040 330 L570 900',
-  'M1020 680 L500 1290',
-  'M980 1000 L430 1640',
-  /* The chevron and its foot. */
-  'M380 1300 L760 1880',
-  'M760 1880 L120 2060',
-  'M300 2150 L100 1600',
-]
-
 function EndPlate() {
   return (
     <div className="hero-end-plate" aria-hidden="true">
       <span className="hero-end-photo" />
-      <svg viewBox="0 20 900 2000" preserveAspectRatio="xMidYMid meet">
-        <g fill="none" stroke="currentColor" strokeWidth="1" vectorEffect="non-scaling-stroke">
-          {MARK_LINES.map((d) => <path key={d} d={d} vectorEffect="non-scaling-stroke" />)}
-        </g>
-      </svg>
     </div>
   )
 }

@@ -255,55 +255,53 @@
 
 .r-scrub {
   position: relative;
-  aspect-ratio: 16 / 9;
   overflow: hidden;
   touch-action: none;   /* the drag is ours, not the scroller's */
   cursor: ew-resize;
   user-select: none;
   background: var(--sunk);
 }
-/* Both halves crop from the same point of the same box, which is the whole
-   requirement for a scrub: if the two photographs are framed differently the
-   slider reads as two pictures meeting at a line, not one room changing. */
+/* How the two halves are sized, and why it is this way round.
+
+   The frame used to fix its own shape with `aspect-ratio` and the pictures
+   took percentage heights from it. Safari on a phone would not resolve those
+   percentages against an aspect-ratio box: the "after" picture fell back to
+   its natural height, ran past the bottom padding, and the two halves no
+   longer matched. Measured on an iPhone: the picture reached the frame's
+   bottom edge while the padding stayed on the other three sides.
+
+   So the "after" picture now sits in normal flow with its OWN aspect ratio
+   and sets the height of the frame. The "before" lives in a wrapper inset by
+   the padding, which is therefore exactly the content box, and fills it. A
+   box whose four edges are given has a definite height in every browser, so
+   nothing here asks Safari to resolve a percentage it will not. */
 .r-scrub img {
-  /* Stretched to its box by its four edges, not by `height: 100%`. The
-     "after" picture used to sit in normal flow with a percentage height, and
-     Safari on a phone resolved that differently from the "before" behind it,
-     so the two halves met at different heights. Both are now positioned the
-     same way against the same padding box, and so are the same size by
-     construction in every browser. */
-  position: absolute;
-  top: var(--scrub-pad, 0px);
-  left: var(--scrub-pad, 0px);
-  /* An image does not stretch between its four edges the way a box does, so
-     the size is stated outright: the padding box less the padding. */
-  width: calc(100% - 2 * var(--scrub-pad, 0px));
-  height: calc(100% - 2 * var(--scrub-pad, 0px));
+  display: block;
   object-fit: cover;
   object-position: 50% 50%;
 }
-/* The "before" sits inside its clipping wrapper, which is already inset by
-   the padding and has a definite height from its own four edges. */
-.r-scrub-before-wrap img { top: 0; left: 0; width: 100%; height: 100%; }
+.r-scrub-after {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+}
 
-/* The "before" is revealed by clipping, not by sizing.
-
-   It used to be a wrapper narrowed to `--at` with the image inside set to
-   `100vw`, and those are two different boxes: the wrapper measures against
-   `.r-scrub`, which is `--maxw` inside the gutters, while `100vw` measures
-   against the window. The two halves were therefore drawn at different scales
-   at every viewport, and no pair of photographs could have lined up.
-
-   `clip-path` leaves both images at exactly the size of `.r-scrub`, so they
-   register by construction. */
+/* The "before" is revealed by clipping, not by sizing, so both halves are
+   drawn at exactly the same scale and register by construction. */
 .r-scrub-before-wrap {
   position: absolute;
-  /* Not `inset: 0` — see `--scrub-pad` in world-identity.css. This half is
+  /* Not `inset: 0`: see `--scrub-pad` in world-identity.css. This wrapper is
      absolutely positioned and so resolves against the padding box; the other
      half is in normal flow inside the content box. They only register if this
      one is inset by the same padding. */
   inset: var(--scrub-pad, 0);
   clip-path: inset(0 calc(100% - var(--at, 52%)) 0 0);
+}
+.r-scrub-before {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
 }
 
 /* Cooler, dimmer, a little flatter — which is what a stripped room actually
