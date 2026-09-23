@@ -29,7 +29,7 @@ const SoundContext = createContext(null)
  * expected on a cold visit, so the player waits for the first gesture of any
  * kind and starts then.
  *
- * The choice is remembered, and only an explicit toggle writes it.
+ * Every visit starts silent, and only the switch starts it.
  *
  * It fades. Cutting a music bed dead on a click sounds like a fault.
  *
@@ -41,26 +41,26 @@ export function SoundProvider({ children }) {
   const fade = useRef(0)
   const target = useRef(0)
 
-  /* Off by default; on is remembered. `oryx.music` is a deliberate key: the
-     older `oryx.sound` was written on every mount, so every browser that ever
-     opened the site holds an "on" it never chose. */
-  const [on, setOn] = useState(() => {
-    try {
-      return localStorage.getItem('oryx.music') === 'on'
-    } catch {
-      return false
-    }
-  })
+  /* Off on every visit. It used to remember "on" across visits, and a site
+     that starts playing music on its own is exactly what nobody wants, so the
+     switch is the only way it starts. */
+  const [on, setOn] = useState(false)
   const [missing, setMissing] = useState(false)
 
   const toggle = () => {
     const next = !on
-    setOn(next)
-    try {
-      localStorage.setItem('oryx.music', next ? 'on' : 'off')
-    } catch {
-      /* Private browsing. The preference is lost on reload; the site is not. */
+    /* Started here, inside the click, and not only in the effect below. Safari
+       allows a sound to start only while the click that asked for it is still
+       running; the effect runs a moment later, after React has committed, and
+       Safari refused it every time. So the switch showed "Sound on" and
+       nothing played. Chrome allows either. The effect still runs afterwards
+       and does the fade; a second `play()` on a playing element is harmless. */
+    const a = el.current
+    if (next && a) {
+      a.volume = 0
+      a.play().catch(() => {})
     }
+    setOn(next)
   }
 
   /* Ramp `volume` toward a target, cancelling any ramp already running.

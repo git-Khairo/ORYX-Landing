@@ -266,11 +266,25 @@
    requirement for a scrub: if the two photographs are framed differently the
    slider reads as two pictures meeting at a line, not one room changing. */
 .r-scrub img {
-  width: 100%;
-  height: 100%;
+  /* Stretched to its box by its four edges, not by `height: 100%`. The
+     "after" picture used to sit in normal flow with a percentage height, and
+     Safari on a phone resolved that differently from the "before" behind it,
+     so the two halves met at different heights. Both are now positioned the
+     same way against the same padding box, and so are the same size by
+     construction in every browser. */
+  position: absolute;
+  top: var(--scrub-pad, 0px);
+  left: var(--scrub-pad, 0px);
+  /* An image does not stretch between its four edges the way a box does, so
+     the size is stated outright: the padding box less the padding. */
+  width: calc(100% - 2 * var(--scrub-pad, 0px));
+  height: calc(100% - 2 * var(--scrub-pad, 0px));
   object-fit: cover;
   object-position: 50% 50%;
 }
+/* The "before" sits inside its clipping wrapper, which is already inset by
+   the padding and has a definite height from its own four edges. */
+.r-scrub-before-wrap img { top: 0; left: 0; width: 100%; height: 100%; }
 
 /* The "before" is revealed by clipping, not by sizing.
 
