@@ -198,14 +198,14 @@ function PlayedSequence({ onFinish }) {
        dark, shrink, copy. `door` follows travel by only the beat the end
        copy's own entrance needs to start under the still-moving mark.
 
-       Timed to the clip, which runs 3.56 s and holds its last frame: the
-       brief reads over the sun rising, and the mark lands at 4.0, after the
-       freeze, onto a head that has stopped moving. */
+       The finale starts 11.1 seconds into the 15-second film, so the brief
+       reads over the sun settling, and the mark lands at 15.2, just after the
+       film has stopped on its last frame, onto a head that no longer moves. */
     const t = [
       setTimeout(() => setPhase('brief'), 2600),
-      setTimeout(() => setPhase('horns'), 4000),
-      setTimeout(() => setPhase('travel'), 5800),
-      setTimeout(() => setPhase('door'), 6100),
+      setTimeout(() => setPhase('horns'), 4100),
+      setTimeout(() => setPhase('travel'), 5900),
+      setTimeout(() => setPhase('door'), 6200),
     ]
     return () => t.forEach(clearTimeout)
   }, [index, act.kind, reduced])

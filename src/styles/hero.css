@@ -210,10 +210,11 @@
      offset and the mark's placement both derive from these, so re-aiming after
      a footage swap means measuring them once.
 
-     The generated clip frames the head centred and square to camera, where the
-     old still had it well right of centre — hence 0.5 rather than 0.62. */
-  --horn-fx: 0.5;
-  --horn-fy: 0.30;
+     Measured on the last frame of the 15-second intro film: the head is
+     centred and square to camera, and the horns meet at the poll a little
+     below the middle of the frame. */
+  --horn-fx: 0.493;
+  --horn-fy: 0.486;
 
   position: absolute;
   inset: 0;
@@ -253,7 +254,7 @@
      and the face, so it needed the plate contained by height and a blurred
      copy of the clip filling the sides — see git history if that ever comes
      back. A 16:9 clip never exposes the sides, so none of that is here. */
-  --vid-r: 1.76667;
+  --vid-r: 1.77037; /* 1912 x 1080, the intro film */
   --plate-w: calc(max(100vw, 100svh * var(--vid-r)) * 1.06);
   --plate-h: calc(var(--plate-w) / var(--vid-r));
   position: absolute;
@@ -311,12 +312,14 @@
      Where the animal's horns converge in the plate. Re-aim the mark after a
      footage swap by changing these and nothing else — the vertical offset is
      derived below rather than measured again. */
-  /* For the 848×480 generated sunset clip: head centred, horns meeting the
-     skull 41.5% of the way down. These were checked in the page against the
-     rendered horns when the clip first went in. */
-  --horn-x: 50%;
-  --horn-y: 41.5%;
-  --mark-w: 23.5%; /* of plate width; height follows from the mark's own ratio */
+  /* For the last frame of the 15-second intro film. Tuned in the page against
+     the frozen frame: at 26% the gold arms run along the real horns from the
+     top of the frame to the head, and at 45.5% the arms cross where the horns
+     meet the skull, leaving the nose clear below the hook. These horns spread
+     wider than the old clip's, which is why the mark is larger than before. */
+  --horn-x: 49.3%;
+  --horn-y: 45.5%;
+  --mark-w: 26%; /* of plate width; height follows from the mark's own ratio */
 
   /* The mark's own geometry: tips at x 0.068/0.932, arms merging at y 0.713 of
      its height, giving a 0.4161 width-to-height ratio.
@@ -532,7 +535,7 @@
 .hero-end-photo {
   position: absolute;
   inset: 0;
-  background: url('/film/04-sun.jpg') 76% 6% / 230% auto no-repeat;
+  background: url('/film/intro-end.jpg') 50% 20% / 230% auto no-repeat;
   filter: grayscale(0.8) sepia(0.35) brightness(0.24) contrast(1.15);
 }
 /* No `to`: the plate ends at its own declared opacity, which is lower on a
@@ -558,7 +561,8 @@
 }
 @media (max-width: 700px) {
   .hero-end-plate { width: 100vw; opacity: 0.8; }
-  .hero-end-photo { background-size: 420% auto; background-position: 70% 6%; }
+  /* The full height of a phone, and the head centred under the mark. */
+  .hero-end-photo { background-size: auto 100%; background-position: 47% 0%; }
   .hero-caption { letter-spacing: 0.18em; gap: 0.7rem; }
   .hero-caption::before { width: 28px; }
 }
@@ -677,10 +681,10 @@
 }
 
 @media (max-width: 640px) {
-  /* Through the variable, never `width` directly: the centring is
-     `left: calc(--horn-x - --mark-w / 2)`, so a width set behind the
-     variable's back would shift the mark off-centre by the difference. */
-  .origin-mark { --mark-w: 20%; }
+  /* No smaller mark on a phone. The mark's size is a fraction of the plate,
+     and the plate is the same frame at every width, so the same fraction is
+     what keeps it lying on the horns. A phone shows the middle of that frame,
+     where the horns and the mark both run off the top together. */
   .hero-copy { gap: 0.7rem; }
 }
 

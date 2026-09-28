@@ -34,7 +34,7 @@ export default function OryxOrigin({ play, phase, reduced }) {
      not getting smaller and the background is still the footage". A one-shot
      tween that has been allowed to start must be allowed to finish. */
   const running = useRef([])
-  const clip = film.oryxSun
+  const clip = film.oryx
 
   /* Start the clip when the shot goes live, not when it mounts.
      `autoPlay` was the whole "only the last frame shows" bug: FilmStage mounts
@@ -161,7 +161,10 @@ export default function OryxOrigin({ play, phase, reduced }) {
     <div className="origin origin--sunset" ref={root} aria-hidden="true">
       <div className="origin-plate">
         <div className="origin-photo">
-          <video ref={video} src={clip.src} poster={clip.poster} muted playsInline preload="auto" tabIndex={-1} />
+          {/* HEVC first, H.264 after it; the browser plays the first it can. */}
+          <video ref={video} src={clip.sources ? undefined : clip.src} poster={clip.poster} muted playsInline preload="auto" tabIndex={-1}>
+            {clip.sources?.map((s) => <source key={s.src} src={s.src} type={s.type} />)}
+          </video>
           {/* Graded to the brand before anything is drawn on top. */}
           <span className="origin-grade" />
         </div>

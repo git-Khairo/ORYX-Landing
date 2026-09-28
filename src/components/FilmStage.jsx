@@ -178,7 +178,7 @@ export default function FilmStage({ activeId, enter, cam, hold, phase, reduced }
           >
             {/* The sunset shot is a composite, not a clip: the footage and the
                 mark are separate objects that have to sit in register. */}
-            {id === 'oryxSun' ? (
+            {id === 'oryx' ? (
               <OryxOrigin play={live} phase={phase} reduced={reduced} />
             ) : clip.kind === 'image' && clip.src ? (
               <img src={clip.src} alt="" />
@@ -187,13 +187,15 @@ export default function FilmStage({ activeId, enter, cam, hold, phase, reduced }
                 ref={(node) => {
                   videos.current[id] = node
                 }}
-                src={clip.src}
+                src={clip.sources ? undefined : clip.src}
                 poster={clip.poster}
                 muted
                 playsInline
                 preload="auto"
                 tabIndex={-1}
-              />
+              >
+                {clip.sources?.map((s) => <source key={s.src} src={s.src} type={s.type} />)}
+              </video>
             ) : null}
           </div>
         )

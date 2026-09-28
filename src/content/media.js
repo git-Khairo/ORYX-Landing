@@ -9,68 +9,42 @@
  * attribution and permits hotlinking, but before production these should be
  * downloaded into `public/film/`. Every URL verified in session: 200, video/mp4.
  */
+/* Our own films, made for ORYX, in `public/film/`.
+
+   Each is two files. The first is HEVC (H.265): small, and played by Safari
+   and by Chrome and Edge wherever the hardware decodes it, which today is
+   nearly everywhere. The second is H.264 at 720p, bigger but played by every
+   browser there is; a browser that cannot play the first skips to it. The
+   `type` strings carry the exact codec of each file, read from the files
+   themselves, because a browser decides from that string alone whether to
+   try a source, and a vague one makes Chrome give up on HEVC it could play.
+
+   `src` is the H.264 file, for anything that reads a single address. The
+   poster is the film's own first frame, so a phone that refuses to autoplay
+   shows the right picture rather than black. */
+const HEVC = 'video/mp4; codecs="hvc1.1.6.H120.90"'
+const H264 = 'video/mp4; codecs="avc1.4D0020"'
+const ours = (name) => ({
+  src: `/film/${name}-h264.mp4`,
+  poster: `/film/${name}.jpg`,
+  sources: [
+    { src: `/film/${name}.mp4`, type: HEVC },
+    { src: `/film/${name}-h264.mp4`, type: H264 },
+  ],
+})
+
 export const film = {
-  /* ── The opening film, a montage ──────────────────────────────────────
-     Four clips from two generations, cut together with dissolves. About
-     sixteen seconds to the end card: 3 + 3 + 4.06 + the finale's 6.1.
-
-     01  744×496 · 30 fps · 5.03 s — a first/last-frame interpolation off a
-         photograph. ⚠ PLACEHOLDER, MUST NOT SHIP: the photograph carries a
-         "© Thomas Vijayan" credit and it is baked into the bottom-left of
-         every frame. `scripts/check-claims.mjs` warns on every build for as
-         long as this exact file is here. The site's own crop hides most of
-         it, which makes it worse, not better. Replace with a clip made from
-         a photograph ORYX holds the rights to.
-     02  744×496 · 30 fps · 5.03 s — a first/last-frame interpolation off a
-         photograph of an oryx beside a dune shrub, facing camera. Nearly
-         static; the act runs the site's `closeIn` camera over it.
-     03  848×480 · 16 fps · 4.06 s — the original generated push, mid-shot
-         to the head, from the keyframe chain that also made 04.
-     04  848×480 · 16 fps · 3.56 s — the original generated sunset: head
-         square to camera, horns in a narrow V, the sun rising into the gap.
-
-     Why 03 and 04 are the originals: the replacement finale came back
-     SQUARE, and on a widescreen no crop of a square keeps both the horn tips
-     and the face. It played for an afternoon contained by height with
-     blurred sides, and was taken out on request. It is parked in `frames/`
-     as `unused-*` — not under `public/`, so it does not ship.
-
-     ⚠ Resolution. All three are below the 1080p a full-bleed hero wants;
-     848×480 was already flagged as soft. The grade and the scrim carry a
-     good deal of it. The real fix is regeneration at 720p+ (a 16:9 finale
-     from the first/last-frame Space, wide keyframes) or an upscale pass. */
-  /* Every intro clip carries a first-frame poster. iOS paints nothing for a
-     video that has not started, and muted autoplay is refused there whenever
-     Low Power Mode is on or Safari's auto-play setting says so — which left
-     the whole film as black frames under the copy. With a poster the stage
-     always shows the shot, and FilmStage retries `play()` on the first touch. */
-  oryxWide: {
-    src: '/film/01-wide.mp4',
-    poster: '/film/01-wide.jpg',
-    /* Where the animal stands on the first frame, as a fraction of the plate —
-       it walks left to right across the shot. Documentation for the `stalk`
-       camera; this act runs `cam: 'none'`. */
-    subject: { x: 0.36, y: 0.52 },
-  },
-  oryxBush: {
-    src: '/film/02-bush.mp4',
-    poster: '/film/02-bush.jpg',
-  },
-  oryxPush: {
-    src: '/film/03-push.mp4',
-    poster: '/film/03-push.jpg',
-  },
-  /* Ends on the shot the whole identity rests on: the head square to camera,
-     the horns rising in a narrow V, and the sun sitting exactly in the gap
-     between them. The mark goes here. The clip holds its last frame; the
-     mark lands after it has stopped — see the phase timers in Hero.jsx. */
-  oryxSun: {
-    src: '/film/04-sun.mp4',
-    poster: '/film/04-sun.jpg',
-    /* Where the horns converge in this clip, as fractions of the frame.
-       Documentation — the live numbers are `--horn-x` / `--horn-y` /
-       `--mark-w` on `.origin-mark` in hero.css. */
-    horn: { x: 0.5, y: 0.30, spread: 0.15 },
+  /* ── The opening film ─────────────────────────────────────────────────
+     Fifteen seconds, generated from two stills made for it: the oryx walking
+     the dunes, and the same animal square to camera with the sun between its
+     horns. It ends holding that frame, and the mark lands on the horns; the
+     alignment lives on `.origin-mark` in hero.css. See `acts` in copy.js for
+     how the copy is timed over it. */
+  oryx: {
+    ...ours('intro'),
+    /* Where the horns converge on the last frame, as fractions of it.
+       Documentation; the live numbers are on `.origin-mark` in hero.css. */
+    horn: { x: 0.493, y: 0.486 },
   },
 
   facilities: {
@@ -80,49 +54,15 @@ export const film = {
     poster: 'https://images.pexels.com/videos/8783705/pictures/preview-0.jpeg',
     credit: 'https://www.pexels.com/video/drone-footage-of-modern-city-buildings-8783705/',
   },
-  transport: {
-    src: 'https://videos.pexels.com/video-files/32838797/13996854_1920_1080_30fps.mp4',
-    /* First frame, so the section paints before the file arrives — and on an
-       iPhone that refuses muted autoplay, instead of a black band. */
-    poster: 'https://images.pexels.com/videos/32838797/copells-32838797.jpeg?auto=compress&cs=tinysrgb&w=1600',
-    credit: 'https://www.pexels.com/video/efficient-warehouse-forklift-loading-outdoors-32838797/',
-  },
-  /* A uniformed team walking equipment toward a modern building — people being
-     brought to a site, which is what this service sells. Replaces warehouse
-     floor-scrubbing, which read as janitorial rather than as staffing. */
-  workforce: {
-    src: 'https://videos.pexels.com/video-files/6195153/6195153-hd_1920_1080_25fps.mp4',
-    /* First frame, so the section paints before the file arrives — and on an
-       iPhone that refuses muted autoplay, instead of a black band. */
-    poster: 'https://images.pexels.com/videos/6195153/pexels-photo-6195153.jpeg?auto=compress&cs=tinysrgb&w=1600',
-    credit: 'https://www.pexels.com/video/cleaners-carrying-working-tools-6195153/',
-  },
-  /* A room mid-renovation in an existing building: plaster, dust sheets, a
-     sprayer, daylight from one window.
-
-     This replaced a time-lapse of a concrete frame going up. Two things were
-     wrong with that. It was NEW CONSTRUCTION, and the source document for this
-     page is entirely about existing property — its differentiator is
-     "conserve what has value, repair what is necessary, replace only as a last
-     resort", which a building rising from nothing directly contradicts. And it
-     was 64 MB, the heaviest thing on the site by a wide margin, because 1080p60
-     was the only rendition offered.
-
-     Verified before use, which is the rule here after three clips turned out
-     not to be what their titles said: poster frame read as an image, HTTP 200,
-     video/mp4, H.264 (avc1), 1920×1080 25fps, 5.8 MB. Two earlier candidates
-     were rejected on the same check — a "time-lapse of two men plastering a
-     house facade" is a brick shell going up on bamboo scaffolding in saturated
-     pink and cobalt, and a "man painting facade on ladder" is unprotected
-     ladder work, which is the wrong message for a page whose catalogue marks
-     access at height as a project-basis condition. */
-  renovation: {
-    src: 'https://videos.pexels.com/video-files/6473920/6473920-hd_1920_1080_25fps.mp4',
-    /* First frame as a still, so the section paints the moment it opens. */
-    poster:
-      'https://images.pexels.com/videos/6473920/pexels-photo-6473920.jpeg?auto=compress&cs=tinysrgb&w=1600',
-    credit: 'https://www.pexels.com/video/a-footage-of-a-room-under-renovation-6473920/',
-  },
+  /* Transport opening: ORYX lorries and a van on a Dutch motorway at dawn,
+     tracked from the roadside. */
+  transport: ours('transport'),
+  /* Workforce opening: a bricklayer and a carpenter at work on the scaffold
+     while the supervisor in the white ORYX shirt checks his tablet. */
+  workforce: ours('workforce'),
+  /* Renovation opening: ORYX painters at the window frames on the scaffold,
+     the van parked below. Made for ORYX. */
+  renovation: ours('renovation'),
 
 
   /* Warm aerial at sunset. The previous closing clip was shot monochrome, which

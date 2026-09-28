@@ -128,9 +128,11 @@ const muteAttr = (node) => {
   node.setAttribute('muted', '')
 }
 
-/** Film or still — the origin plate is an image, so both have to be handled. */
+/** Film or still. A film with `sources` offers each file in order, and the
+    browser plays the first it can: our own films come as HEVC with an H.264
+    fallback, see `ours()` in media.js. */
 export function Media({ clip, className = '' }) {
-  if (!clip?.src) return <div className={`world-film ${className}`} aria-hidden="true" />
+  if (!clip?.src && !clip?.sources?.length) return <div className={`world-film ${className}`} aria-hidden="true" />
   return (
     <div className={`world-film ${className}`} data-film aria-hidden="true">
       {clip.kind === 'image' ? (
@@ -138,14 +140,16 @@ export function Media({ clip, className = '' }) {
       ) : (
         <video
           ref={muteAttr}
-          src={clip.src}
+          src={clip.sources ? undefined : clip.src}
           poster={clip.poster}
           muted
           loop
           playsInline
           preload="none"
           tabIndex={-1}
-        />
+        >
+          {clip.sources?.map((s) => <source key={s.src} src={s.src} type={s.type} />)}
+        </video>
       )}
     </div>
   )

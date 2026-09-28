@@ -53,78 +53,69 @@ export const brand = {
  * end card.
  */
 export const acts = [
+  /* One continuous film, fifteen seconds, and four beats of copy over it.
+     The oryx walks across the dunes, turns to face the camera, and after one
+     cut the camera pushes in on its face while the sun sets into the V
+     between its horns. It ends holding still on that frame, which is where
+     the mark lands.
+
+     Every act plays the same clip, `film.oryx`, so the video simply runs
+     through and the acts only change the words on top. That is also why each
+     act enters on a plain `cut`: a `dissolve` restarts a fade on the clip
+     itself, and here that would flash the film at every change of line.
+
+     The holds are timed to the footage: 0 to 6.6 seconds is the walk, the cut
+     comes at about 6.6, and the finale starts at 11.1 so the mark lands at
+     15.2, just after the film has stopped on its last frame. */
   {
-    /* Establishing, with one line under it. The three lines across the film
-       build: a sentence about the desert, then the value, then the name that
-       stands for it. `line` is drawn as hero type when `text` is 'line';
-       `sub` only feeds the screen-reader announcement. */
+    /* Establishing, with one line under it. `line` is drawn as hero type when
+       `text` is 'line'; `sub` only feeds the screen-reader announcement. */
     id: 'wild',
     kind: 'plate',
-    film: 'oryxWide',
-    /* The clip runs five seconds; three of them are used. */
-    hold: 3.0,
-    enter: 'up',
+    film: 'oryx',
+    hold: 3.3,
+    enter: 'cut',
     cam: 'none',
     text: 'line',
     line: 'Some ground only the steady can cross.',
     sub: 'An oryx crossing the Namib desert.',
   },
   {
-    /* A second look before the name: the same kind of animal, closer, turned
-       toward us, at the foot of a dune. The line is the values headline from
-       further down the page, said once here first. It is here so the film has
-       the length it was asked for without stretching any one shot past the
-       footage it has — this clip barely moves on its own (measured, a fifth
-       of the wide shot's motion), so the site's slow `closeIn` push runs over
-       it, and it dissolves in and out because it is a different place from
-       both neighbours. */
+    /* Still the walk. The oryx stops and turns toward the camera under this
+       line, the values headline from further down the page. */
     id: 'bush',
     kind: 'plate',
-    film: 'oryxBush',
-    hold: 3.0,
-    enter: 'dissolve',
-    cam: 'closeIn',
+    film: 'oryx',
+    hold: 3.3,
+    enter: 'cut',
+    cam: 'none',
     text: 'line',
     line: 'Reliable before impressive.',
-    sub: 'An oryx at the foot of a dune.',
+    sub: 'The oryx turns to face the camera.',
   },
   {
-    /* The push onto the head, carrying the name itself: O·R·Y·X unfolding
-       into the slogan it abbreviates. This shot is where the word is
-       explained, so the letters live here rather than over the finale, which
-       has its own work to do.
-
-       A dissolve, not a cut: the shot before this is a different animal in a
-       different place, and a hard cut between two scenes jumps. No CSS
-       camera — this clip is itself a push from mid-shot to the head, and it
-       ends a hair off the frame the finale begins on. */
+    /* The push in on the head, carrying the name: O, R, Y, X unfolding into
+       the slogan it abbreviates. */
     id: 'push',
     kind: 'plate',
-    film: 'oryxPush',
-    hold: 4.06,
-    enter: 'dissolve',
+    film: 'oryx',
+    hold: 4.5,
+    enter: 'cut',
     cam: 'none',
     text: 'letters',
     line: 'ORYX',
     sub: brand.slogan,
   },
   {
-    /* The finale. The sun comes up inside the V the horns make, the mark
-       fades onto them, a short brief about the company reads over the held
-       frame — and then the same mark, one element, never swapped, shrinks
-       into its place while the footage gives out and the way in appears
-       under it.
-
-       `enter: 'dissolve'`: this shot and the push were generated as one
-       keyframe chain and nearly share the frame they cut on, but not quite —
-       the head lands at a slightly different scale either side, and the
-       dissolve hides it. No `hold`: the timeline stops here and the film
-       waits to be dismissed rather than dismissing itself. */
+    /* The finale. The sun settles between the horns, a short brief reads over
+       it, the film stops on its last frame, the mark fades onto the horns and
+       then shrinks into its place while the way in appears under it. No
+       `hold`: the timeline stops here and waits to be dismissed. */
     id: 'finale',
     kind: 'finale',
-    film: 'oryxSun',
+    film: 'oryx',
     hold: 0,
-    enter: 'dissolve',
+    enter: 'cut',
     cam: 'none',
     text: 'brief',
     line: 'ORYX GROUP',
