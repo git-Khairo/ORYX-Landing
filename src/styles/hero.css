@@ -471,14 +471,16 @@
   -webkit-mask: url('/mark.png') center / contain no-repeat;
   mask: url('/mark.png') center / contain no-repeat;
 }
-/* Condensed and tracked, under the button. O, R, Y and X are sand and the
-   rest is white, from `.slogan` in shared.css. */
+/* Montserrat, tracked, under the button, the way the board sets its line
+   under the lockup. Not in capitals: the capital X in eXcellence is the
+   point, and upper-casing the line would bury it. O, R, Y and X are sand and
+   the rest is white, from `.slogan` in shared.css. */
 .hero-end-slogan {
   margin-top: clamp(1rem, 3.4vh, 2.2rem);
-  font-family: 'Barlow Condensed', 'Arial Narrow', var(--font);
-  font-size: clamp(1.05rem, 0.95rem + 0.5vw, 1.4rem);
+  font-family: var(--font);
+  font-size: clamp(0.95rem, 0.88rem + 0.35vw, 1.2rem);
   font-weight: 500;
-  letter-spacing: 0.09em;
+  letter-spacing: 0.08em;
 }
 .hero-end-slogan .slogan-k { font-weight: 600; }
 

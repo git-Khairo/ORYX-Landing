@@ -105,22 +105,25 @@ const slogan = () => {
     .join('')
 }
 
+/* The board's two faces and nothing else, as on the site: Cinzel standing in
+   for Trajan Pro on headings, Montserrat for the rest. The two pages differ
+   only in how heavy their headings are, matching their service pages. */
+const FACES = [
+  `@font-face{font-family:'Cinzel';font-weight:400;src:url('${font('@fontsource/cinzel/files/cinzel-latin-400-normal.woff2')}') format('woff2');}`,
+  `@font-face{font-family:'Cinzel';font-weight:600;src:url('${font('@fontsource/cinzel/files/cinzel-latin-600-normal.woff2')}') format('woff2');}`,
+  `@font-face{font-family:'Montserrat';font-weight:100 900;src:url('${font('@fontsource-variable/montserrat/files/montserrat-latin-wght-normal.woff2')}') format('woff2');}`,
+].join('\n')
+const DISPLAY = `'Cinzel', serif`
+const BODY = `'Montserrat', sans-serif`
 const THEME = {
-  workforce: {
-    display: `'Archivo'`, body: `'Archivo'`, displayWeight: 800,
-    faces: `@font-face{font-family:'Archivo';font-weight:100 900;src:url('${font('@fontsource-variable/archivo/files/archivo-latin-wght-normal.woff2')}') format('woff2');}`,
-  },
-  renovation: {
-    display: `'Space Grotesk'`, body: `'Space Grotesk'`, displayWeight: 500,
-    faces: `@font-face{font-family:'Space Grotesk';font-weight:300 700;src:url('${font('@fontsource-variable/space-grotesk/files/space-grotesk-latin-wght-normal.woff2')}') format('woff2');}`,
-  },
+  workforce: { displayWeight: 600 },
+  renovation: { displayWeight: 400 },
 }
 
 const page = ({ theme, unit, no, title, lede, stats, img, body, email, cta }) => `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><title>${esc(title)} | ${esc(brand.full)}</title>
 <style>
-${THEME[theme].faces}
-@font-face{font-family:'Cinzel';font-weight:600;src:url('${font('@fontsource/cinzel/files/cinzel-latin-600-normal.woff2')}') format('woff2');}
+${FACES}
 /* Every page bleeds to the edge, because the paper colour is part of the
    design and Chrome leaves page margins white. The breathing room at the top
    and bottom of a continued page comes from box-decoration-break: clone on
@@ -128,7 +131,7 @@ ${THEME[theme].faces}
 @page { size: A4; margin: 0; }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: #f4f1e8; }
-body { font-family: ${THEME[theme].body}, sans-serif; font-size: 9.6pt; line-height: 1.5; color: #1c1c1a; background: #f4f1e8; }
+body { font-family: ${BODY}; font-size: 9.6pt; line-height: 1.5; color: #1c1c1a; background: #f4f1e8; }
 b { font-weight: inherit; }
 
 .cover { position: relative; height: 297mm; padding: 16mm; display: flex; flex-direction: column; justify-content: space-between; background: #131311; color: #f4f1e8; overflow: hidden; page-break-after: always; }
@@ -146,13 +149,13 @@ b { font-weight: inherit; }
 .unit { font-size: 8pt; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: #d4b98d; }
 .cover-main { display: grid; gap: 6mm; }
 .cover-no { font-size: 9pt; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; color: #d4b98d; }
-h1 { font-family: ${THEME[theme].display}, sans-serif; font-weight: ${THEME[theme].displayWeight}; font-size: 33pt; line-height: 1.02; letter-spacing: 0.005em; text-transform: uppercase; max-width: 160mm; }
+h1 { font-family: ${DISPLAY}; font-weight: ${THEME[theme].displayWeight}; font-size: 30pt; line-height: 1.1; letter-spacing: 0.06em; text-transform: uppercase; max-width: 160mm; }
 .lede { font-size: 12.5pt; line-height: 1.5; font-weight: 300; color: #ece6d6; max-width: 140mm; }
 .stats { display: flex; gap: 0; margin-top: 2mm; border: 0.3mm solid rgba(200,169,120,0.45); width: fit-content; }
 .stats div { padding: 3.5mm 7mm; border-right: 0.3mm solid rgba(200,169,120,0.45); }
 .stats div:last-child { border-right: 0; }
 .stats dt { font-size: 7pt; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: #b8b4a8; }
-.stats dd { font-family: ${THEME[theme].display}, sans-serif; font-weight: ${THEME[theme].displayWeight}; font-size: 20pt; line-height: 1.1; color: #c8a978; }
+.stats dd { font-family: ${DISPLAY}; font-weight: ${THEME[theme].displayWeight}; font-size: 20pt; line-height: 1.1; color: #c8a978; }
 .cover-foot { display: flex; justify-content: space-between; align-items: flex-end; font-size: 8.5pt; color: #b8b4a8; }
 .slogan { font-size: 10pt; font-weight: 600; letter-spacing: 0.03em; color: #f4f1e8; }
 .slogan b { color: #c8a978; }
@@ -161,8 +164,8 @@ h1 { font-family: ${THEME[theme].display}, sans-serif; font-weight: ${THEME[them
 .kick { display: flex; align-items: center; gap: 3mm; font-size: 7.5pt; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: #6b4f2a; margin: 7mm 0 3mm; }
 .kick:first-child { margin-top: 0; }
 .kick::after { content: ''; flex: 1; height: 0.25mm; background: rgba(74,56,40,0.3); }
-h2 { font-family: ${THEME[theme].display}, sans-serif; font-weight: ${THEME[theme].displayWeight}; font-size: 13pt; line-height: 1.15; text-transform: uppercase; margin-bottom: 1mm; break-after: avoid; }
-h2 span { font-weight: 500; font-size: 8pt; letter-spacing: 0.14em; color: #7d7a72; margin-left: 2mm; }
+h2 { font-family: ${DISPLAY}; font-weight: ${THEME[theme].displayWeight}; font-size: 13pt; line-height: 1.2; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 1mm; break-after: avoid; }
+h2 span { font-family: ${BODY}; font-weight: 500; font-size: 8pt; letter-spacing: 0.14em; color: #7d7a72; margin-left: 2mm; }
 .intro { color: #55534c; margin-bottom: 2.5mm; max-width: 150mm; break-after: avoid; }
 .grp { margin-bottom: 6mm; }
 .rows { border-top: 0.25mm solid rgba(28,28,26,0.22); }
@@ -179,7 +182,7 @@ h2 span { font-weight: 500; font-size: 8pt; letter-spacing: 0.14em; color: #7d7a
 .note { color: #55534c; font-size: 8.8pt; margin-top: 3mm; max-width: 160mm; }
 .note b { font-weight: 700; color: #1c1c1a; }
 .contact { margin-top: 6mm; padding: 6mm 7mm; background: #131311; color: #f4f1e8; display: flex; justify-content: space-between; align-items: center; gap: 8mm; break-inside: avoid; }
-.contact-k { font-family: ${THEME[theme].display}, sans-serif; font-weight: ${THEME[theme].displayWeight}; font-size: 14pt; text-transform: uppercase; line-height: 1.1; }
+.contact-k { font-family: ${DISPLAY}; font-weight: ${THEME[theme].displayWeight}; font-size: 14pt; letter-spacing: 0.06em; text-transform: uppercase; line-height: 1.1; }
 .contact-d { color: #b8b4a8; font-size: 9pt; margin-top: 1mm; }
 .contact-m { text-align: right; font-size: 10pt; font-weight: 600; color: #c8a978; white-space: nowrap; }
 .contact-m small { display: block; font-size: 7.5pt; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: #b8b4a8; margin-bottom: 1mm; }

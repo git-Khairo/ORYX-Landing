@@ -57,6 +57,9 @@
      three identities cannot drift the brand along with them. */
   --font-group: 'Cinzel', 'Trajan Pro', 'Trajan', Georgia, serif;
   --font: 'Montserrat Variable', 'Montserrat', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  /* The board has no monospace. What the service pages used to set in one,
+     times, references and item numbers, is Montserrat with tabular figures. */
+  --font-mono: var(--font);
 
   --step--2: clamp(0.69rem, 0.67rem + 0.08vw, 0.75rem);
   --step--1: clamp(0.79rem, 0.77rem + 0.12vw, 0.87rem);

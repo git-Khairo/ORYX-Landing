@@ -187,13 +187,16 @@
   gap: 0.35rem 0.8rem;
   padding: 0.85rem 0.9rem 0.9rem;
 }
+/* Montserrat capitals, the way the board sets its list of services: at card
+   size Trajan's wide capitals would not fit "MANUFACTURING" in a phone's
+   two-column grid, and the board keeps its display face for the lockup. */
 .card-k {
   grid-column: 1 / -1;
-  font-family: var(--font-display);
+  font-family: var(--font);
   font-size: var(--step-0);
   font-weight: 700;
-  line-height: 1.2;
-  letter-spacing: var(--track-display);
+  line-height: 1.25;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--text);
   text-wrap: balance;
@@ -598,11 +601,14 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-family: var(--font-display);
-  font-size: var(--step--1);
-  font-weight: 800;
-  line-height: 1.15;
-  letter-spacing: var(--track-display);
+  font-family: var(--font);
+  /* Scales with the tile, which is 11rem wide until about 930px and then
+     grows with the window. A fixed size let "INFRASTRUCTURE" and its icon
+     run past a small tile. */
+  font-size: clamp(0.69rem, 0.95vw, 0.87rem);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   text-align: left;
   color: #f4f1e8;

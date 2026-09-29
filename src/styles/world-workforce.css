@@ -46,10 +46,10 @@
   mask: url('/mark.png') center / contain no-repeat;
 }
 .w-nav-word {
-  font-family: var(--font-display);
-  font-size: var(--step--1);
-  font-weight: 800;
-  letter-spacing: 0.1em;
+  font-family: var(--font-group);
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--text);
 }
@@ -262,7 +262,7 @@
   font-family: var(--font-display);
   font-size: var(--step-2);
   font-variant-numeric: tabular-nums;
-  font-weight: 800;
+  font-weight: 600;
   letter-spacing: var(--track-display);
   text-transform: uppercase;
   color: var(--text);
@@ -398,8 +398,10 @@
 .w-step-k {
   font-family: var(--font-display);
   font-size: var(--step-2);
-  font-weight: 500;
-  line-height: 1.05;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: var(--track-display);
+  line-height: 1.1;
   color: var(--text);
 }
 .w-step-d { font-size: var(--step-0); line-height: 1.6; color: var(--text-2); max-width: 46ch; }
@@ -428,12 +430,14 @@
 .w-trust-line {
   font-family: var(--font-display);
   font-size: var(--step-3);
-  font-weight: 800;
+  font-weight: 600;
   letter-spacing: var(--track-display);
   text-transform: uppercase;
-  line-height: 1.02;
+  line-height: 1.08;
   color: var(--sand);
-  max-width: 14ch;
+  /* In `ch` of Cinzel, whose capitals run wide: 14 set the line six deep in
+     a column with room for more. */
+  max-width: 20ch;
 }
 .w-trust-d { font-size: var(--step-0); color: var(--text-2); max-width: 46ch; line-height: 1.55; }
 
@@ -475,7 +479,7 @@
 .w-doc-stamp rect { fill: color-mix(in srgb, var(--sunk) 80%, transparent); stroke: var(--sand); stroke-width: 2; }
 .w-doc-stamp text {
   fill: var(--sand);
-  font-family: var(--font-display);
+  font-family: var(--font);
   font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.12em;
@@ -706,14 +710,14 @@
   align-content: start;
   padding: 0.95rem 1rem 1.1rem;
 }
-/* The situation, set as speech: a real sentence someone says, in the heavy
-   display face so it is the first thing read. */
+/* The situation, set as speech: a real sentence someone says, in heavy
+   capitals so it is the first thing read. */
 .w-way-say {
-  font-family: var(--font-display);
-  font-size: var(--step-1);
-  font-weight: 800;
-  line-height: 1.12;
-  letter-spacing: var(--track-display);
+  font-family: var(--font);
+  font-size: var(--step-0);
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: 0.03em;
   text-transform: uppercase;
   color: var(--text);
   text-wrap: balance;

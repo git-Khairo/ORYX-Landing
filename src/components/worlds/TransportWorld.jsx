@@ -31,7 +31,7 @@ export default function TransportWorld({ service, onClose, onRequest }) {
   return (
     <WorldShell service={service} onClose={onClose}>
       {/* ── Its own navigation ────────────────────────────────────────
-          A dispatch portal's bar: dense, full width, condensed uppercase, with
+          A dispatch portal's bar: dense, full width, tracked capitals, with
           a live status chip. Nothing about it is shared with the other two
           services beyond the wordmark. */}
       <header className="t-nav">

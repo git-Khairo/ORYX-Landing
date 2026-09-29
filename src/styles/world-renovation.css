@@ -31,7 +31,7 @@
    revision and scale on the right. Not a website nav at all — which is the
    point. It sticks, because a title strip is what stays with you as you move
    around a drawing. */
-/* Annotation-size labels — the mono captions on the drawing, the sheet
+/* Annotation-size labels — the small captions on the drawing, the sheet
    numbers, the column heads. 0.6rem is the drawing's own scale on a desk;
    on a phone that is 9.6px, below anything a thumb-length away can read, so
    the floor lifts to 11px there. One pair of variables, every label. */
@@ -68,10 +68,10 @@
 }
 .r-nav-mark span { display: grid; gap: 0.1rem; }
 .r-nav-mark b {
-  font-family: var(--font-display);
+  font-family: var(--font-group);
   font-size: var(--step--1);
-  font-weight: 500;
-  letter-spacing: 0.06em;
+  font-weight: 600;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--text);
 }
@@ -439,11 +439,11 @@
   color: var(--fill-strong);
 }
 .r-step-k {
-  font-family: var(--font-display);
+  font-family: var(--font);
   font-size: var(--step-0);
-  font-weight: 500;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: var(--track-display-lg);
+  letter-spacing: 0.08em;
   line-height: 1.1;
   color: var(--text);
 }
@@ -666,11 +666,11 @@
   color: var(--sand-text);
 }
 .r-fork-ok {
-  font-family: var(--font-display);
-  font-weight: 500;
+  font-family: var(--font);
+  font-weight: 600;
   font-size: var(--step-0);
   text-transform: uppercase;
-  letter-spacing: var(--track-display-lg);
+  letter-spacing: 0.08em;
   color: var(--text);
   line-height: 1.1;
 }
@@ -738,7 +738,9 @@
   stroke: none;
   font-family: var(--font-mono);
   font-size: 17px;
-  letter-spacing: 0.14em;
+  /* Montserrat runs wider than the mono this was drawn for, and at 0.14em
+     "STRUCTURE" reached the sheet's clipped right edge. */
+  letter-spacing: 0.08em;
 }
 
 /* ── The read column ──────────────────────────────────────────────────
@@ -821,9 +823,9 @@
 }
 .r-fork-note p {
   font-family: var(--font-display);
-  font-weight: 500;
+  font-weight: 400;
   text-transform: uppercase;
-  letter-spacing: var(--track-display-lg);
+  letter-spacing: var(--track-display);
   line-height: 1.18;
   font-size: var(--step-2);
   color: var(--text);
@@ -873,13 +875,17 @@
 
 /* ══ The remaining sections ══════════════════════════════════════════════ */
 
-/* The source's four beats, under the opening headline. Mono, because on this
-   sheet a sequence of named stages is annotation. */
+/* The source's four beats, under the opening headline. Small tracked
+   capitals, because on this sheet a sequence of named stages is annotation. */
 .r-beats {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem 1.4rem;
   margin-top: 1rem;
+  /* Each separator hangs to the left of its word. When the row wraps, the
+     one starting a new line would hang out past the column, so it is clipped
+     here and only the ones between words show. */
+  overflow: hidden;
 }
 .r-beats li {
   font-family: var(--font-mono);
@@ -926,10 +932,10 @@
 .r-tool figcaption { display: grid; gap: 0.35rem; align-content: start; }
 .r-tool-k {
   font-family: var(--font-display);
-  font-weight: 500;
+  font-weight: 400;
   font-size: var(--step-1);
   text-transform: uppercase;
-  letter-spacing: var(--track-display-lg);
+  letter-spacing: var(--track-display);
   color: var(--text);
   line-height: 1.1;
 }
@@ -947,6 +953,7 @@
 .r-draw-ink { fill: none; stroke: var(--text-2); stroke-width: 1.2; stroke-linecap: square; stroke-linejoin: miter; }
 .r-draw-page { fill: var(--raise); stroke: var(--line); }
 .r-draw-cover { fill: var(--sunk); stroke: var(--text-2); }
+.r-draw-mark { fill: var(--fill-strong); stroke: none; }
 .r-draw-sheet { fill: var(--raise); stroke: var(--line-sand); }
 .r-draw-rule { stroke: var(--line); }
 .r-draw-t, .r-draw-s, .r-draw-tab-t {
@@ -1019,11 +1026,11 @@
   color: var(--fill-strong);
 }
 .r-client-k {
-  font-family: var(--font-display);
-  font-weight: 500;
+  font-family: var(--font);
+  font-weight: 600;
   font-size: var(--step-0);
   text-transform: uppercase;
-  letter-spacing: var(--track-display-lg);
+  letter-spacing: 0.08em;
   color: var(--text);
   line-height: 1.15;
 }

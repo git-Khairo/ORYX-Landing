@@ -86,7 +86,7 @@
   min-width: 2ch;
   font-family: var(--font-display);
   font-size: clamp(4.5rem, 20vh, 12rem);
-  font-weight: 800;
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.02em;
   line-height: 0.86;
@@ -105,10 +105,10 @@
   min-height: calc(2em + 0.8rem);
   font-family: var(--font-display);
   font-size: var(--step-2);
-  font-weight: 800;
+  font-weight: 600;
   letter-spacing: var(--track-display);
   text-transform: uppercase;
-  line-height: 1;
+  line-height: 1.05;
   color: var(--text);
   text-wrap: balance;
   animation: wc-settle 0.42s var(--ease-out);
@@ -174,7 +174,7 @@
 .wc-ground { fill: none; stroke: var(--text-3); stroke-width: 2; }
 .wc-tag,
 .wc-num {
-  font-family: var(--font-display);
+  font-family: var(--font);
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.14em;
