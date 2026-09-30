@@ -151,7 +151,7 @@
   justify-items: center;
 }
 .r-foot-ask { max-width: var(--maxw); width: 100%; display: grid; gap: 1rem; }
-.r-foot-ask h3 { font-size: var(--step-3); color: var(--text); max-width: 20ch; }
+.r-foot-ask h3 { font-size: var(--step-3); color: var(--text); max-width: 30ch; }
 .r-foot-ask p { font-size: var(--step-0); color: var(--text-2); max-width: 44ch; }
 .r-foot-cta {
   justify-self: start;
@@ -555,7 +555,9 @@
   align-items: start;
 }
 .r-fork-head { grid-area: head; display: grid; gap: 0.9rem; max-width: 62ch; }
-.r-fork-head h3 { font-size: var(--step-3); color: var(--text); max-width: 18ch; }
+/* In `ch` of Cinzel, whose tracked capitals run about half as wide again as
+   the figure the unit measures: at 18ch the heading stood one word a line. */
+.r-fork-head h3 { font-size: var(--step-3); color: var(--text); max-width: 30ch; }
 
 /* ── The two datum bars ───────────────────────────────────────────────
    One property in at the top, one plan out at the bottom, three options
@@ -810,36 +812,6 @@
   padding-top: 0.7rem;
 }
 
-/* Outside the plate and spanning it, so it visibly governs all three. */
-.r-fork-note {
-  max-width: var(--maxw);
-  margin: clamp(1.4rem, 3vh, 2rem) auto 0;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 1rem 2rem;
-  align-items: end;
-  border-top: 1px solid var(--fill-strong);
-  padding-top: clamp(1.2rem, 3vh, 1.8rem);
-}
-.r-fork-note p {
-  font-family: var(--font-display);
-  font-weight: 400;
-  text-transform: uppercase;
-  letter-spacing: var(--track-display);
-  line-height: 1.18;
-  font-size: var(--step-2);
-  color: var(--text);
-  max-width: 30ch;
-}
-.r-fork-nk {
-  font-family: var(--font-mono);
-  font-size: var(--step--2);
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--text-2);
-  text-align: right;
-}
-
 @media (max-width: 1080px) {
   .r-fork-inner {
     grid-template-columns: minmax(0, 1fr);
@@ -850,10 +822,6 @@
   /* The ballot stays VERTICAL at every width. Laying three alternatives out
      in a row is the misreading this figure exists to prevent, and a
      breakpoint is not a reason to re-introduce it. */
-}
-@media (max-width: 620px) {
-  .r-fork-note { grid-template-columns: minmax(0, 1fr); }
-  .r-fork-nk { text-align: left; }
 }
 @media (prefers-reduced-motion: reduce) {
   .r-fork-mk { transition: none; }

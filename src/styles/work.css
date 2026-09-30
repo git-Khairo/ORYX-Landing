@@ -131,6 +131,9 @@
   bottom: 0;
   z-index: 2;
   display: grid;
+  /* A zero minimum, so a long word in the title can never widen the column
+     the promise and the description share. */
+  grid-template-columns: minmax(0, 1fr);
   gap: 0.7rem;
   padding: clamp(1.4rem, 4vh, 2.6rem);
   opacity: 0;
@@ -149,11 +152,27 @@
   line-height: 1.05;
   color: var(--oryx-white);
 }
+/* Side by side, the open door is about 39.6% of the window (the doors take
+   1.7 of 2.7 columns, and the open one 3.4 of 5.4 shares). "RENOVATION"
+   runs about 8.1 times its font size, so at 1024px the scale's own size put
+   it 5px past the edge of the screen. The cap is in `vw` rather than in
+   container units so the title does not reflow while the door slides open,
+   and from about 1400px up the scale is the smaller of the two again. */
+@media (min-width: 1001px) {
+  .door-title { font-size: min(var(--step-3), calc(4.6vw - 8px)); }
+}
+/* The section's paragraphs alternate faces: the short promise in Cinzel, the
+   description under it in Montserrat, and the brand panel keeps the same
+   rhythm down its column. */
 .door-promise {
+  font-family: var(--font-display);
   font-size: var(--step-1);
-  font-weight: 500;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  line-height: 1.35;
   color: var(--sand-text);
   max-width: 30ch;
+  text-wrap: balance;
 }
 .door-body {
   font-size: var(--step-0);
@@ -217,14 +236,16 @@
   margin-bottom: clamp(1rem, 2.6vh, 1.8rem);
 }
 
-/* The statement leads the panel and is set to. Montserrat, not Cinzel — Cinzel
-   is a Trajan revival whose lowercase are small capitals, so a sentence this
-   long comes out as an unbroken block of caps nobody reads. */
+/* The statement leads the panel, in Cinzel: first of the panel's paragraphs,
+   which alternate faces from here down (tagline Montserrat, vision Cinzel,
+   mission Montserrat, values Cinzel). Cinzel's lowercase are small capitals,
+   so it is tracked a little and given the line height capitals need. */
 .purpose-line {
+  font-family: var(--font-display);
   font-size: clamp(1.05rem, 1.5vw, 1.45rem);
-  font-weight: 300;
+  font-weight: 400;
   line-height: 1.5;
-  letter-spacing: 0.002em;
+  letter-spacing: 0.03em;
   color: var(--oryx-white);
   text-wrap: pretty;
 }
@@ -319,6 +340,9 @@
     opacity 0.4s var(--ease-out) 0.12s;
 }
 .mvv-inner { overflow: hidden; }
+/* Vision and values in Cinzel, mission between them in Montserrat. */
+.mvv-item:nth-child(odd) .mvv-inner { font-family: var(--font-display); }
+.mvv-item:nth-child(odd) p { font-weight: 400; letter-spacing: 0.03em; }
 
 /* Indented to the number column, so the panel hangs off the same axis as the
    name above it instead of starting at the panel edge. */

@@ -134,7 +134,7 @@
 .w-foot-say h3 {
   font-size: var(--step-3);
   color: var(--text);
-  max-width: 16ch;
+  max-width: 26ch;
 }
 .w-foot-say p {
   margin-top: 1rem;
@@ -162,7 +162,8 @@
 
 .w-foot-cols {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  /* The contact column is never narrower than the address in it. */
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(min-content, 1.2fr);
   gap: 2rem;
 }
 .w-foot-cols h4 {
@@ -180,8 +181,10 @@
   padding: 0.22rem 0;
   /* An address is a single unbreakable token — `people@oryx.example` is 19
      characters with nowhere to wrap, and in a third of a phone screen it hung
-     31px off the edge and scrolled the whole world sideways. */
-  overflow-wrap: anywhere;
+     31px off the edge and scrolled the whole world sideways. Its column is
+     sized to hold it now; this is only the last resort, and unlike
+     `anywhere` it does not shrink the column's minimum to a single letter. */
+  overflow-wrap: break-word;
 }
 .w-foot-cols a { border-bottom: 1px solid var(--line-sand); }
 
@@ -200,13 +203,18 @@
 .w-foot-back { font: inherit; color: var(--text-3); border-bottom: 1px solid var(--line-sand); }
 .w-foot-back:hover { color: var(--text); }
 
-@media (max-width: 860px) {
+/* Stacked from 1300px, not 860px: in Cinzel's wide capitals the three
+   directory columns beside the sign-off were 114px each at 1024px, and
+   "MANUFACTURING" and the address broke in half. */
+@media (max-width: 1300px) {
   .w-foot-main { grid-template-columns: 1fr; }
 }
 @media (max-width: 560px) {
   /* Three directory columns on a phone give each about 90px, which is narrower
-     than several sector names. */
+     than several sector names. The contact column takes the full width, so
+     the address stays on one line. */
   .w-foot-cols { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .w-foot-cols > :last-child { grid-column: 1 / -1; }
 }
 
 /* This world's opening carries four blocks where the other two carry two —
@@ -313,7 +321,7 @@
   gap: clamp(2rem, 5vw, 4rem);
 }
 .w-method-head { min-width: 0; }
-.w-method-head h3 { font-size: var(--step-3); color: var(--text); max-width: 14ch; }
+.w-method-head h3 { font-size: var(--step-3); color: var(--text); max-width: 22ch; }
 
 /* The sticky wrapper both sections share. `top` clears the navigation, which
    is itself sticky — at `top: 2rem` the heading parked underneath the bar and

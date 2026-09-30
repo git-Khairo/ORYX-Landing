@@ -425,8 +425,6 @@ export const services = [
       forkTop: { k: 'Datum', v: 'One property, assessed once.', n: 'ORYX Property Check' },
       forkFoot: { k: 'Whichever is chosen', v: 'One plan, one accountable team and results you can check.', n: 'Evidence-based handover' },
       forkSet: 'Scope, phasing and budget range are set at the ORYX Property Check, for whichever is chosen.',
-      forkNote: 'We keep what has value, repair what needs it and replace only as a last resort.',
-      forkNoteKey: 'The three options are ordered by how deep the work goes, not by preference.',
       scenarios: [
         {
           id: 'maintain',

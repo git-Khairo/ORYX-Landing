@@ -131,12 +131,14 @@
 .foot-mail:hover { color: var(--oryx-white); border-color: var(--sand); }
 
 /* ── The directory ────────────────────────────────────────────────────
-   Small tracked headings, small quiet links. Nothing here is set in display
-   type: it is a place to look something up, and a footer that shouts is a
-   footer competing with the page above it. */
+   Small tracked headings, small quiet links: a place to look something up,
+   and a footer that shouts is a footer competing with the page above it. The
+   whole footer is in Cinzel (see shared.css), and its capitals are wide
+   enough that the email address outgrew an equal third at 1024px; the
+   contact column is never narrower than its longest word. */
 .foot-cols {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.8fr) minmax(min-content, 1.2fr);
   gap: clamp(1.4rem, 3vw, 2.6rem);
 }
 .foot-cols h4 {

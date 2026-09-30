@@ -12,6 +12,19 @@
 .slogan { color: var(--oryx-white); }
 .slogan-k { font-weight: inherit; color: var(--sand); }
 
+/* ── Footers ────────────────────────────────────────────────────────────
+   Every footer, the home page's and the three service pages', is set
+   entirely in Cinzel. The pieces inside read `--font` and `--font-mono`, so
+   pointing both at the display face here moves the whole footer at once. */
+.foot,
+.t-foot,
+.w-foot,
+.r-foot {
+  --font: var(--font-display);
+  --font-mono: var(--font-display);
+  font-family: var(--font-display);
+}
+
 /* ── Icons ──────────────────────────────────────────────────────────── */
 .icon { display: block; flex: none; }
 

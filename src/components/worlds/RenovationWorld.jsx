@@ -545,12 +545,6 @@ function Fork({ world }) {
           <p className="r-fork-dn">{world.forkFoot.n}</p>
         </div>
       </div>
-
-      {/* Outside the plate and spanning it, so it visibly governs all three. */}
-      <div className="r-fork-note">
-        <p>{world.forkNote}</p>
-        <p className="r-fork-nk">{world.forkNoteKey}</p>
-      </div>
     </section>
   )
 }

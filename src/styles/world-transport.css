@@ -164,9 +164,9 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: var(--track-display);
-  line-height: 1;
+  line-height: 1.05;
   color: var(--text);
-  max-width: 20ch;
+  max-width: 30ch;
 }
 .t-foot-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem 1.6rem; }
 .t-foot-cta {
@@ -1081,14 +1081,22 @@
   color: var(--text);
 }
 
+/* Rows that are always full. The 1px gaps show the grey ground through as
+   rules, so an empty cell showed it as a block: the old `auto-fit` grid laid
+   five panels out 4 + 1 on a laptop and left three cells of bare grey.
+   Wrapped flex rows let the last row's panels stretch across whatever is
+   left, and the breakpoints pick 5, 3 + 2, 2 + 2 + 1 or one column, so no row
+   is ever a lone panel beside empty space. The `- 1px` pays for the gaps. */
 .t-inside {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: 1px;
   background: var(--line);
   border: 1px solid var(--line);
 }
 .t-inside li {
+  flex: 1 1 calc(20% - 1px);
+  min-width: 0;
   position: relative;
   background: var(--tone);
   padding: clamp(1.3rem, 3vh, 1.8rem) clamp(1.1rem, 1.8vw, 1.5rem) clamp(1.1rem, 2.6vh, 1.5rem);
@@ -1102,6 +1110,9 @@
   transition: background 0.25s var(--ease-out);
 }
 .t-inside li:hover { background: var(--raise); }
+@media (max-width: 1279px) { .t-inside li { flex-basis: calc(33.333% - 1px); } }
+@media (max-width: 760px) { .t-inside li { flex-basis: calc(50% - 1px); } }
+@media (max-width: 520px) { .t-inside li { flex-basis: 100%; } }
 
 /* A sand rule across the head of each panel, running out to full width as the
    panel is pointed at. It is the one accent on the section and it is what
