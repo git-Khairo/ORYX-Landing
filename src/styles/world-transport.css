@@ -967,14 +967,20 @@
 
 .t-for { margin-top: clamp(1.5rem, 3.5vh, 2.4rem); }
 .t-for-line { font-size: var(--step-1); color: var(--text); max-width: 44ch; }
+/* Full rows only, for the same reason as the services grid below: the 1px
+   gaps are the grey ground showing through, and `auto-fit` laid the four
+   out 3 + 1 on a tablet with two cells of bare grey. 4, then 2 + 2, then
+   one column; and if a fifth is ever added, the last row still stretches. */
 .t-chips {
   margin-top: 1.6rem;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: 1px;
   background: var(--line);
 }
-.t-chips li { background: var(--tone); padding: 1.1rem 1.2rem; display: grid; gap: 0.3rem; }
+.t-chips li { flex: 1 1 calc(25% - 1px); min-width: 0; background: var(--tone); padding: 1.1rem 1.2rem; display: grid; gap: 0.3rem; align-content: start; }
+@media (max-width: 1000px) { .t-chips li { flex-basis: calc(50% - 1px); } }
+@media (max-width: 520px) { .t-chips li { flex-basis: 100%; } }
 .t-chips span { font-size: var(--step-0); font-weight: 600; color: var(--oryx-white); }
 .t-chips small { font-size: var(--step--2); color: var(--text-2); line-height: 1.5; }
 
