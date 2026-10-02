@@ -165,6 +165,9 @@
 }
 .foot-cols a:hover,
 .foot-cols button:hover { color: var(--oryx-white); }
+/* An address is one long word: on a 320px phone the column is narrower than
+   the inbox, which ran 19px out of it. It breaks where it has to. */
+.foot-cols a[href^="mailto:"] { overflow-wrap: anywhere; }
 
 /* ── The legal line ───────────────────────────────────────────────────── */
 .foot-base {

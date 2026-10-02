@@ -13,6 +13,8 @@ import { usePrefersReduced } from '../lib/usePrefersReduced'
 import { SoundToggle } from '../components/Sound'
 import Slogan from '../components/Slogan'
 import Icon from '../components/Icon'
+import { ui } from '../content/ui'
+import { fmt } from '../i18n/core'
 
 /**
  * The request page.
@@ -39,11 +41,7 @@ import Icon from '../components/Icon'
  */
 const EMPTY = { name: '', email: '', company: '', phone: '', service: '', sub: '', note: '', site: '' }
 
-const STEPS = [
-  { icon: 'note', k: 'You send the request', d: 'A few details are enough to start.' },
-  { icon: 'mail', k: 'It reaches the right team', d: 'Each service has its own inbox, so nothing is passed around.' },
-  { icon: 'phone', k: 'They contact you', d: 'To agree the details and the next step with you.' },
-]
+const STEPS = ['note', 'mail', 'phone'].map((icon, i) => ({ icon, ...ui.request.steps[i] }))
 
 /* What was typed, kept for as long as the tab is open. Escape and the Close
    button both unmount this page, and a long note lost to one stray key press is
@@ -104,12 +102,13 @@ export default function RequestPage({ preset, onClose }) {
 
   const validate = () => {
     const e = {}
-    if (!f.name.trim()) e.name = 'Please add your name.'
-    if (!f.email.trim()) e.email = 'Please add your email address.'
-    else if (!isEmail(f.email.trim())) e.email = 'That email address does not look complete.'
-    if (f.phone.trim() && f.phone.replace(/\D/g, '').length < 6) e.phone = 'That phone number looks too short.'
-    if (!f.service) e.service = 'Please choose a service.'
-    else if (!f.sub) e.sub = 'Please choose one option.'
+    const m = ui.request.errors
+    if (!f.name.trim()) e.name = m.name
+    if (!f.email.trim()) e.email = m.emailMissing
+    else if (!isEmail(f.email.trim())) e.email = m.emailBad
+    if (f.phone.trim() && f.phone.replace(/\D/g, '').length < 6) e.phone = m.phone
+    if (!f.service) e.service = m.service
+    else if (!f.sub) e.sub = m.sub
     return e
   }
 
@@ -162,7 +161,7 @@ export default function RequestPage({ preset, onClose }) {
       <label htmlFor={`${uid}-${k}`}>
         <Icon name={icon} size={16} />
         <span>{label}</span>
-        {optional && <em>Optional</em>}
+        {optional && <em>{ui.request.optional}</em>}
       </label>
       <input
         id={`${uid}-${k}`}
@@ -192,8 +191,8 @@ export default function RequestPage({ preset, onClose }) {
           <div className="req-bar-r">
             <SoundToggle />
             {/* The word is hidden on a phone, so the name is set here too. */}
-            <button type="button" className="req-close" onClick={onClose} aria-label="Close">
-              <span>Close</span>
+            <button type="button" className="req-close" onClick={onClose} aria-label={ui.request.close}>
+              <span>{ui.request.close}</span>
               <Icon name="close" size={16} />
             </button>
           </div>
@@ -202,12 +201,9 @@ export default function RequestPage({ preset, onClose }) {
         <div className="req-scroll" ref={scroller}>
           <div className="req-grid">
             <aside className="req-side">
-              <p className="req-kicker">Request a service</p>
-              <h2 id={`${uid}-h`}>Tell us what you need</h2>
-              <p className="req-lede">
-                Choose the service, add a few details and send. Your request goes
-                straight to the team that handles it.
-              </p>
+              <p className="req-kicker">{ui.request.kicker}</p>
+              <h2 id={`${uid}-h`}>{ui.request.title}</h2>
+              <p className="req-lede">{ui.request.lede}</p>
 
               <ol className="req-steps" role="list">
                 {STEPS.map((s, i) => (
@@ -228,34 +224,34 @@ export default function RequestPage({ preset, onClose }) {
                 <span className="req-done-i"><Icon name={sent?.via === 'mailto' ? 'mail' : 'check'} size={28} /></span>
                 {sent?.via === 'mailto' ? (
                   <>
-                    <h3>One more step</h3>
+                    <h3>{ui.request.mailtoTitle}</h3>
                     <p>
-                      Your mail app should have opened with the request already
-                      written and addressed to{' '}
-                      <a className="req-link" href={sent.href}>{sent.to}</a>. Press
-                      send there to finish. If nothing opened, use that link to
-                      try again, or go back and copy what you wrote.
+                      {ui.request.mailtoBefore}{' '}
+                      <a className="req-link" href={sent.href}>{sent.to}</a>.{' '}
+                      {ui.request.mailtoAfter}
                     </p>
                   </>
                 ) : (
                   <>
-                    <h3>Request sent</h3>
+                    <h3>{ui.request.sentTitle}</h3>
                     <p>
-                      Thank you, {f.name.trim().split(' ')[0]}. Your request is with
-                      the {service?.label} team, and they will contact you at{' '}
-                      {f.email.trim()} to agree the details.
+                      {fmt(ui.request.sentBody, {
+                        name: f.name.trim().split(' ')[0],
+                        team: service?.label,
+                        email: f.email.trim(),
+                      })}
                     </p>
                   </>
                 )}
                 <div className="req-done-actions">
                   <button type="button" className="req-submit" onClick={onClose}>
-                    Back to the site <i aria-hidden="true"><Icon name="arrow" size={16} /></i>
+                    {ui.request.back} <i aria-hidden="true"><Icon name="arrow" size={16} /></i>
                   </button>
                   {sent?.via === 'mailto' ? (
                     /* Nothing has been sent yet as far as the page can tell,
                        so going back keeps every field as it was. */
                     <button type="button" className="req-ghost" onClick={() => setState('idle')}>
-                      Back to my request
+                      {ui.request.backToRequest}
                     </button>
                   ) : (
                     <button
@@ -263,7 +259,7 @@ export default function RequestPage({ preset, onClose }) {
                       className="req-ghost"
                       onClick={() => { setF({ ...EMPTY }); setErrors({}); setState('idle') }}
                     >
-                      Send another request
+                      {ui.request.another}
                     </button>
                   )}
                 </div>
@@ -271,18 +267,18 @@ export default function RequestPage({ preset, onClose }) {
             ) : (
               <form className="req-form" onSubmit={submit} noValidate>
                 <div className="req-row">
-                  {field('name', 'Full name', 'user', { type: 'text', autoComplete: 'name', required: true })}
-                  {field('email', 'Email', 'mail', { type: 'email', autoComplete: 'email', inputMode: 'email', required: true })}
+                  {field('name', ui.request.name, 'user', { type: 'text', autoComplete: 'name', required: true })}
+                  {field('email', ui.request.emailLabel, 'mail', { type: 'email', autoComplete: 'email', inputMode: 'email', required: true })}
                 </div>
                 <div className="req-row">
-                  {field('company', 'Company', 'building', { type: 'text', autoComplete: 'organization' }, true)}
-                  {field('phone', 'Phone', 'phone', { type: 'tel', autoComplete: 'tel', inputMode: 'tel' }, true)}
+                  {field('company', ui.request.company, 'building', { type: 'text', autoComplete: 'organization' }, true)}
+                  {field('phone', ui.request.phone, 'phone', { type: 'tel', autoComplete: 'tel', inputMode: 'tel' }, true)}
                 </div>
 
                 <div className={`req-field ${errors.service ? 'is-bad' : ''}`}>
                   <label htmlFor={`${uid}-service`}>
                     <Icon name="layers" size={16} />
-                    <span>Service</span>
+                    <span>{ui.request.service}</span>
                   </label>
                   <div className="req-select">
                     <select
@@ -293,7 +289,7 @@ export default function RequestPage({ preset, onClose }) {
                       aria-invalid={errors.service ? 'true' : undefined}
                       aria-describedby={errors.service ? `${uid}-service-e` : undefined}
                     >
-                      <option value="">Choose a service</option>
+                      <option value="">{ui.request.chooseService}</option>
                       {requestServices.map((s) => (
                         <option key={s.id} value={s.id}>{s.label}</option>
                       ))}
@@ -319,7 +315,7 @@ export default function RequestPage({ preset, onClose }) {
                         aria-invalid={errors.sub ? 'true' : undefined}
                         aria-describedby={errors.sub ? `${uid}-sub-e` : undefined}
                       >
-                        <option value="">Choose one</option>
+                        <option value="">{ui.request.chooseOne}</option>
                         {service.subs.map((s) => (
                           <option key={s.id} value={s.id}>{s.label}</option>
                         ))}
@@ -332,15 +328,15 @@ export default function RequestPage({ preset, onClose }) {
                 <div className="req-field">
                   <label htmlFor={`${uid}-note`}>
                     <Icon name="note" size={16} />
-                    <span>Note</span>
-                    <em>Optional</em>
+                    <span>{ui.request.note}</span>
+                    <em>{ui.request.optional}</em>
                   </label>
                   <textarea
                     id={`${uid}-note`}
                     rows={4}
                     value={f.note}
                     onChange={set('note')}
-                    placeholder="Anything that helps us understand the job: dates, location, numbers."
+                    placeholder={ui.request.notePlaceholder}
                   />
                 </div>
 
@@ -352,19 +348,16 @@ export default function RequestPage({ preset, onClose }) {
 
                 {state === 'failed' && (
                   <p className="req-fail" role="alert">
-                    The request could not be sent just now. Please try again
-                    {service ? `, or write to ${service.email}` : ''}.
+                    {service ? fmt(ui.request.failedWrite, { email: service.email }) : ui.request.failed}
                   </p>
                 )}
 
                 <div className="req-foot">
                   <button type="submit" className="req-submit" disabled={state === 'sending'}>
-                    {state === 'sending' ? 'Sending' : 'Send request'}
+                    {state === 'sending' ? ui.request.sending : ui.request.send}
                     <i aria-hidden="true"><Icon name="arrow" size={16} /></i>
                   </button>
-                  <p className="req-small">
-                    Your details are used only to answer this request.
-                  </p>
+                  <p className="req-small">{ui.request.privacy}</p>
                 </div>
               </form>
             )}

@@ -1,4 +1,5 @@
 import { mail, requestServices } from '../content/requests'
+import { getLang, LANG_NAMES } from '../i18n/core'
 
 /**
  * Send one request to the address of the service it is about.
@@ -35,6 +36,9 @@ const asText = (f, service, sub) =>
     `Email: ${f.email}`,
     `Company: ${f.company || '-'}`,
     `Phone: ${f.phone || '-'}`,
+    /* The labels stay English for the team; the visitor's own words, and the
+       service names, arrive in the language they used the site in. */
+    `Language: ${LANG_NAMES[getLang()]}`,
     '',
     'Note:',
     f.note || '-',
@@ -72,6 +76,7 @@ export async function sendRequest(fields, { signal } = {}) {
             company: fields.company,
             phone: fields.phone,
             note: fields.note,
+            language: LANG_NAMES[getLang()],
           },
         }),
       })

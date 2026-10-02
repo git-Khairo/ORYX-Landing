@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Nav from './components/Nav'
 import Cursor from './components/Cursor'
 import { SoundProvider } from './components/Sound'
@@ -29,6 +29,9 @@ import './styles/footer.css'
    `world--<id>` class still gets its own layout from here. */
 import './styles/shared.css'
 import './styles/request.css'
+import { ui } from './content/ui'
+import { switchLanguage, takeCarry } from './i18n/boot'
+import { LangContext } from './i18n/context'
 
 /**
  * The site is two surfaces and an intro.
@@ -41,10 +44,35 @@ import './styles/request.css'
  * can be dismissed at any point, and cannot be stumbled back into.
  */
 export default function App() {
-  const [openId, setOpenId] = useState(null)
+  /* Set by a language switch on the page before this one; null on an
+     ordinary visit. */
+  const [carry] = useState(takeCarry)
+  const [openId, setOpenId] = useState(() => carry?.open ?? null)
   /* Once this is true the film is unmounted, not hidden — there is no path
-     back to it short of reloading, which is exactly the intent. */
-  const [introDone, setIntroDone] = useState(false)
+     back to it short of reloading, which is exactly the intent. A visitor who
+     has just switched language has already seen it. */
+  const [introDone, setIntroDone] = useState(Boolean(carry))
+
+  /* Back to where the reading was: on the home page underneath, and inside
+     the service page if one was open. That page mounts and lays itself out
+     over a few frames, so its panel is retried until it is tall enough. */
+  useEffect(() => {
+    if (carry?.y) window.scrollTo(0, carry.y)
+    if (!carry?.wy) return
+    let tries = 0
+    const id = setInterval(() => {
+      const panel = document.querySelector('.world-scroll')
+      if (panel && panel.scrollHeight - panel.clientHeight >= carry.wy) {
+        /* Instant: the panel scrolls smoothly by default, and a page that
+           glides down from the top after the load reads as a jump. */
+        panel.scrollTo({ top: carry.wy, behavior: 'instant' })
+        clearInterval(id)
+      } else if (++tries > 40) clearInterval(id)
+    }, 50)
+    return () => clearInterval(id)
+  }, [carry])
+
+  const switchTo = (lang) => switchLanguage(lang, { open: openId })
   const service = services.find((s) => s.id === openId) || null
 
   /* The request page. `null` is closed; otherwise `{ service, sub }`, either
@@ -72,12 +100,13 @@ export default function App() {
     })
 
   return (
+    <LangContext.Provider value={switchTo}>
     <SoundProvider>
       {/* Only once the film has gone. While the intro is up the page beneath
           is locked, so a link promising to jump into it would be a dead end —
           the intro's own control is the way through, and it is reachable by
           keyboard from the first frame. */}
-      {introDone && <a className="skip-link" href="#work">Skip to services</a>}
+      {introDone && <a className="skip-link" href="#work">{ui.app.skip}</a>}
       {/* The chrome stays mounted underneath the film so the page is already
           there the instant the intro clears — nothing has to load in behind it. */}
       <Cursor />
@@ -104,5 +133,6 @@ export default function App() {
 
       {req && <RequestPage preset={req} onClose={() => setReq(null)} />}
     </SoundProvider>
+    </LangContext.Provider>
   )
 }

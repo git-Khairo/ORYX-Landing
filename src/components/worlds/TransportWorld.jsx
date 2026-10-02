@@ -10,6 +10,8 @@ import { cardImage } from '../../lib/cardImage'
 import { SoundToggle } from '../Sound'
 import { Social } from '../../sections/Footer'
 import Icon from '../Icon'
+import { ui } from '../../content/ui'
+import LangSwitch from '../LangSwitch'
 
 /**
  * Transport & Logistics — "The Route."
@@ -39,14 +41,14 @@ export default function TransportWorld({ service, onClose, onRequest }) {
           <button type="button" className="t-nav-mark" onClick={onClose}>
             <i aria-hidden="true" />
             <span className="t-nav-word">ORYX</span>
-            <span className="t-nav-unit">Dispatch</span>
+            <span className="t-nav-unit">{ui.transport.unit}</span>
           </button>
 
-          <nav className="t-nav-links" aria-label="Transport sections">
-            <a href="#t-network">Network</a>
-            <a href="#t-route">Schedule</a>
-            <a href="#t-load">Services</a>
-            <a href="#t-coverage">Coverage</a>
+          <nav className="t-nav-links" aria-label={ui.transport.sections}>
+            <a href="#t-network">{ui.transport.navNetwork}</a>
+            <a href="#t-route">{ui.transport.navSchedule}</a>
+            <a href="#t-load">{ui.transport.navServices}</a>
+            <a href="#t-coverage">{ui.transport.navCoverage}</a>
           </nav>
 
           {/* Was "Live · 24/7", which is a staffed-cover claim and blocked by
@@ -56,11 +58,15 @@ export default function TransportWorld({ service, onClose, onRequest }) {
           <div className="t-nav-r">
             <span className="t-nav-status">
               <i aria-hidden="true" />
-              Tracked end to end
+              {ui.transport.status}
             </span>
+            <LangSwitch />
             <SoundToggle bare />
-            <button type="button" className="t-nav-cta" onClick={() => onRequest(service.id)}>
-              {ctaFor(service.id)}
+            {/* Full label for anyone who can see or hear it; the short one only
+                on the narrowest phones, as in the home page's bar. */}
+            <button type="button" className="t-nav-cta" onClick={() => onRequest(service.id)} aria-label={ctaFor(service.id)}>
+              <span className="world-cta-full">{ctaFor(service.id)}</span>
+              <span className="world-cta-short" aria-hidden="true">{ui.nav.requestShort}</span>
             </button>
           </div>
         </div>
@@ -76,7 +82,9 @@ export default function TransportWorld({ service, onClose, onRequest }) {
           </p>
           {/* The headline carries the opening, not the service name — the name
               is already in the eyebrow above it and in the navigation. */}
-          <h2 data-reveal>
+          {/* `--len`, the longest word in letters, keeps a long German or
+              Dutch word on one line on a phone; see world-shell.css. */}
+          <h2 data-reveal style={{ '--len': Math.max(...world.headline.split(/\s+/).map((w) => w.length)) }}>
             {world.headline.split('\n').map((l) => (
               <span key={l}>{l}</span>
             ))}
@@ -89,10 +97,9 @@ export default function TransportWorld({ service, onClose, onRequest }) {
             page uses. It tells you what kind of page this is before a word of
             body copy is read. */}
         <dl className="t-manifest" data-reveal>
-          <div><dt>Origin</dt><dd>Amsterdam hub</dd></div>
-          <div><dt>Service</dt><dd>Scheduled and on demand</dd></div>
-          <div><dt>Reach</dt><dd>Five capitals</dd></div>
-          <div><dt>Proof</dt><dd>Signed and timestamped</dd></div>
+          {ui.transport.manifest.map((m) => (
+            <div key={m.dt}><dt>{m.dt}</dt><dd>{m.dd}</dd></div>
+          ))}
         </dl>
       </header>
 
@@ -131,8 +138,8 @@ export default function TransportWorld({ service, onClose, onRequest }) {
           starts. Four steps, in dispatch language, numbered like a manifest. */}
       <section className="t-process" id="t-process">
         <div className="t-process-head">
-          <p className="world-kicker" data-reveal>How it runs</p>
-          <h3 data-reveal>From brief to proof</h3>
+          <p className="world-kicker" data-reveal>{ui.transport.processKicker}</p>
+          <h3 data-reveal>{ui.transport.processHead}</h3>
         </div>
         <ol className="t-steps">
           {world.process.map((st, i) => (
@@ -179,7 +186,7 @@ export default function TransportWorld({ service, onClose, onRequest }) {
           the board in an operations room: always moving, never demanding to be
           read. It renders sector names until real logos are dropped into
           `/public/clients/` — see `clients` in copy.js. */}
-      <section className="t-tape" aria-label="Clients">
+      <section className="t-tape" aria-label={ui.transport.clients}>
         <div className="t-tape-rail">
           {/* Two identical runs. The loop is a translate of exactly -50%, so
               the second copy is under the pointer at the instant the first
@@ -203,8 +210,8 @@ export default function TransportWorld({ service, onClose, onRequest }) {
       {/* ── What's inside, against the proof-of-delivery card ──────────── */}
       <section className="t-inside-block" id="t-included">
         <div className="t-inside-copy">
-          <p className="world-kicker" data-reveal>The services</p>
-          <h3 className="t-inside-head" data-reveal>Five things we run for you</h3>
+          <p className="world-kicker" data-reveal>{ui.transport.servicesKicker}</p>
+          <h3 className="t-inside-head" data-reveal>{ui.transport.servicesHead}</h3>
           <ol className="t-inside">
             {world.inside.map((it, i) => (
               <li key={it.k} data-reveal>
@@ -252,42 +259,40 @@ function TransportFooter({ service, onClose, onRequest }) {
 
       <div className="t-foot-cols">
         <div>
-          <h4>Services</h4>
+          <h4>{ui.transport.footServices}</h4>
           <ul>
             {transportServices.map((t) => <li key={t.id}>{t.label}</li>)}
           </ul>
         </div>
         <div>
-          <h4>Coverage</h4>
+          <h4>{ui.transport.footCoverage}</h4>
           <ul>
-            <li>The Netherlands</li>
-            <li>Belgium and Luxembourg</li>
-            <li>France and Germany</li>
+            {ui.transport.coverage.map((c) => <li key={c}>{c}</li>)}
           </ul>
         </div>
         <div>
-          <h4>Network</h4>
+          <h4>{ui.transport.footNetwork}</h4>
           <ul className="t-foot-mono">
             {service.world.map.nodes.map((n) => <li key={n.k}>{n.k}</li>)}
           </ul>
         </div>
         <div>
-          <h4>Dispatch</h4>
+          <h4>{ui.transport.footDispatch}</h4>
           <ul className="t-foot-mono">
             {/* The one cleared 24/7 wording. "Mon–Sun · 24 hours" and
                 "Exception cover · always" both promised a person on the end of
                 it, which the gate blocks until it is evidenced. */}
-            <li>Requests may be submitted 24/7</li>
+            <li>{ui.common.submitAnytime}</li>
             <li><a href={`mailto:${emailFor('transport')}`}>{emailFor('transport')}</a></li>
           </ul>
         </div>
       </div>
 
       <div className="t-foot-base">
-        <span>ORYX Dispatch, a service of ORYX GROUP</span>
+        <span>{ui.transport.footBase}</span>
         <Social />
         <button type="button" className="t-foot-back" onClick={onClose}>
-          <Icon name="back" size={16} /> All ORYX services
+          <Icon name="back" size={16} /> {ui.common.allServices}
         </button>
       </div>
     </footer>
@@ -446,7 +451,7 @@ function Load({ items }) {
   return (
     <section className="t-load" id="t-load" ref={section}>
       <div className="t-load-sticky">
-        <p className="world-kicker">What it is</p>
+        <p className="world-kicker">{ui.transport.whatItIs}</p>
 
         <div className="t-load-scene" aria-hidden="true">
           <svg viewBox="120 160 1000 250">
@@ -573,20 +578,18 @@ function NetworkMap({ map }) {
 
   if (!map) return null
 
-  const hubIndex = Math.max(0, nodes.findIndex((n) => n.s === 'Home hub'))
+  const hubIndex = Math.max(0, nodes.findIndex((n) => n.hub))
   const hub = nodes[hubIndex]
 
   return (
     <section className="t-map-block" id="t-network">
       <div className="t-map-head">
-        <p className="world-kicker" data-reveal>The network</p>
-        <p className="world-line" data-reveal>
-          One hub in Amsterdam, and regular runs to four more capitals.
-        </p>
+        <p className="world-kicker" data-reveal>{ui.transport.networkKicker}</p>
+        <p className="world-line" data-reveal>{ui.transport.networkLine}</p>
       </div>
 
       <figure className="t-map" data-reveal ref={figure}>
-        <svg viewBox="0 0 1180 340" role="img" aria-label="Route network linking Paris, Luxembourg, Brussels, Amsterdam and Berlin">
+        <svg viewBox="0 0 1180 340" role="img" aria-label={ui.transport.mapLabel}>
           <defs>
             <pattern id="t-grid" width="40" height="40" patternUnits="userSpaceOnUse">
               <path d="M40 0 H0 V40" fill="none" stroke="currentColor" strokeWidth="1" />
@@ -761,7 +764,7 @@ function Route({ stops, lede, shot }) {
   return (
     <section className="t-route" id="t-route" ref={section}>
       <div className="t-route-intro">
-        <p className="world-kicker" data-reveal>What it is</p>
+        <p className="world-kicker" data-reveal>{ui.transport.whatItIs}</p>
         <p className="world-lede" data-reveal>{lede}</p>
         {shot && (
           <figure className="t-route-shot" data-reveal>
@@ -835,8 +838,8 @@ function Pod({ shot }) {
         <path className="t-pod-sign-ink" d={SIGNATURE} pathLength="1" />
       </svg>
       <figcaption className="t-pod-stamp" aria-hidden="true">
-        <span className="t-pod-mark">Delivered</span>
-        <span className="t-pod-meta">Signed 11:20 / Proof returned</span>
+        <span className="t-pod-mark">{ui.transport.delivered}</span>
+        <span className="t-pod-meta">{ui.transport.deliveredMeta}</span>
       </figcaption>
     </figure>
   )

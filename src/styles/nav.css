@@ -108,15 +108,36 @@
 }
 .nav-cta:hover { background: var(--sand); border-color: var(--sand); color: var(--oryx-black); }
 
-@media (max-width: 760px) {
+@media (max-width: 900px) {
   /* The links go first: both of their destinations are one scroll away, and
-     the request button and the sound switch are not. */
+     the request button and the sound switch are not. From 900px, not 760px,
+     since the language switcher joined the bar and German and French labels
+     run longer: at 768px the button was pushed off the screen. */
   .nav-links { display: none; }
 }
 .nav-mark span { white-space: nowrap; }
 .nav-cta-short { display: none; }
 @media (max-width: 520px) {
-  .nav-cta { padding: 0.55rem 0.8rem; }
+  .nav-cta { padding: 0.5rem 0.65rem; }
   .nav-cta-full { display: none; }
   .nav-cta-short { display: inline; }
+  /* A phone holds the mark, the language code, the sound switch and the
+     button only if each gives a little: the chevron goes, the gaps close. */
+  .nav-right { gap: 0.45rem; }
+  .nav .lang-btn { padding: 0.5rem 0.5rem; }
+  .nav .lang-btn .icon { display: none; }
+}
+/* The narrowest phones, measured in all four languages: the Dutch short
+   button, "Aanvragen", was the longest, and at 360px it ran 8px past the
+   edge. The wordmark gives a little size, the language code drops its box. */
+@media (max-width: 400px) {
+  .nav-mark { gap: 0.5rem; }
+  .nav-mark span { font-size: 0.72rem; letter-spacing: 0.12em; margin-right: -0.12em; }
+  .nav .lang-btn { padding: 0.5rem 0.2rem; border-color: transparent; }
+  .nav-cta { padding: 0.5rem 0.55rem; }
+}
+/* Below that there is room for the mark, the language and the button, and
+   not for music too; the intro keeps its own sound switch. */
+@media (max-width: 340px) {
+  .nav-right .sound { display: none; }
 }

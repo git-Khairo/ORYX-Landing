@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { useSmoothProgress } from '../../../lib/useReveal'
 import { roles } from '../../../content/workforce'
+import { ui } from '../../../content/ui'
+import { fmt } from '../../../i18n/core'
 
 /**
  * The crew scene: one worker, then a flex pool, then a complete project crew.
@@ -95,10 +97,10 @@ const headCount = (p) => {
 }
 
 const labelFor = (n) => {
-  if (n <= 1) return 'One skilled worker'
-  if (n < 5) return 'A small team'
-  if (n < CREW.length) return 'A flex pool'
-  return 'A complete project crew'
+  if (n <= 1) return ui.crew.one
+  if (n < 5) return ui.crew.small
+  if (n < CREW.length) return ui.crew.pool
+  return ui.crew.full
 }
 
 const pad = (n) => String(n).padStart(2, '0')
@@ -151,11 +153,8 @@ export default function CrewScene() {
     >
       <div className="wc-sticky">
         <header className="wc-head">
-          <p className="world-kicker" id="w-crew-title">How a crew is built</p>
-          <p className="wc-line">
-            An illustration: one skilled worker first, then the trades around
-            them, and a foreman last.
-          </p>
+          <p className="world-kicker" id="w-crew-title">{ui.crew.kicker}</p>
+          <p className="wc-line">{ui.crew.line}</p>
         </header>
 
         {/* Hidden from assistive technology. The value depends on how far the
@@ -163,7 +162,7 @@ export default function CrewScene() {
             the sentence above and the list below carry the same information
             in a form that does not move. */}
         <div className="wc-count" aria-hidden="true">
-          <span className="wc-cap">In this drawing</span>
+          <span className="wc-cap">{ui.crew.cap}</span>
           {/* Keyed, so each change remounts the node and replays its small
               settle. A transform only: the number is never invisible. */}
           <span className="wc-n" key={shown}>{shown}</span>
@@ -201,8 +200,8 @@ export default function CrewScene() {
             {/* To the right of the decks, clear of the supervisor's head. The
                 ground needs no label. */}
             <g className="wc-detail">
-              <text className="wc-tag" x="598" y={LEVEL_2 + 4}>Level 2</text>
-              <text className="wc-tag" x="598" y={LEVEL_1 + 4}>Level 1</text>
+              <text className="wc-tag" x="598" y={LEVEL_2 + 4}>{fmt(ui.crew.level, { n: 2 })}</text>
+              <text className="wc-tag" x="598" y={LEVEL_1 + 4}>{fmt(ui.crew.level, { n: 1 })}</text>
             </g>
 
             {CREW.map((person, i) => {
@@ -236,7 +235,7 @@ export default function CrewScene() {
         </div>
 
         {/* The same twelve, as words. Real content, so it is a real list. */}
-        <ol className="wc-roles" aria-label="The roles in this example crew">
+        <ol className="wc-roles" aria-label={ui.crew.list}>
           {CREW.map((person, i) => (
             <li
               key={person.id}

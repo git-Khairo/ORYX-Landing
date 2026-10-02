@@ -3,6 +3,7 @@ import { services, pillars, brand } from '../content/copy'
 import { portal } from '../content/media'
 import Slogan from '../components/Slogan'
 import Icon from '../components/Icon'
+import { ui } from '../content/ui'
 
 /**
  * The gateway, and the group beneath it.
@@ -56,7 +57,7 @@ export default function Work({ onOpenService, warm = true }) {
   const [open, setOpen] = useState(null)
 
   return (
-    <section className="gate" id="work" aria-label="Services and purpose">
+    <section className="gate" id="work" aria-label={ui.work.label}>
       {/* Everything closes when the pointer leaves the row — unless the
           keyboard is in there, in which case closing would pull the panel out
           from under someone who is still reading it with Tab. */}
@@ -80,7 +81,7 @@ export default function Work({ onOpenService, warm = true }) {
                 onClick={() => (isOn ? onOpenService?.(s.id) : setActive(s.id))}
                 onMouseEnter={() => setActive(s.id)}
                 onFocus={() => setActive(s.id)}
-                aria-label={`${s.title}. ${s.promise} ${isOn ? "Open this service." : "Show this service."}`}
+                aria-label={`${s.title}. ${s.promise} ${isOn ? ui.work.open : ui.work.show}`}
               >
                 {/* Always playing, never a still that swaps in on hover —
                     footage that only starts on approach announces itself as a
@@ -110,11 +111,18 @@ export default function Work({ onOpenService, warm = true }) {
                 <span className="door-spine" aria-hidden="true">{s.short}</span>
 
                 <span className="door-open">
-                  <span className="door-title">{s.title}</span>
+                  {/* `--len` is the longest word in letters, which is what has to fit
+                      across the open door in whatever language this is. */}
+                  <span
+                    className="door-title"
+                    style={{ '--len': Math.max(...s.title.split(/\s+/).map((w) => w.length)) }}
+                  >
+                    {s.title}
+                  </span>
                   <span className="door-promise">{s.promise}</span>
                   <span className="door-body">{s.body}</span>
                   <span className="door-go" aria-hidden="true">
-                    Enter <i aria-hidden="true"><Icon name="arrow" size={14} /></i>
+                    {ui.work.go} <i aria-hidden="true"><Icon name="arrow" size={14} /></i>
                   </span>
                 </span>
               </button>

@@ -21,6 +21,11 @@ COPY package.json package-lock.json ./
 RUN npm ci --no-audit --no-fund
 
 COPY . .
+# The public address the language pages name as canonical and as each
+# other's alternates (scripts/build-lang-pages.mjs). Override per deployment:
+#   docker build --build-arg SITE_URL=https://example.com .
+ARG SITE_URL=https://oryx.withhumble.com
+ENV SITE_URL=$SITE_URL
 RUN npm run build
 
 # ── Stage 2: serve ────────────────────────────────────────────────────────

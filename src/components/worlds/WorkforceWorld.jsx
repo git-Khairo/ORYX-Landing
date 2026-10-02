@@ -14,6 +14,9 @@ import { SoundToggle } from '../Sound'
 import { Social } from '../../sections/Footer'
 import Sheet from '../Sheet'
 import Icon from '../Icon'
+import { ui } from '../../content/ui'
+import { fmt, plural, brochure } from '../../i18n/core'
+import LangSwitch from '../LangSwitch'
 
 /**
  * Workforce — "The Register."
@@ -63,21 +66,25 @@ export default function WorkforceWorld({ service, onClose, onRequest }) {
           <button type="button" className="w-nav-mark" onClick={onClose}>
             <i aria-hidden="true" />
             <span className="w-nav-word">ORYX</span>
-            <span className="w-nav-unit">Workforce</span>
+            <span className="w-nav-unit">{ui.workforce.unit}</span>
           </button>
 
-          <nav className="w-nav-links" aria-label="Workforce sections">
-            <a href="#w-crew">Crew</a>
-            <a href="#w-sectors">Sectors</a>
-            <a href="#w-ways">Ways to hire</a>
-            <a href="#w-method">Method</a>
-            <a href="#w-trust">Trust</a>
+          <nav className="w-nav-links" aria-label={ui.workforce.sections}>
+            <a href="#w-crew">{ui.workforce.navCrew}</a>
+            <a href="#w-sectors">{ui.workforce.navSectors}</a>
+            <a href="#w-ways">{ui.workforce.navWays}</a>
+            <a href="#w-method">{ui.workforce.navMethod}</a>
+            <a href="#w-trust">{ui.workforce.navTrust}</a>
           </nav>
 
           <div className="w-nav-r">
+            <LangSwitch />
             <SoundToggle bare />
-            <button type="button" className="w-nav-cta" onClick={() => onRequest(service.id)}>
-              {ctaFor(service.id)}
+            {/* Full label for anyone who can see or hear it; the short one only
+                on the narrowest phones, as in the home page's bar. */}
+            <button type="button" className="w-nav-cta" onClick={() => onRequest(service.id)} aria-label={ctaFor(service.id)}>
+              <span className="world-cta-full">{ctaFor(service.id)}</span>
+              <span className="world-cta-short" aria-hidden="true">{ui.nav.requestShort}</span>
             </button>
           </div>
         </div>
@@ -89,7 +96,9 @@ export default function WorkforceWorld({ service, onClose, onRequest }) {
           <p className="world-eyebrow" data-reveal>
             {service.index} / {service.title}
           </p>
-          <h2 data-reveal>
+          {/* `--len`, the longest word in letters, keeps a long German or
+              Dutch word on one line on a phone; see world-shell.css. */}
+          <h2 data-reveal style={{ '--len': Math.max(...world.headline.split(/\s+/).map((w) => w.length)) }}>
             {world.headline.split('\n').map((l) => (
               <span key={l}>{l}</span>
             ))}
@@ -149,8 +158,8 @@ export default function WorkforceWorld({ service, onClose, onRequest }) {
       <section className="w-method" id="w-method">
         <div className="w-method-head">
           <div className="w-stick">
-            <p className="world-kicker" data-reveal>Method</p>
-            <h3 data-reveal>How we fill a role</h3>
+            <p className="world-kicker" data-reveal>{ui.workforce.methodKicker}</p>
+            <h3 data-reveal>{ui.workforce.methodHead}</h3>
           </div>
         </div>
 
@@ -213,14 +222,18 @@ export default function WorkforceWorld({ service, onClose, onRequest }) {
 
    ── No scroll-linked motion ──────────────────────────────────────────
    Entrance reveal only. Nothing here slices an opacity out of `--p`. */
-const STATUS = { req: 'On request', qc: 'Qualification required' }
+const STATUS = ui.workforce.status
 const SHOWN = 6
+
+/* Search ignores case and accents: on the French and German pages half the
+   role names carry one, and "securite" or "Gerust" should still find them. */
+const fold = (s) => s.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase()
 
 function Register({ onOpenSector, popupOpen }) {
   const [q, setQ] = useState('')
   const uid = useId().replace(/:/g, '')
 
-  const query = q.trim().toLowerCase()
+  const query = fold(q.trim())
   const searching = query.length >= 2
 
   /* Built once. `where` is singular by construction: no role id appears in
@@ -233,7 +246,7 @@ function Register({ onOpenSector, popupOpen }) {
       s.groups.forEach((g) => {
         g.roles.forEach((id) => {
           const [t, d, st] = roles[id]
-          idx.push({ id, t, st, tn: t.toLowerCase(), dn: d.toLowerCase() })
+          idx.push({ id, t, st, tn: fold(t), dn: fold(d) })
           w[id] = { sid: s.id, short: s.short, gname: g.name }
         })
       })
@@ -259,8 +272,8 @@ function Register({ onOpenSector, popupOpen }) {
   useEscape(Boolean(q) && !popupOpen, () => setQ(''))
 
   const status = searching
-    ? `${hits.length} role${hits.length === 1 ? '' : 's'} matching ${q.trim()}`
-    : `${totals.sectors} sectors, ${totals.roles} roles.`
+    ? fmt(ui.workforce.matching, { n: hits.length, roles: plural(hits.length, ui.workforce.roleWord), q: q.trim() })
+    : fmt(ui.workforce.summary, { sectors: totals.sectors, roles: totals.roles })
   const [announced, setAnnounced] = useState(status)
   useEffect(() => {
     const t = setTimeout(() => setAnnounced(status), 350)
@@ -272,17 +285,15 @@ function Register({ onOpenSector, popupOpen }) {
   return (
     <section className="w-reg-wrap" id="w-sectors" aria-labelledby={`${uid}-h`} data-reveal>
       <div className="w-reg-head">
-        <p className="world-kicker">What the register covers</p>
-        <h3 id={`${uid}-h`}>Twelve sectors</h3>
-        <p className="world-line">
-          Pick your sector to see the roles we supply, or search for a job title.
-        </p>
+        <p className="world-kicker">{ui.workforce.regKicker}</p>
+        <h3 id={`${uid}-h`}>{ui.workforce.regHead}</h3>
+        <p className="world-line">{ui.workforce.regLine}</p>
       </div>
 
       <div className="w-find">
         <span className="w-find-tag" aria-hidden="true"><Icon name="search" size={16} /></span>
         <label className="sr-only" htmlFor={`${uid}-find`}>
-          Search all {totals.roles} roles
+          {fmt(ui.workforce.searchLabel, { n: totals.roles })}
         </label>
         <input
           id={`${uid}-find`}
@@ -290,21 +301,21 @@ function Register({ onOpenSector, popupOpen }) {
           type="search"
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder="Search a job title, for example forklift, welder, carpenter"
+          placeholder={ui.workforce.searchPlaceholder}
         />
         {q && (
           <button type="button" className="w-find-clear" onClick={() => setQ('')}>
-            Clear
+            {ui.workforce.clear}
           </button>
         )}
       </div>
       <p className="sr-only" role="status">{announced}</p>
 
       {searching && (
-        <div className="w-results" role="region" aria-label="Search results">
+        <div className="w-results" role="region" aria-label={ui.workforce.results}>
           {hits.length === 0 ? (
             <p className="w-reg-none">
-              Nothing matches “{q.trim()}”. Try a shorter word, or open a sector below.
+              {fmt(ui.workforce.noMatch, { q: q.trim() })}
             </p>
           ) : (
             <ul className="w-hits" role="list">
@@ -321,7 +332,7 @@ function Register({ onOpenSector, popupOpen }) {
           )}
           {hits.length > CAP && (
             <p className="w-reg-more">
-              Showing {CAP} of {hits.length}. Type a little more to narrow it down.
+              {fmt(ui.workforce.showing, { shown: CAP, total: hits.length })}
             </p>
           )}
         </div>
@@ -343,8 +354,8 @@ function Register({ onOpenSector, popupOpen }) {
                 </span>
                 <span className="card-body">
                   <span className="card-k">{s.short}</span>
-                  <span className="card-c">{count(s)} roles</span>
-                  <span className="card-go"><span>View</span><Icon name="arrow" size={14} /></span>
+                  <span className="card-c">{count(s)} {plural(count(s), ui.workforce.roleWord)}</span>
+                  <span className="card-go"><span>{ui.common.view}</span><Icon name="arrow" size={14} /></span>
                 </span>
               </button>
             </li>
@@ -373,8 +384,8 @@ function SectorSheet({ sector, mark, onClose, onRequest }) {
           {/* The link first and the button last, on purpose. The focus trap
               wraps on the last control, and Safari does not tab to links by
               default, so a link in last place let Tab walk out of the popup. */}
-          <a className="btn" href={`/brochures/workforce-${sector.id}.pdf`} download>
-            <Icon name="download" size={16} /> Download brochure
+          <a className="btn" {...brochure(`workforce-${sector.id}`)}>
+            <Icon name="download" size={16} /> {ui.common.downloadBrochure}
           </a>
           <button type="button" className="btn btn--fill" onClick={onRequest}>
             {ctaFor('workforce')} <Icon name="arrow" size={16} />
@@ -385,13 +396,13 @@ function SectorSheet({ sector, mark, onClose, onRequest }) {
       <div className="sheet-head">
         <span className="sheet-badge"><Icon name={sector.id} size={24} /></span>
         <ul className="sheet-stats" role="list">
-          <li><b>{count(sector)}</b>roles</li>
-          <li><b>{sector.groups.length}</b>groups</li>
+          <li><b>{count(sector)}</b>{plural(count(sector), ui.workforce.roleWord)}</li>
+          <li><b>{sector.groups.length}</b>{plural(sector.groups.length, ui.workforce.groupWord)}</li>
         </ul>
       </div>
       <p className="sheet-lede">{sector.blurb}</p>
 
-      <h4 className="sheet-h">Roles we supply</h4>
+      <h4 className="sheet-h">{ui.workforce.rolesWeSupply}</h4>
       <ul className="sheet-groups" role="list">
         {sector.groups.map((g) => {
           /* A role reached from search is always among the ones shown. */
@@ -406,7 +417,7 @@ function SectorSheet({ sector, mark, onClose, onRequest }) {
                 {ids.slice(0, SHOWN).map((id) => (
                   <li key={id} className={id === mark ? 'is-hit' : ''}>{roles[id][0]}</li>
                 ))}
-                {more > 0 && <li className="is-more">and {more} more</li>}
+                {more > 0 && <li className="is-more">{fmt(ui.workforce.andMore, { n: more })}</li>}
               </ul>
             </li>
           )
@@ -414,8 +425,8 @@ function SectorSheet({ sector, mark, onClose, onRequest }) {
       </ul>
 
       <p className="sheet-note">
-        The brochure lists every role in this sector with a line on what it covers.
-        {flagged && ` Some roles are marked "${STATUS.req}" or "${STATUS.qc}" there. Those are confirmed for each assignment.`}
+        {ui.workforce.brochureNote}
+        {flagged && ` ${fmt(ui.workforce.brochureFlagged, STATUS)}`}
       </p>
     </Sheet>
   )
@@ -433,7 +444,7 @@ function SectorBand({ onOpen }) {
     icon: sec.id,
     img: cardImage(`workforce/${sec.id}`),
   }))
-  return <PhotoBand items={items} onOpen={onOpen} label="The twelve sectors in pictures" />
+  return <PhotoBand items={items} onOpen={onOpen} label={ui.workforce.band} />
 }
 
 /* ═══ Four ways to hire ══════════════════════════════════════════════
@@ -445,10 +456,10 @@ function SectorBand({ onOpen }) {
    Plain situations only. Nothing here says how fast ORYX responds or that
    anyone is standing by, which the claims rules forbid. */
 const SITUATIONS = [
-  { n: '01', say: 'Two people are off sick this week.', img: 'cleaning' },
-  { n: '02', say: 'A nine-month project needs a fitter.', img: 'technical' },
-  { n: '03', say: 'We want to hire someone, not borrow them.', img: 'manufacturing' },
-  { n: '04', say: 'A whole crew for a new site.', img: 'property' },
+  { n: '01', say: ui.workforce.situations[0], img: 'cleaning' },
+  { n: '02', say: ui.workforce.situations[1], img: 'technical' },
+  { n: '03', say: ui.workforce.situations[2], img: 'manufacturing' },
+  { n: '04', say: ui.workforce.situations[3], img: 'property' },
 ]
 
 function Situations({ onRequest }) {
@@ -456,12 +467,9 @@ function Situations({ onRequest }) {
   return (
     <section className="w-ways" id="w-ways">
       <div className="w-ways-head">
-        <p className="world-kicker" data-reveal>Four ways to hire</p>
-        <h3 data-reveal>Which one sounds like your week?</h3>
-        <p className="world-line" data-reveal>
-          Any role in the register can be supplied in any of these four ways.
-          The job stays the same, and only the way you hire changes.
-        </p>
+        <p className="world-kicker" data-reveal>{ui.workforce.waysKicker}</p>
+        <h3 data-reveal>{ui.workforce.waysHead}</h3>
+        <p className="world-line" data-reveal>{ui.workforce.waysLine}</p>
       </div>
 
       <ul className="w-ways-grid" role="list">
@@ -475,7 +483,7 @@ function Situations({ onRequest }) {
               <button
                 type="button"
                 className="w-way"
-                onClick={() => onRequest('workforce', '', `How: ${t.line.k}`)}
+                onClick={() => onRequest('workforce', '', fmt(ui.workforce.howNote, { way: t.line.k }))}
               >
                 <span className="w-way-img">
                   {img && <img src={img.src} alt="" loading="lazy" />}
@@ -485,7 +493,7 @@ function Situations({ onRequest }) {
                   <span className="w-way-say">{t.say}</span>
                   <span className="w-way-k">{t.line.k}</span>
                   <span className="w-way-d">{t.line.d}</span>
-                  <span className="w-way-go">{ctaFor('workforce')} this way<Icon name="arrow" size={14} /></span>
+                  <span className="w-way-go">{ui.workforce.wayGo}<Icon name="arrow" size={14} /></span>
                 </span>
               </button>
             </li>
@@ -623,8 +631,8 @@ function Holds({ holds }) {
         <path className="w-doc-rule" d="M80 36h52M80 50h40M80 64h58M32 96h118M32 110h96M32 124h108" />
         <g className="w-doc-stamp">
           <rect x="76" y="84" width="140" height="42" />
-          <text x="146" y="101" textAnchor="middle">CHECKED FOR</text>
-          <text x="146" y="117" textAnchor="middle">THIS ASSIGNMENT</text>
+          <text x="146" y="101" textAnchor="middle">{ui.workforce.stamp[0]}</text>
+          <text x="146" y="117" textAnchor="middle">{ui.workforce.stamp[1]}</text>
         </g>
       </svg>
     </div>
@@ -663,19 +671,19 @@ function WorkforceFooter({ service, onClose, onRequest }) {
               changes — which is precisely how two sectors that had been removed
               everywhere else survived down here last time. */}
           <div>
-            <h4>Sectors</h4>
+            <h4>{ui.workforce.footSectors}</h4>
             <ul role="list">
               {sectors.map((s) => <li key={s.id}>{s.short}</li>)}
             </ul>
           </div>
           <div>
-            <h4>Service lines</h4>
+            <h4>{ui.workforce.footLines}</h4>
             <ul role="list">
               {serviceLines.map((l) => <li key={l.n}>{l.k}</li>)}
             </ul>
           </div>
           <div>
-            <h4>Talk to us</h4>
+            <h4>{ui.workforce.footTalk}</h4>
             {/* No opening hours. "Desk open Mon–Fri · 08:00–18:00" was invented
                 — the source names no hours anywhere — and any hours here read
                 as a response-time promise, which is the blocked claim. */}
@@ -688,10 +696,10 @@ function WorkforceFooter({ service, onClose, onRequest }) {
       </div>
 
       <div className="w-foot-base">
-        <span>© {year} ORYX Workforce, a service of ORYX GROUP</span>
+        <span>© {year} {ui.workforce.footBase}</span>
         <Social />
         <button type="button" className="w-foot-back" onClick={onClose}>
-          All ORYX services
+          {ui.common.allServices}
         </button>
       </div>
     </footer>

@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useRef, useState } from 'react'
 import { usePrefersReduced } from '../lib/usePrefersReduced'
+import { ui } from '../content/ui'
 
 /** Where to put the file: `public/audio/theme.mp3`. Anything under `public/`
     is served from the site root, so that path is what the browser asks for.
@@ -162,7 +163,7 @@ export function SoundToggle({ className = '', bare = false }) {
       className={`sound ${on ? 'is-on' : ''} ${bare ? 'sound--bare' : ''} ${className}`}
       onClick={toggle}
       aria-pressed={on}
-      aria-label={on ? 'Turn background music off' : 'Turn background music on'}
+      aria-label={on ? ui.sound.turnOff : ui.sound.turnOn}
     >
       <span className="sound-eq" aria-hidden="true">
         <i style={{ '--i': 0 }} />
@@ -170,7 +171,7 @@ export function SoundToggle({ className = '', bare = false }) {
         <i style={{ '--i': 2 }} />
         <i style={{ '--i': 3 }} />
       </span>
-      {!bare && <span className="sound-l">{on ? 'Sound on' : 'Sound off'}</span>}
+      {!bare && <span className="sound-l">{on ? ui.sound.on : ui.sound.off}</span>}
     </button>
   )
 }

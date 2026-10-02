@@ -13,6 +13,17 @@ import '@fontsource-variable/montserrat'
 
 import './styles/tokens.css'
 import './styles/global.css'
-import App from './App.jsx'
+import { boot } from './i18n/boot'
+import { setLanguage, DEFAULT_LANG } from './i18n/core'
 
-ReactDOM.createRoot(document.getElementById('root')).render(<App />)
+/* The language first, then the app. Every content module reads the language
+   as it is evaluated, so App, and everything it imports, is loaded only once
+   the chosen language's text is in place. */
+/* If choosing the language fails for any reason, the site still renders, in
+   English: a page in the wrong language beats no page. */
+boot()
+  .catch(() => setLanguage(DEFAULT_LANG, null))
+  .then(() => import('./App.jsx'))
+  .then(({ default: App }) => {
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />)
+  })

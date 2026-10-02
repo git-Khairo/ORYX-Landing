@@ -112,17 +112,33 @@
 
 /* The status chip is the first thing to give way: with the labels set in
    Montserrat, which is wider than the condensed face this bar was drawn for,
-   the button ran off the right edge at 1024px while the chip was still in. */
-@media (max-width: 1180px) {
+   the button ran off the right edge at 1024px while the chip was still in.
+   Since the language switcher joined the bar it goes below 1280px, not 1180:
+   at 1200px the English button sat 44px into the margin. Dutch and French
+   run longest here, the chip ("Van begin tot eind gevolgd") and the links
+   both, and at 1280px they pushed the button 46px and 30px over, so in those
+   two it goes a step earlier. */
+@media (max-width: 1279px) {
   .t-nav-status { display: none; }
+}
+@media (max-width: 1360px) {
+  .t-nav-status:lang(nl),
+  .t-nav-status:lang(fr) { display: none; }
 }
 /* Same squeeze as Workforce: at 360px the mark, the switch and the button are
    wider than the bar. The unit label gives way. */
 @media (max-width: 480px) {
   .t-nav-unit { display: none; }
 }
-@media (max-width: 880px) {
+/* The section links go below 1020px, not 880: with the language switcher in
+   the bar, measured at 881px the button ran 81px off the edge in English, and
+   every language needs about 1000px to hold links, switcher and button. French
+   needs 1030, so in French they go a step earlier. */
+@media (max-width: 1020px) {
   .t-nav-links { display: none; }
+}
+@media (max-width: 1080px) {
+  .t-nav-links:lang(fr) { display: none; }
 }
 
 /* ── Its own footer ───────────────────────────────────────────────────
@@ -212,6 +228,9 @@
 }
 .t-foot-cols li { font-size: var(--step--1); color: var(--text-2); padding: 0.22rem 0; }
 .t-foot-mono li { font-family: var(--font-mono); font-size: var(--step--2); letter-spacing: 0.02em; }
+/* An address is one long word: on a 320px phone the footer column is 125px
+   and the dispatch inbox is 145. It breaks where it has to rather than spill. */
+.t-foot-mono a { overflow-wrap: anywhere; }
 
 .t-foot-base {
   max-width: var(--maxw);
@@ -1264,8 +1283,11 @@
     margin-top: 1.4rem;
     z-index: 1;
   }
+  /* `minmax(0, 1fr)`, not `1fr`: a plain `1fr` track grows to its widest
+     word, and at 320px the timetable's stop names pushed the whole section,
+     picture included, 20px past the screen in English and 34px in German. */
   .t-route,
-  .t-inside-block { grid-template-columns: 1fr; }
+  .t-inside-block { grid-template-columns: minmax(0, 1fr); }
   /* `.t-pod` stays `relative`. It was made static here too, which let its
      absolutely positioned stamp escape to the scroll container and sit at
      "bottom: 12%" of the *screen* — a DELIVERED stamp riding down the whole
@@ -1274,4 +1296,20 @@
   .t-route-intro { position: static; }
   .t-figs { grid-template-columns: 1fr; }
   .t-stops { --paddingLeft: 3.4rem; --rail: 1.8rem; }
+}
+
+/* The narrowest phones. A stop's time goes above its name, which gives the
+   name the full width beside the rail: "Abweichung" and "Afgeleverd" are a
+   letter longer than "Delivered" and did not fit beside the time. And the
+   step titles step down a size, since the two columns are 130px each and
+   "Nachweis" is wider than that at full size. */
+@media (max-width: 420px) {
+  .t-stop { grid-template-columns: minmax(0, 1fr); }
+  .t-stop-t { justify-self: start; }
+  .t-step-k { font-size: var(--step-1); }
+}
+/* And on the very narrowest the four steps stack: the French "Exécution" is
+   still 2px wider than a 320px phone's half column. */
+@media (max-width: 340px) {
+  .t-steps { grid-template-columns: minmax(0, 1fr); }
 }

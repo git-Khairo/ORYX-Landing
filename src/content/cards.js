@@ -12,7 +12,9 @@
  *
  * Plain data with no imports, so the brochure script can read it in Node.
  */
-export const cardStills = {
+import { localize } from '../i18n/core.js'
+
+export const cardStills = localize('cards.cardStills', {
   /* ── Workforce ─ */
   'workforce/cleaning': {
     src: 'https://images.pexels.com/photos/34194579/pexels-photo-34194579.jpeg',
@@ -99,4 +101,4 @@ export const cardStills = {
     src: 'https://images.pexels.com/photos/8961298/pexels-photo-8961298.jpeg',
     alt: 'A woman in a checked shirt and work trousers holds large paper drawings and explains them to a man in a dusty black T-shirt who holds the other edge, inside a timber-walled building under renovation with a stone stove, a site vacuum, cables and a bare hanging light bulb behind them.',
   },
-}
+})

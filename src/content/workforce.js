@@ -76,17 +76,19 @@
    Four lines, quoted from the source. Every role above can be supplied
    through any of them; the choice is commercial and contractual, never
    occupational. */
-export const serviceLines = [
+import { localize } from '../i18n/core.js'
+
+export const serviceLines = localize('workforce.serviceLines', [
   { n: '01', k: 'Temporary staffing',        fit: 'Peaks, absence, flexible shifts and short-term deployment.', d: 'Flexible capacity aligned with the assignment and schedule.' },
   { n: '02', k: 'Secondment',                fit: 'Longer assignments, projects and continuity.',               d: 'Skilled people for an agreed period and scope.' },
   { n: '03', k: 'Recruitment & selection',   fit: 'The candidate joins the employer directly.',                 d: 'Targeted recruitment for a sustainable permanent match.' },
   { n: '04', k: 'Project teams & flex pools', fit: 'Multiple roles, sites, shifts or recurring demand.',        d: 'A scalable deployment structure with planning and quality control.' },
-]
+])
 
 /* ── The register ────────────────────────────────────────────────────
    id: [title, description, status?] — tuples rather than objects because
    there are 307 of them and the shape never varies. */
-export const roles = {
+export const roles = localize('workforce.roles', {
   'cleaning-operative': ['Cleaning operative', 'Routine site cleaning, washrooms, workplaces and communal areas.'],
   'mobile-cleaner-relief-worker': ['Mobile cleaner / relief worker', 'Multiple sites, open shifts and temporary cover.'],
   'housekeeping-operative': ['Housekeeping operative', 'Hotel rooms, holiday accommodation, public areas and changeover days.'],
@@ -394,14 +396,14 @@ export const roles = {
   'contact-centre-workforce-planner': ['Contact Centre Workforce Planner', 'Workforce management and capacity planning for contact centre operations.', 'req'],
   'customer-contact-quality-coach': ['Customer Contact Quality Coach', 'Quality coaching on conversation standards and customer contact performance.', 'req'],
   'sales-coach': ['Sales Coach', 'Sales training and performance coaching for commercial teams.', 'req'],
-}
+})
 
 /* ── Axis one: the industry the work sits in ─────────────────────────
    `short` is the rail label; `name` is the full source name, used in the
    panel where there is room for it. The longest full name runs to 48
    characters and wraps to four lines in a 200px rail, which is why the two
    are separate fields rather than one truncated at render time. */
-export const sectors = [
+export const sectors = localize('workforce.sectors', [
   {
     id: 'cleaning',
     no: '01',
@@ -916,14 +918,14 @@ export const sectors = [
       },
     ],
   },
-]
+])
 
 /* Totals, computed rather than typed, so they cannot drift from the data
    above the way a hand-written figure would. Used by the page to state the
    size of the catalogue honestly — as coverage, never as availability. */
-export const totals = {
+export const totals = localize('workforce.totals', {
   sectors: sectors.length,
   groups: sectors.reduce((n, s) => n + s.groups.length, 0),
   roles: Object.keys(roles).length,
   tags: sectors.reduce((n, s) => n + s.groups.reduce((m, g) => m + g.roles.length, 0), 0),
-}
+})

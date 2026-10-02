@@ -25,6 +25,26 @@ body {
   overflow-x: clip;
 }
 
+/* Dutch and German build long compounds ("Zustellnachweis", "Personeels-
+   planning") and French runs long too. Words of ten letters or more break at
+   a syllable, with a hyphen, rather than running out of a narrow panel or a
+   phone's width. The page's `lang` is set from its address, which is what
+   tells the browser which dictionary to use. */
+body:lang(nl),
+body:lang(de),
+body:lang(fr) {
+  -webkit-hyphens: auto;
+  hyphens: auto;
+  hyphenate-limit-chars: 10 4 4;
+}
+/* Balanced titles take a hyphen just to even out their lines, even where the
+   word fitted whole. The service pages' opening headlines are sized to their
+   longest word and turn hyphens off (world-shell.css). Card titles, 114px
+   wide on a 320px phone where "Infrastruktur" and "Leerstandsinstandsetzung"
+   have to break, keep the hyphen and give up the balancing instead, which
+   was what put one in "energe- / tische" with room to spare. */
+body:is(:lang(nl), :lang(de), :lang(fr)) .card-k { text-wrap: wrap; }
+
 img,
 svg,
 video {

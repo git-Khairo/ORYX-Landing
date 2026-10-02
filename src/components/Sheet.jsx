@@ -2,6 +2,7 @@ import { useEffect, useId, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { useEscape, useFocusTrap } from '../lib/useOverlay'
 import Icon from './Icon'
+import { ui } from '../content/ui'
 
 /**
  * The detail popup.
@@ -42,7 +43,7 @@ export default function Sheet({ tone, label, image, onClose, children, actions }
     >
       <div className="sheet-back" onClick={onClose} aria-hidden="true" />
       <div className="sheet-card">
-        <button type="button" className="sheet-close" onClick={onClose} aria-label="Close">
+        <button type="button" className="sheet-close" onClick={onClose} aria-label={ui.common.close}>
           <Icon name="close" size={18} />
         </button>
 

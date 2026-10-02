@@ -3,9 +3,14 @@
  *
  *     npm run brochures
  *
- * Twelve for the Workforce sectors and nine for the Renovation services, all
- * written to `public/brochures/`, which is where the "Download brochure"
- * buttons point.
+ * Twelve for the Workforce sectors and nine for the Renovation services, in
+ * each of the site's four languages: English in `public/brochures/`, the
+ * others in `public/brochures/<lang>/`, which is where each language's
+ * "Download brochure" buttons point.
+ *
+ *     npm run brochures                 all four languages
+ *     npm run brochures -- --lang=de    German only
+ *     npm run brochures -- cleaning     every language, one brochure
  *
  * ── Why the brochures are generated and not designed by hand ──────────
  * Everything in them already exists as data: the sector, its groups, every
@@ -29,20 +34,59 @@
  * there, and otherwise the stand-in still from `content/cards.js`. Re-run the
  * script after adding pictures so the brochures pick them up.
  */
-import { execFileSync, spawn } from 'node:child_process'
-import { existsSync, mkdirSync, writeFileSync, rmSync, readdirSync, statSync } from 'node:fs'
+import { execFileSync, spawn, spawnSync } from 'node:child_process'
+import { existsSync, mkdirSync, writeFileSync, rmSync, readdirSync, statSync, readFileSync } from 'node:fs'
 import { pathToFileURL, fileURLToPath } from 'node:url'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
 
-import { brand } from '../src/content/copy.js'
-import { sectors, roles, serviceLines } from '../src/content/workforce.js'
-import { services } from '../src/content/renovation.js'
-import { requestServices } from '../src/content/requests.js'
-import { cardStills } from '../src/content/cards.js'
+import { LANGS, DEFAULT_LANG, setLanguage, fmt, plural } from '../src/i18n/core.js'
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
-const OUT = path.join(ROOT, 'public/brochures')
+const SELF = fileURLToPath(import.meta.url)
+
+/* ── One process per language ────────────────────────────────────────
+   The content modules translate themselves once, when they are first
+   imported, so a language has to be set before that and cannot be changed
+   after. Without `--lang` this run is only a conductor: it starts one run of
+   this same script per language, in turn, sharing a folder of downloaded
+   cover pictures so each is fetched once. */
+const arg = process.argv.slice(2)
+const langArg = arg.find((a) => a.startsWith('--lang='))?.slice(7)
+const only = arg.find((a) => !a.startsWith('--'))
+
+if (!langArg) {
+  const shared = path.join(tmpdir(), `oryx-brochures-${process.pid}`)
+  mkdirSync(shared, { recursive: true })
+  let failed = 0
+  for (const l of LANGS) {
+    console.log(`\n${l.toUpperCase()}`)
+    const r = spawnSync(process.execPath, [SELF, `--lang=${l}`, ...(only ? [only] : [])], {
+      stdio: 'inherit', env: { ...process.env, BROCHURE_PICTURES: shared },
+    })
+    if (r.status !== 0) failed += 1
+  }
+  /* Kept HTML points at these pictures, so they stay with it. */
+  if (!process.env.BROCHURE_KEEP_HTML) rmSync(shared, { recursive: true, force: true })
+  process.exit(failed ? 1 : 0)
+}
+
+if (!LANGS.includes(langArg)) {
+  console.error(`--lang must be one of ${LANGS.join(', ')}`)
+  process.exit(1)
+}
+const LANG = langArg
+setLanguage(LANG, LANG === DEFAULT_LANG ? null : JSON.parse(readFileSync(path.join(ROOT, `src/i18n/locales/${LANG}.json`), 'utf8')))
+
+const { brand } = await import('../src/content/copy.js')
+const { sectors, roles, serviceLines } = await import('../src/content/workforce.js')
+const { services } = await import('../src/content/renovation.js')
+const { requestServices } = await import('../src/content/requests.js')
+const { cardStills } = await import('../src/content/cards.js')
+const { ui } = await import('../src/content/ui.js')
+const T = ui.brochure
+
+const OUT = path.join(ROOT, 'public/brochures', LANG === DEFAULT_LANG ? '' : LANG)
 const CHROME =
   process.env.CHROME_PATH ||
   ['/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
@@ -72,6 +116,8 @@ const picture = async (key, workdir) => {
     const f = path.join(ROOT, 'src/assets/cards', `${key}.${ext}`)
     if (existsSync(f)) { src = f; break }
   }
+  const out = path.join(workdir, `${key.replace('/', '-')}.jpg`)
+  if (existsSync(out)) return pathToFileURL(out).href
   const raw = path.join(workdir, `${key.replace('/', '-')}-raw`)
   if (!src) {
     const still = cardStills[key]
@@ -85,7 +131,6 @@ const picture = async (key, workdir) => {
       return null
     }
   }
-  const out = path.join(workdir, `${key.replace('/', '-')}.jpg`)
   try {
     execFileSync('sips', ['-s', 'format', 'jpeg', '-s', 'formatOptions', '62', '-Z', '1400', src, '--out', out], { stdio: 'pipe' })
     return pathToFileURL(out).href
@@ -120,8 +165,13 @@ const THEME = {
   renovation: { displayWeight: 400 },
 }
 
-const page = ({ theme, unit, no, title, lede, stats, img, body, email, cta }) => `<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><title>${esc(title)} | ${esc(brand.full)}</title>
+/* The cover title steps down for a long word, the way the door titles on the
+   site do: German compounds run to twenty letters and more, and at the full
+   30pt a word that long would run off the page. */
+const longest = (s) => Math.max(...String(s).split(/\s+/).map((w) => w.length))
+
+const page = ({ theme, unit, no, title, lede, stats, img, body, email, cta, team }) => `<!doctype html>
+<html lang="${LANG}"><head><meta charset="utf-8"><title>${esc(title)} | ${esc(brand.full)}</title>
 <style>
 ${FACES}
 /* Every page bleeds to the edge, because the paper colour is part of the
@@ -133,6 +183,9 @@ ${FACES}
 html { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: #f4f1e8; }
 body { font-family: ${BODY}; font-size: 9.6pt; line-height: 1.5; color: #1c1c1a; background: #f4f1e8; }
 b { font-weight: inherit; }
+/* Dutch, French and German words run long for a 42mm column. English is
+   set as it always was, unbroken. */
+${LANG === DEFAULT_LANG ? '' : 'p, h2 { hyphens: auto; -webkit-hyphens: auto; hyphenate-limit-chars: 10 4 4; }'}
 
 .cover { position: relative; height: 297mm; padding: 16mm; display: flex; flex-direction: column; justify-content: space-between; background: #131311; color: #f4f1e8; overflow: hidden; page-break-after: always; }
 .cover-img { position: absolute; inset: 0; }
@@ -149,7 +202,7 @@ b { font-weight: inherit; }
 .unit { font-size: 8pt; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: #d4b98d; }
 .cover-main { display: grid; gap: 6mm; }
 .cover-no { font-size: 9pt; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; color: #d4b98d; }
-h1 { font-family: ${DISPLAY}; font-weight: ${THEME[theme].displayWeight}; font-size: 30pt; line-height: 1.1; letter-spacing: 0.06em; text-transform: uppercase; max-width: 160mm; }
+h1 { font-family: ${DISPLAY}; font-weight: ${THEME[theme].displayWeight}; font-size: min(30pt, calc(160mm / (var(--len) * 0.86))); line-height: 1.1; letter-spacing: 0.06em; text-transform: uppercase; max-width: 160mm; }
 .lede { font-size: 12.5pt; line-height: 1.5; font-weight: 300; color: #ece6d6; max-width: 140mm; }
 .stats { display: flex; gap: 0; margin-top: 2mm; border: 0.3mm solid rgba(200,169,120,0.45); width: fit-content; }
 .stats div { padding: 3.5mm 7mm; border-right: 0.3mm solid rgba(200,169,120,0.45); }
@@ -192,7 +245,7 @@ h2 span { font-family: ${BODY}; font-weight: 500; font-size: 8pt; letter-spacing
   <div class="brandbar"><span class="lock"><i></i>${esc(brand.full)}</span><span class="unit">${esc(unit)}</span></div>
   <div class="cover-main">
     <p class="cover-no">${esc(no)}</p>
-    <h1>${esc(title)}</h1>
+    <h1 style="--len:${longest(title)}">${esc(title)}</h1>
     <p class="lede">${esc(lede)}</p>
     <dl class="stats">${stats.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl>
   </div>
@@ -201,17 +254,15 @@ h2 span { font-family: ${BODY}; font-weight: 500; font-size: 8pt; letter-spacing
 <section class="inner">
 ${body}
   <div class="contact">
-    <div><p class="contact-k">${esc(cta)}</p><p class="contact-d">Tell us what you need and the ${esc(unit)} team will contact you to agree the details.</p></div>
-    <p class="contact-m"><small>Write to</small>${esc(email)}</p>
+    <div><p class="contact-k">${esc(cta)}</p><p class="contact-d">${esc(fmt(T.contact, { team }))}</p></div>
+    <p class="contact-m"><small>${esc(T.writeTo)}</small>${esc(email)}</p>
   </div>
 </section>
 </body></html>`
 
-const STATUS = { req: 'On request', qc: 'Qualification required' }
-const COND = {
-  project: ['Project basis', 'Confirmed for each project after property, risk, partner and qualification checks.'],
-  qualified: ['Qualified specialist', 'Carried out or supervised by a qualified specialist where required.'],
-}
+const STATUS = ui.workforce.status
+const COND = Object.fromEntries(Object.entries(ui.renovation.conds).map(([c, { k, d }]) => [c, [k, d]]))
+const two = (n) => String(n).padStart(2, '0')
 
 const jobs = []
 
@@ -219,26 +270,26 @@ const wf = requestServices.find((s) => s.id === 'workforce')
 sectors.forEach((s, i) => {
   const flagged = s.groups.some((g) => g.roles.some((id) => roles[id][2]))
   const body = `
-  <p class="kick">Roles we supply</p>
+  <p class="kick">${esc(ui.workforce.rolesWeSupply)}</p>
   ${s.groups.map((g) => `
   <div class="grp">
-    <h2>${esc(g.name)}<span>${g.roles.length} roles</span></h2>
+    <h2>${esc(g.name)}<span>${g.roles.length} ${esc(plural(g.roles.length, ui.workforce.roleWord))}</span></h2>
     ${g.intro ? `<p class="intro">${esc(g.intro)}</p>` : ''}
     <div class="rows">${g.roles.map((id) => {
       const [t, d, st] = roles[id]
-      return `<div class="row"><p class="row-t">${esc(t)}${st ? `<br><span class="tag">${STATUS[st]}</span>` : ''}</p><p class="row-d">${esc(d)}</p></div>`
+      return `<div class="row"><p class="row-t">${esc(t)}${st ? `<br><span class="tag">${esc(STATUS[st])}</span>` : ''}</p><p class="row-d">${esc(d)}</p></div>`
     }).join('')}</div>
   </div>`).join('')}
-  ${flagged ? `<p class="note"><b>${STATUS.req}</b> means the role is supplied subject to confirmation. <b>${STATUS.qc}</b> means the role calls for a certificate, and a certificate does not automatically grant authority.</p>` : ''}
-  <p class="kick">Four ways to work with us</p>
+  ${flagged ? `<p class="note">${fmt(esc(T.flagged), { req: `<b>${esc(STATUS.req)}</b>`, qc: `<b>${esc(STATUS.qc)}</b>` })}</p>` : ''}
+  <p class="kick">${esc(T.waysHead)}</p>
   <div class="ways">${serviceLines.map((l) => `<div class="way"><p class="way-n">${l.n}</p><p class="way-k">${esc(l.k)}</p><p class="way-d">${esc(l.d)}</p><p class="way-f">${esc(l.fit)}</p></div>`).join('')}</div>`
   jobs.push({
     file: `workforce-${s.id}.pdf`,
     html: (img) => page({
       img,
-      theme: 'workforce', unit: 'Workforce', no: `Sector ${String(i + 1).padStart(2, '0')} of ${sectors.length}`,
+      theme: 'workforce', unit: wf.label, team: wf.label, no: fmt(T.sector, { n: two(i + 1), total: sectors.length }),
       title: s.name, lede: s.blurb,
-      stats: [['Roles', count(s)], ['Groups', s.groups.length], ['Ways to hire', serviceLines.length]],
+      stats: [[T.statRoles, count(s)], [T.statGroups, s.groups.length], [T.statWays, serviceLines.length]],
       body, email: wf.email, cta: wf.cta,
     }),
     key: `workforce/${s.id}`,
@@ -249,20 +300,20 @@ const rn = requestServices.find((s) => s.id === 'renovation')
 services.forEach((s) => {
   const used = [...new Set(s.works.map((w) => w.s || s.cond).filter(Boolean))]
   const body = `
-  <p class="kick">What it covers</p>
+  <p class="kick">${esc(ui.renovation.covers)}</p>
   <div class="rows">${s.works.map((w) => {
     const c = w.s || s.cond
-    return `<div class="row"><p class="row-t">${esc(w.t)}${c ? `<br><span class="tag">${COND[c][0]}</span>` : ''}</p><p class="row-d">${esc(w.d)}</p></div>`
+    return `<div class="row"><p class="row-t">${esc(w.t)}${c ? `<br><span class="tag">${esc(COND[c][0])}</span>` : ''}</p><p class="row-d">${esc(w.d)}</p></div>`
   }).join('')}</div>
-  ${used.map((c) => `<p class="note"><b>${COND[c][0]}.</b> ${COND[c][1]}</p>`).join('')}
+  ${used.map((c) => `<p class="note"><b>${esc(COND[c][0])}.</b> ${esc(COND[c][1])}</p>`).join('')}
   ${s.note ? `<p class="note">${esc(s.note)}</p>` : ''}`
   jobs.push({
     file: `renovation-${s.id}.pdf`,
     html: (img) => page({
       img,
-      theme: 'renovation', unit: 'Renovation', no: `Service ${s.no} of ${String(services.length).padStart(2, '0')}`,
+      theme: 'renovation', unit: rn.label, team: rn.label, no: fmt(T.service, { n: s.no, total: two(services.length) }),
       title: s.name, lede: s.sub,
-      stats: [['Works', s.works.length], ['Service', s.no]],
+      stats: [[T.statWorks, s.works.length], [T.statService, s.no]],
       body, email: rn.email, cta: rn.cta,
     }),
     key: `renovation/${s.id}`,
@@ -270,8 +321,9 @@ services.forEach((s) => {
 })
 
 mkdirSync(OUT, { recursive: true })
-const tmp = path.join(tmpdir(), `oryx-brochures-${process.pid}`)
+const tmp = path.join(tmpdir(), `oryx-brochures-${LANG}-${process.pid}`)
 mkdirSync(tmp, { recursive: true })
+const pictures = process.env.BROCHURE_PICTURES || tmp
 
 /* Headless Chrome writes the PDF and then does not exit, so waiting for the
    process means waiting for a timeout: ninety seconds a brochure, half an hour
@@ -302,12 +354,11 @@ const print = async (html, target) => {
   return existsSync(target) && statSync(target).size > 2000
 }
 
-const only = process.argv[2]
 let made = 0
 for (const job of jobs) {
   if (only && !job.file.includes(only)) continue
   const html = path.join(tmp, job.file.replace(/\.pdf$/, '.html'))
-  writeFileSync(html, job.html(await picture(job.key, tmp)))
+  writeFileSync(html, job.html(await picture(job.key, pictures)))
   const target = path.join(OUT, job.file)
   if (await print(html, target)) {
     made += 1
@@ -316,9 +367,10 @@ for (const job of jobs) {
     console.error(`  ✗ ${job.file}`)
   }
 }
-rmSync(tmp, { recursive: true, force: true })
+if (!process.env.BROCHURE_KEEP_HTML) rmSync(tmp, { recursive: true, force: true })
+else console.log(`  HTML kept in ${tmp}`)
 
 const stale = readdirSync(OUT).filter((f) => f.endsWith('.pdf') && !jobs.some((j) => j.file === f))
 if (stale.length) console.log(`\n⚠ No longer generated, safe to delete: ${stale.join(', ')}`)
-console.log(`\n${made} brochure${made === 1 ? '' : 's'} written to public/brochures/`)
+console.log(`${made} brochure${made === 1 ? '' : 's'} written to ${path.relative(ROOT, OUT)}/`)
 process.exit(made ? 0 : 1)

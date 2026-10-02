@@ -1,5 +1,7 @@
 import { brand } from '../content/copy'
 import { SoundToggle } from './Sound'
+import { ui } from '../content/ui'
+import LangSwitch from './LangSwitch'
 
 /**
  * A bar, not a pill.
@@ -26,17 +28,18 @@ export default function Nav({ onRequest }) {
           sound switch lives here now instead of floating in a corner, and the
           request button is the one call to action the bar carries. */}
       <div className="nav-right">
-        <nav className="nav-links" aria-label="Primary">
-          <a href="#work">Services</a>
+        <nav className="nav-links" aria-label={ui.nav.primary}>
+          <a href="#work">{ui.nav.services}</a>
           <span aria-hidden="true">/</span>
-          <a href="#contact">Contact</a>
+          <a href="#contact">{ui.nav.contact}</a>
         </nav>
+        <LangSwitch />
         <SoundToggle />
         {/* The full label for anyone who can see it or hear it; the short one
             only where a phone would otherwise wrap the wordmark. */}
-        <button type="button" className="nav-cta" onClick={onRequest} aria-label="Request a service">
-          <span className="nav-cta-full">Request a service</span>
-          <span className="nav-cta-short" aria-hidden="true">Request</span>
+        <button type="button" className="nav-cta" onClick={onRequest} aria-label={ui.nav.request}>
+          <span className="nav-cta-full">{ui.nav.request}</span>
+          <span className="nav-cta-short" aria-hidden="true">{ui.nav.requestShort}</span>
         </button>
       </div>
     </header>

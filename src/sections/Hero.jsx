@@ -9,6 +9,7 @@ import { acts, brand } from '../content/copy'
 import { promo } from '../content/media'
 import { usePrefersReduced } from '../lib/usePrefersReduced'
 import { useScrollLock, useEscape } from '../lib/useOverlay'
+import { ui } from '../content/ui'
 
 /**
  * The opening film: five shots, about twenty seconds, then a card that waits.
@@ -92,7 +93,7 @@ function PromoFilm({ onFinish }) {
     <section
       className={`hero ${leaving ? 'is-leaving' : ''} ${done ? 'is-end' : ''}`}
       id="hero"
-      aria-label="Introduction"
+      aria-label={ui.hero.label}
     >
       <div className="hero-promo" aria-hidden="true">
         {!done && (
@@ -120,7 +121,7 @@ function PromoFilm({ onFinish }) {
             <span className="hero-end-mark" aria-hidden="true" />
             <p className="sr-only">{brand.full}</p>
             <button type="button" className="hero-enter" onClick={dismiss}>
-              Enter
+              {ui.hero.go}
             </button>
             <Slogan className="hero-end-slogan" />
           </div>
@@ -130,11 +131,11 @@ function PromoFilm({ onFinish }) {
       <div className="hero-foot">
         {!done && (
           <button type="button" className="hero-cue" onClick={dismiss}>
-            <span>Skip intro</span>
+            <span>{ui.hero.skip}</span>
             <i aria-hidden="true" />
           </button>
         )}
-        {done && <p className="hero-caption">The horns became the mark</p>}
+        {done && <p className="hero-caption">{ui.hero.caption}</p>}
         {/* The soundtrack belongs to this film, so the switch for it has to be
             reachable while the film is playing and not only after it. */}
         <SoundToggle className="hero-sound" />
@@ -285,7 +286,7 @@ function PlayedSequence({ onFinish }) {
     <section
       className={`hero ${leaving ? 'is-leaving' : ''} ${dark ? 'is-dark' : ''} ${centred ? 'is-end' : ''}`}
       id="hero"
-      aria-label="Introduction"
+      aria-label={ui.hero.label}
     >
       <FilmStage
         activeId={act.film}
@@ -346,7 +347,7 @@ function PlayedSequence({ onFinish }) {
                 and the slogan as the sign-off. The group's name is not set
                 here because the mark above is the name. */}
             <button type="button" className="hero-enter" onClick={dismiss}>
-              Enter
+              {ui.hero.go}
             </button>
             <Slogan className="hero-end-slogan" />
           </div>
@@ -359,11 +360,11 @@ function PlayedSequence({ onFinish }) {
             two of them is offering a choice that does not exist. */}
         {!ended && (
           <button type="button" className="hero-cue" onClick={dismiss}>
-            <span>Skip intro</span>
+            <span>{ui.hero.skip}</span>
             <i aria-hidden="true" />
           </button>
         )}
-        {ended && <p className="hero-caption">The horns became the mark</p>}
+        {ended && <p className="hero-caption">{ui.hero.caption}</p>}
         {/* The soundtrack belongs to this film, so the switch for it has to be
             reachable while the film is playing and not only after it. */}
         <SoundToggle className="hero-sound" />

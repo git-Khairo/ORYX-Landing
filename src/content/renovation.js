@@ -57,18 +57,20 @@
    "before publication, confirm…" instructions that follow each one in the
    source are deliberately not carried over — they are notes to ORYX, not
    copy for a visitor. */
-export const statuses = [
+import { localize } from '../i18n/core.js'
+
+export const statuses = localize('renovation.statuses', [
   { n: '01', k: 'Delivered directly', fit: 'Work packages ORYX executes and coordinates with its own capacity.' },
   { n: '02', k: 'Available on a project basis', fit: 'Confirmed per project, not offered as a standing service.', d: 'Released after property, risk, partner and qualification checks.' },
   { n: '03', k: 'Through a demonstrably qualified specialist', fit: 'Regulated or certified work that must not be presented as a standard service.', d: 'Delivered or supervised only by competent and qualified parties where required.' },
-]
+])
 
 /* ── The catalogue ───────────────────────────────────────────────────
    All nine, as one catalogue. The source's own site architecture gives seven
    of them a "service card" and five a URL, and flags both gaps as open items —
    but those are questions about a multi-page site. On one page they are simply
    nine services, which is also the client's instruction. */
-export const services = [
+export const services = localize('renovation.services', [
   {
     id: 'property-check',
     no: '01',
@@ -222,13 +224,13 @@ export const services = [
       { t: 'Aftercare', d: 'Reporting route, evaluation and return visits under the agreed service level.' },
     ],
   },
-]
+])
 
 /* ── The method ──────────────────────────────────────────────────────
    Seven steps. The claim the source makes about them is the interesting part
    and is worth keeping visible: "The route is the same whatever the service;
    only the scope of step three changes." */
-export const route = [
+export const route = localize('renovation.route', [
   { n: '01', k: 'Property Check', d: 'Define the property, use, issue, ambition and risks.' },
   { n: '02', k: 'Three scenarios', d: 'Maintain, improve or transform.' },
   { n: '03', k: 'ORYX delivery plan', d: 'Scope, phasing, communication, budget and evidence.' },
@@ -236,7 +238,7 @@ export const route = [
   { n: '05', k: 'Delivery with property control', d: 'Progress, disruption, quality, safety and change.' },
   { n: '06', k: 'Evidence-based handover', d: 'Inspections, snags, warranties and a complete record.' },
   { n: '07', k: 'Aftercare & forward plan', d: 'Evaluation, reporting route and future maintenance moments.' },
-]
+])
 
 /* ── The two named methods ───────────────────────────────────────────
    ⚠ These names are approved for immediate use *as methods*. The source is
@@ -248,28 +250,28 @@ export const route = [
    `nl` is the Dutch name. Whether a proprietary name should be translated at
    all is an open item in the source — both are carried so the decision is a
    data edit rather than a rewrite. */
-export const tools = [
+export const tools = localize('renovation.tools', [
   { k: 'ORYX Property Passport', nl: 'Objectpaspoort', d: 'Digital history containing inspections, photos, works, materials, decisions, warranties and future maintenance.' },
   { k: 'ORYX Disruption Meter', nl: 'Hindermeter', d: 'Early view of likely impact on residents, staff or operations by scenario and phase.' },
-]
+])
 
 /* ── Who arrives, and what they ask first ────────────────────────────
    Six audiences, each with a different opening question. */
-export const clients = [
+export const clients = localize('renovation.clients', [
   { k: 'Housing associations', d: 'Estate maintenance, voids, occupied renovation and energy improvement.' },
   { k: 'Owners\' associations & managers', d: 'Long-term planning, maintenance, damage, energy improvement and resident coordination.' },
   { k: 'Municipal, care & education', d: 'Continuity, safety, user disruption and phased renovation.' },
   { k: 'Commercial property', d: 'Availability, appearance, tenant change, operation and conversion.' },
   { k: 'Contractors & developers', d: 'Work packages, renovation teams, partner control and handover.' },
   { k: 'Heritage owners', d: 'Research, planning, specialist restoration and long-term conservation.' },
-]
+])
 
 /* ── The five questions ──────────────────────────────────────────────
    The source's own framing: "Answers written to close the gap between promise
    and evidence." Every one of them narrows a claim rather than widening it,
    which is why they can be published while the claims matrix below is still
    unresolved. */
-export const faq = [
+export const faq = localize('renovation.faq', [
   /* PENDING SIGN-OFF — the source answer published the blocked
      direct-delivery claim; this uses the gate's approved wording. */
   { q: 'Does ORYX deliver everything directly?', a: 'ORYX organises delivery, combining its own coordination with fixed partners; specialist works use demonstrably qualified parties.' },
@@ -277,7 +279,7 @@ export const faq = [
   { q: 'Does ORYX work on heritage assets?', a: 'On a project basis, after significance, permission and competence checks.' },
   { q: 'Is emergency maintenance available?', a: 'By region and property after confirmation of the agreed service level.' },
   { q: 'How does a project start?', a: 'With the Property Check and a personal conversation about property, objective, risk and programme.' },
-]
+])
 
 /* ── The publication gate ────────────────────────────────────────────
    Eight claims, none of which may be published in full until the evidence in
@@ -294,7 +296,7 @@ export const faq = [
    VGO-keur, ERM and NEN 2767 references, which are registers held by an
    entity whose scope and validity must be confirmed first; and any savings or
    performance figure, which must always be a scenario and never a guarantee. */
-export const gate = [
+export const gate = localize('renovation.gate', [
   {
     claim: 'Direct delivery',
     check: 'Work package, region, capacity, equipment and accountable entity.',
@@ -335,11 +337,11 @@ export const gate = [
     check: 'Written consent, accuracy, privacy and publication period.',
     safe: 'Anonymised case.',
   },
-]
+])
 
 /* Computed rather than typed, so they cannot drift from the data above. */
-export const totals = {
+export const totals = localize('renovation.totals', {
   services: services.length,
   works: services.reduce((n, s) => n + s.works.length, 0),
   conditional: services.reduce((n, s) => n + s.works.filter((w) => w.s).length, 0),
-}
+})

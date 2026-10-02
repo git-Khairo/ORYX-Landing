@@ -153,14 +153,27 @@
   color: var(--oryx-white);
 }
 /* Side by side, the open door is about 39.6% of the window (the doors take
-   1.7 of 2.7 columns, and the open one 3.4 of 5.4 shares). "RENOVATION"
-   runs about 8.1 times its font size, so at 1024px the scale's own size put
-   it 5px past the edge of the screen. The cap is in `vw` rather than in
-   container units so the title does not reflow while the door slides open,
-   and from about 1400px up the scale is the smaller of the two again. */
+   1.7 of 2.7 columns, and the open one 3.4 of 5.4 shares). Its longest word
+   has to fit across that, less the padding: Cinzel's capitals run about 0.86
+   of the font size per letter with their tracking, so the cap divides the
+   room by `--len` letters, which Work.jsx sets per title. "RENOVATION" fit
+   at a fixed cap; the German "RENOVIERUNG" did not, which is why the cap is
+   per title and not per language. In `vw` rather than container units, so
+   the title does not reflow while the door slides open. */
 @media (min-width: 1001px) {
-  .door-title { font-size: min(var(--step-3), calc(4.6vw - 8px)); }
+  .door-title {
+    font-size: min(var(--step-3), calc((39.6vw - 5.2rem) / (var(--len, 10) * 0.86)));
+  }
 }
+/* Stacked, on a tablet or phone, each door is the full width less its padding,
+   and the same cap applies: at 320px the German title broke as "RENOVIE- /
+   RUNG". Sized to fit, a title never needs a hyphen, and is not given one. */
+@media (max-width: 1000px) {
+  .door-title {
+    font-size: min(var(--step-3), calc((100vw - 2 * clamp(1.4rem, 4vh, 2.6rem)) / (var(--len, 10) * 0.86)));
+  }
+}
+.door-title { -webkit-hyphens: manual; hyphens: manual; }
 /* The section's paragraphs alternate faces: the short promise in Cinzel, the
    description under it in Montserrat, and the brand panel keeps the same
    rhythm down its column. */

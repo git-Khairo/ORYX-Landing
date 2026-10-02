@@ -25,6 +25,112 @@
   font-family: var(--font-display);
 }
 
+/* ── The language switcher ──────────────────────────────────────────────
+   The same box as the sound switch beside it in every bar: the current code
+   and a chevron, opening the four languages, each named in itself. Colours
+   are tokens, so it is dark on the dark pages and ink on Renovation's sheet. */
+.lang { position: relative; display: inline-flex; flex: none; }
+.lang-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid var(--line);
+  font-family: var(--font);
+  font-size: var(--step--2);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  color: var(--text-3);
+  white-space: nowrap;
+  transition: color 0.25s var(--ease-out), border-color 0.25s var(--ease-out);
+}
+.lang-btn:hover,
+.lang.is-open .lang-btn { color: var(--text); border-color: var(--line-sand); }
+.lang-btn .icon { transition: transform 0.25s var(--ease-out); }
+.lang.is-open .lang-btn .icon { transform: rotate(180deg); }
+.lang-pop {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 60;
+  min-width: 11.5rem;
+  padding: 0.35rem 0;
+  list-style: none;
+  background: var(--raise);
+  border: 1px solid var(--line-sand);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
+}
+.lang-pop[hidden] { display: none; }
+.lang-pop a {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  padding: 0.55rem 0.95rem;
+  font-family: var(--font);
+  font-size: var(--step--1);
+  color: var(--text-2);
+  transition: color 0.2s var(--ease-out), background 0.2s var(--ease-out);
+}
+.lang-pop a b {
+  min-width: 1.7rem;
+  font-size: var(--step--2);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  color: var(--text-3);
+}
+.lang-pop a:hover { color: var(--text); background: var(--raise-2, var(--sunk)); }
+.lang-pop a[aria-current] { color: var(--sand-text); }
+.lang-pop a[aria-current] b { color: var(--sand-text); }
+
+/* On a phone each service page's bar holds its mark, the language code and
+   one button, and in German or Dutch that button runs long ("Fahrzeug
+   buchen" was 176px on its own). The code drops its box and chevron, the
+   button its wide tracking, and below 420px the music switch leaves the bar. */
+@media (max-width: 520px) {
+  .t-nav .lang-btn,
+  .w-nav .lang-btn,
+  .r-nav .lang-btn { padding: 0.5rem 0.25rem; border-color: transparent; }
+  .t-nav .lang-btn .icon,
+  .w-nav .lang-btn .icon,
+  .r-nav .lang-btn .icon { display: none; }
+  .t-nav-cta,
+  .w-nav-cta { letter-spacing: 0.06em; padding-inline: 0.7rem; }
+}
+/* French needs the compact form for longer: at 521px "Réserver un véhicule"
+   still ran 39px off the edge. */
+@media (max-width: 640px) {
+  .t-nav .lang-btn:lang(fr),
+  .w-nav .lang-btn:lang(fr) { padding: 0.5rem 0.25rem; border-color: transparent; }
+  .t-nav .lang-btn:lang(fr) .icon,
+  .w-nav .lang-btn:lang(fr) .icon { display: none; }
+  .t-nav-cta:lang(fr),
+  .w-nav-cta:lang(fr) { letter-spacing: 0.06em; padding-inline: 0.7rem; }
+}
+@media (max-width: 420px) {
+  .t-nav-r .sound,
+  .w-nav-r .sound { display: none; }
+}
+/* At 320px the German bar was still 3px over, and the French one 24px:
+   "Réserver un véhicule" is the longest button in the four languages. On the
+   narrowest phones the gap after the mark closes up and the button takes the
+   short label the home page's bar uses ("Request", "Demande"). */
+.world-cta-short { display: none; }
+@media (max-width: 360px) {
+  .t-nav-inner,
+  .w-nav-inner { gap: 0.6rem; }
+}
+/* Up to 374px: at 360px "Demander du personnel" was still 7px over. */
+@media (max-width: 374px) {
+  .world-cta-full { display: none; }
+  .world-cta-short { display: inline; }
+}
+
+/* The footer's row: the four names, the current one in sand. */
+.lang-list ul { display: flex; flex-wrap: wrap; gap: 0.4rem 1.1rem; list-style: none; }
+.lang-list a { color: var(--text-3); transition: color 0.25s var(--ease-out); }
+.lang-list a:hover { color: var(--oryx-white); }
+.lang-list a[aria-current] { color: var(--sand-text); }
+
 /* ── Icons ──────────────────────────────────────────────────────────── */
 .icon { display: block; flex: none; }
 

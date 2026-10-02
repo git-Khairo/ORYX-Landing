@@ -33,7 +33,9 @@ const ours = (name) => ({
   ],
 })
 
-export const film = {
+import { localize } from '../i18n/core.js'
+
+export const film = localize('media.film', {
   /* ── The opening film ─────────────────────────────────────────────────
      Fifteen seconds, generated from two stills made for it: the oryx walking
      the dunes, and the same animal square to camera with the sun between its
@@ -74,7 +76,7 @@ export const film = {
     poster: 'https://images.pexels.com/videos/28542398/pictures/preview-0.jpg',
     credit: 'https://www.pexels.com/video/sunset-28542398/',
   },
-}
+})
 
 /**
  * The hero promo — one finished film, when there is one.
@@ -96,23 +98,23 @@ export const film = {
  *  - **A poster.** Without one the first frame is black until enough of the
  *    file has arrived, which on a slow connection is the whole opening beat.
  */
-export const promo = {
+export const promo = localize('media.promo', {
   src: null,
   poster: null,
-}
+})
 
 /** The closing frame under the footer — a different aerial from the outro act,
     so the last two things on the page are not the same shot twice. */
-export const footerFilm = {
+export const footerFilm = localize('media.footerFilm', {
   src: 'https://videos.pexels.com/video-files/8783386/8783386-hd_1920_1080_30fps.mp4',
   /* First frame, so the section paints before the file arrives — and on an
      iPhone that refuses muted autoplay, instead of a black band. */
   poster: 'https://images.pexels.com/videos/8783386/pexels-photo-8783386.jpeg?auto=compress&cs=tinysrgb&w=1600',
   credit: 'https://www.pexels.com/video/drone-footage-of-tall-buildings-in-the-city-8783386/',
-}
+})
 
 /** Section two. Different footage, same three services. */
-export const portal = {
+export const portal = localize('media.portal', {
   transport: {
     src: 'https://videos.pexels.com/video-files/6170613/6170613-hd_1920_1080_25fps.mp4',
     /* First frame, so the section paints before the file arrives — and on an
@@ -139,7 +141,7 @@ export const portal = {
       'https://images.pexels.com/videos/6474085/pexels-photo-6474085.jpeg?auto=compress&cs=tinysrgb&w=1600',
     credit: 'https://www.pexels.com/video/man-painting-a-wall-6474085/',
   },
-}
+})
 
 /**
  * Stills, three per service.
@@ -158,13 +160,13 @@ const shot = (id) =>
 /* A third clip per service, for the closing frame. The close was replaying the
    opening clip, so a page that had travelled through six sections ended on the
    shot it began with and felt like it had gone nowhere. */
-export const closing = {
+export const closing = localize('media.closing', {
   transport: film.outro,
   workforce: film.facilities,
   renovation: footerFilm,
-}
+})
 
-export const gallery = {
+export const gallery = localize('media.gallery', {
   transport: [
     { src: shot(18395054), alt: 'Loading bay at a distribution centre' },
     { src: shot(19034547), alt: 'Pallets racked in a warehouse aisle' },
@@ -194,4 +196,4 @@ export const gallery = {
     { src: shot(12526862), alt: 'A commercial floor part-cleared during works' },
     { src: '/renovation/after.jpg', alt: 'Illustration: the same floor completed, with oak flooring, suspended ceiling with linear lighting, desks in place' },
   ],
-}
+})

@@ -28,7 +28,9 @@ export function SloganWord({ k, w }) {
 
 export default function Slogan({ as: Tag = 'p', className = '' }) {
   return (
-    <Tag className={`slogan ${className}`}>
+    /* English on every page, so it is marked English: read with Dutch or
+       German pronunciation it would not be understood. */
+    <Tag className={`slogan ${className}`} lang="en">
       <span className="sr-only">{brand.slogan}</span>
       <span aria-hidden="true">
         {brand.letters.map(({ k, w }, i) => (

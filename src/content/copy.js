@@ -6,7 +6,9 @@
  * the identity board settles the question — the mark and the word ORYX are the
  * brand, and the descriptor line does the explaining underneath.
  */
-export const brand = {
+import { localize } from '../i18n/core.js'
+
+export const brand = localize('copy.brand', {
   full: 'ORYX GROUP',
   /* The capital X is the point, not a typo. The slogan is a backronym of the
      name and X is the letter it gives up — setting it "Excellence" hides the
@@ -32,7 +34,7 @@ export const brand = {
   purpose:
     'We build, support and deliver essential services and smart solutions that create value, empower people and build a better tomorrow.',
   region: 'Netherlands',
-}
+})
 
 /**
  * The opening film — five shots, and the subject is the name.
@@ -52,7 +54,7 @@ export const brand = {
  * kept for the two edits that change subject: into the letters, and into the
  * end card.
  */
-export const acts = [
+export const acts = localize('copy.acts', [
   /* One continuous film, fifteen seconds, and four beats of copy over it.
      The oryx walks across the dunes, turns to face the camera, and after one
      cut the camera pushes in on its face while the sun sets into the V
@@ -121,7 +123,7 @@ export const acts = [
     line: 'ORYX GROUP',
     sub: 'One group for transport, workforce and renovation, with reliable people and services across the Netherlands.',
   },
-]
+])
 
 /**
  * The client tape.
@@ -134,14 +136,14 @@ export const acts = [
  * The names below are SECTORS, not companies, and are safe to ship as they
  * stand. Replace them with real clients only when the logos are cleared.
  */
-export const clients = [
+export const clients = localize('copy.clients', [
   { name: 'Retail groups', logo: null },
   { name: 'Manufacturing', logo: null },
   { name: 'Healthcare', logo: null },
   { name: 'Multi-site offices', logo: null },
   { name: 'Events & venues', logo: null },
   { name: 'Public sector', logo: null },
-]
+])
 
 /**
  * The three services, and the worlds behind them.
@@ -151,7 +153,7 @@ export const clients = [
  * colour. `accent` is sand for all three on purpose: the layouts differentiate
  * these pages, the palette does not have to.
  */
-export const services = [
+export const services = localize('copy.services', [
   {
     id: 'transport',
     accent: '#c8a978',
@@ -227,7 +229,7 @@ export const services = [
           { k: 'Paris', s: 'France', x: 150, y: 268 },
           { k: 'Luxembourg', s: 'Grand Duchy', x: 360, y: 232 },
           { k: 'Brussels', s: 'Belgium', x: 570, y: 176 },
-          { k: 'Amsterdam', s: 'Home hub', x: 790, y: 104 },
+          { k: 'Amsterdam', s: 'Home hub', x: 790, y: 104, hub: true },
           { k: 'Berlin', s: 'Germany', x: 1030, y: 136 },
         ],
         path: 'M150 268 C 230 266, 290 246, 360 232 S 500 204, 570 176 S 710 112, 790 104 S 950 120, 1030 136',
@@ -511,10 +513,10 @@ export const services = [
       prompt: 'Tell us about the property.',
     },
   },
-]
+])
 
 /** Vision, mission, values. One sentence and four named points each. */
-export const pillars = [
+export const pillars = localize('copy.pillars', [
   {
     id: 'vision',
     label: 'Vision',
@@ -548,4 +550,4 @@ export const pillars = [
       { k: 'Professionalism', d: 'Every detail reflects the craft.' },
     ],
   },
-]
+])

@@ -10,6 +10,9 @@ import { Social } from '../../sections/Footer'
 import Sheet from '../Sheet'
 import Icon from '../Icon'
 import PhotoBand from '../PhotoBand'
+import { ui } from '../../content/ui'
+import { fmt, plural, brochure } from '../../i18n/core'
+import LangSwitch from '../LangSwitch'
 
 /**
  * Renovation — "The Sheet."
@@ -187,26 +190,27 @@ export default function RenovationWorld({ service, onClose, onRequest, onSwitch 
         <button type="button" className="r-nav-cell r-nav-mark" onClick={onClose}>
           <i aria-hidden="true" />
           <span>
-            <b>ORYX Projects</b>
-            <em>Return to group</em>
+            <b>{ui.renovation.unit}</b>
+            <em>{ui.renovation.back}</em>
           </span>
         </button>
 
-        <nav className="r-nav-cell r-nav-links" aria-label="Renovation sections">
-          <a href="#r-scenarios">Decision</a>
-          <a href="#r-schedule">Schedule</a>
-          <a href="#r-route">Route</a>
-          <a href="#r-trust">Trust</a>
+        <nav className="r-nav-cell r-nav-links" aria-label={ui.renovation.sections}>
+          <a href="#r-scenarios">{ui.renovation.navDecision}</a>
+          <a href="#r-schedule">{ui.renovation.navSchedule}</a>
+          <a href="#r-route">{ui.renovation.navRoute}</a>
+          <a href="#r-trust">{ui.renovation.navTrust}</a>
         </nav>
 
         <div className="r-nav-cell r-nav-sound">
+          <LangSwitch />
           <SoundToggle bare />
         </div>
 
         <dl className="r-nav-cell r-nav-meta">
-          <div><dt>Sheet</dt><dd>03</dd></div>
-          <div><dt>Services</dt><dd>{String(totals.services).padStart(2, '0')}</dd></div>
-          <div><dt>Works</dt><dd>{totals.works}</dd></div>
+          <div><dt>{ui.renovation.metaSheet}</dt><dd>03</dd></div>
+          <div><dt>{ui.renovation.metaServices}</dt><dd>{String(totals.services).padStart(2, '0')}</dd></div>
+          <div><dt>{ui.renovation.metaWorks}</dt><dd>{totals.works}</dd></div>
         </dl>
       </header>
 
@@ -217,7 +221,9 @@ export default function RenovationWorld({ service, onClose, onRequest, onSwitch 
           <p className="world-eyebrow" data-reveal>
             {service.index} / {service.title}
           </p>
-          <h2 data-reveal>
+          {/* `--len`, the longest word in letters, keeps a long German or
+              Dutch word on one line on a phone; see world-shell.css. */}
+          <h2 data-reveal style={{ '--len': Math.max(...world.headline.split(/\s+/).map((w) => w.length)) }}>
             {world.headline.split('\n').map((l) => (
               <span key={l}>{l}</span>
             ))}
@@ -241,7 +247,7 @@ export default function RenovationWorld({ service, onClose, onRequest, onSwitch 
       <section className="r-scrub-block">
         <div className="r-scrub-intro" data-draw>
           <Dim n="3.3" />
-          <p className="world-kicker" data-reveal>Before, and after</p>
+          <p className="world-kicker" data-reveal>{ui.renovation.beforeAfter}</p>
           <p className="world-lede" data-reveal>{world.lede}</p>
         </div>
         <Scrub before={shots[0]} after={shots[2]} />
@@ -251,10 +257,7 @@ export default function RenovationWorld({ service, onClose, onRequest, onSwitch 
             precisely what it must not be until a real job has been shot. The
             source's gate says the same thing about client cases: consent,
             accuracy and publication period first, anonymised until then. */}
-        <p className="r-scrub-note" data-reveal>
-          Illustration of a typical scope, not a photograph of a completed ORYX
-          project. Project photographs follow once clients give written consent.
-        </p>
+        <p className="r-scrub-note" data-reveal>{ui.renovation.scrubNote}</p>
       </section>
 
       {/* ── The route ─────────────────────────────────────────────────
@@ -265,8 +268,8 @@ export default function RenovationWorld({ service, onClose, onRequest, onSwitch 
       <section className="r-process" id="r-route">
         <div className="r-process-head" data-draw>
           <Dim n="3.4" />
-          <p className="world-kicker" data-reveal>How a project runs</p>
-          <h3 data-reveal>Seven steps on every project</h3>
+          <p className="world-kicker" data-reveal>{ui.renovation.processKicker}</p>
+          <h3 data-reveal>{ui.renovation.processHead}</h3>
           <p className="world-lede" data-reveal>{world.routeLine}</p>
         </div>
         {/* The wrapper exists to carry the corner marks: a list may only hold
@@ -286,7 +289,8 @@ export default function RenovationWorld({ service, onClose, onRequest, onSwitch 
               {i === 0 ? <Passport /> : <Meter phases={world.beats} />}
               <figcaption>
                 <p className="r-tool-k">{t.k}</p>
-                <p className="r-tool-nl">In Dutch: {t.nl}</p>
+                {/* Not in Dutch, where the name above already is it. */}
+                {!t.k.includes(t.nl) && <p className="r-tool-nl">{fmt(ui.renovation.inDutch, { name: t.nl })}</p>}
                 <p className="r-tool-d">{t.d}</p>
               </figcaption>
             </figure>
@@ -301,7 +305,7 @@ export default function RenovationWorld({ service, onClose, onRequest, onSwitch 
       <PhotoBand
         items={svcs.map((x) => ({ id: x.id, label: x.name, icon: x.id, img: cardImage(`renovation/${x.id}`) }))}
         onOpen={setSheetId}
-        label="The nine services in pictures"
+        label={ui.renovation.band}
       />
 
       {/* ── Who we work for ────────────────────────────────────────────
@@ -310,8 +314,8 @@ export default function RenovationWorld({ service, onClose, onRequest, onSwitch 
       <section className="r-who">
         <div className="r-who-head" data-draw>
           <Dim n="3.5" />
-          <p className="world-kicker" data-reveal>Clients</p>
-          <h3 data-reveal>Who we work for</h3>
+          <p className="world-kicker" data-reveal>{ui.renovation.clientsKicker}</p>
+          <h3 data-reveal>{ui.renovation.clientsHead}</h3>
         </div>
         <div className="r-framed">
           <Clients items={clients} />
@@ -327,8 +331,8 @@ export default function RenovationWorld({ service, onClose, onRequest, onSwitch 
       <section className="r-trust" id="r-trust">
         <div className="r-trust-say" data-draw>
           <Dim n="3.6" />
-          <p className="world-kicker" data-reveal>What we promise</p>
-          <h3 data-reveal>Straight answers</h3>
+          <p className="world-kicker" data-reveal>{ui.renovation.trustKicker}</p>
+          <h3 data-reveal>{ui.renovation.trustHead}</h3>
           <p className="r-trust-line" data-reveal>{world.trust.line}</p>
         </div>
         <div className="r-framed">
@@ -455,7 +459,7 @@ function Fork({ world }) {
       <div className="r-fork-inner">
         <div className="r-fork-head" data-draw>
           <Dim n="3.1" />
-          <p className="world-kicker" data-reveal>The decision</p>
+          <p className="world-kicker" data-reveal>{ui.renovation.decision}</p>
           <h3 data-reveal>{world.forkHead}</h3>
           <p className="world-lede" data-reveal>{world.forkLede}</p>
         </div>
@@ -470,13 +474,9 @@ function Fork({ world }) {
         </div>
 
         <div className="r-fork-choose">
-          <p className="r-fork-lim" aria-hidden="true">Less intervention</p>
+          <p className="r-fork-lim" aria-hidden="true">{ui.renovation.less}</p>
           <fieldset className="r-fork-rail">
-            <legend className="sr-only">
-              Choose a scenario. These are three alternatives for the same
-              property, not three stages of one job. One is chosen, and the
-              other two are not done afterwards.
-            </legend>
+            <legend className="sr-only">{ui.renovation.chooseLegend}</legend>
             {world.scenarios.map((s) => (
               <label className="r-fork-opt" key={s.id}>
                 <input
@@ -494,7 +494,7 @@ function Fork({ world }) {
               </label>
             ))}
           </fieldset>
-          <p className="r-fork-lim" aria-hidden="true">More intervention</p>
+          <p className="r-fork-lim" aria-hidden="true">{ui.renovation.more}</p>
           <p className="r-fork-set">{world.forkSet}</p>
         </div>
 
@@ -508,11 +508,11 @@ function Fork({ world }) {
         <div className="r-fork-read">
           {world.scenarios.map((s) => (
             <div className="r-fork-panel" key={s.id} aria-hidden={s.id !== live}>
-              <p className="r-fork-over">Scenario: {s.k}</p>
+              <p className="r-fork-over">{fmt(ui.renovation.scenario, { k: s.k })}</p>
               <p className="r-fork-claim">{s.claim}</p>
               <p className="r-fork-body">{s.body}</p>
               <div className="r-fork-marks">
-                <p className="r-fork-mh">What the drawing marks</p>
+                <p className="r-fork-mh">{ui.renovation.marks}</p>
                 <ul role="list">
                   {s.marks.map((m) => (
                     <li key={m.t}>
@@ -524,10 +524,7 @@ function Fork({ world }) {
                       {m.st && (
                         <span className="r-fork-st">
                           {m.st}
-                          <span className="sr-only">
-                            . Carried out or supervised by a qualified
-                            specialist where required.
-                          </span>
+                          <span className="sr-only">. {ui.renovation.qualifiedNote}</span>
                         </span>
                       )}
                     </li>
@@ -575,11 +572,7 @@ function Section({ scenarios }) {
   return (
     <svg className="r-fork-svg" viewBox="0 0 720 460" role="img"
          aria-labelledby="r-fork-title">
-      <title id="r-fork-title">
-        Section through a four-storey block. Maintain marks the outer envelope;
-        Improve marks the fabric inside it; Transform marks the structure and
-        the plan itself. The building drawn is the same in all three.
-      </title>
+      <title id="r-fork-title">{ui.renovation.sectionTitle}</title>
 
       <defs>
         {/* Deep Brown, never sand: sand measures 1.77:1 on this ground and the
@@ -598,7 +591,7 @@ function Section({ scenarios }) {
         ))}
         <path d="M112,384 V210" strokeDasharray="4 6" />
         <path d="M608,384 V210" strokeDasharray="4 6" />
-        <text x="26" y="376">DATUM</text>
+        <text x="26" y="376">{ui.renovation.datum}</text>
       </g>
 
       {/* Fabric — identical in all three states. The same building. */}
@@ -702,10 +695,7 @@ function Section({ scenarios }) {
    under service 08 included, and the line under the grid says what no tag
    means. No status is invented for any service: the source assigns an
    explicit label to service 08 alone. */
-const CONDS = {
-  project: { k: 'Project basis', d: 'Confirmed for each project after property, risk, partner and qualification checks.' },
-  qualified: { k: 'Qualified specialist', d: 'Carried out or supervised by a qualified specialist where required.' },
-}
+const CONDS = ui.renovation.conds
 
 function Schedule({ onOpen }) {
   const uid = useId().replace(/:/g, '')
@@ -714,11 +704,9 @@ function Schedule({ onOpen }) {
     <section className="r-sched" id="r-schedule" aria-labelledby={`${uid}-h`}>
       <div className="r-sched-head" data-reveal data-draw>
         <Dim n="3.2" />
-        <p className="world-kicker">Schedule of works</p>
-        <h3 id={`${uid}-h`}>Nine services</h3>
-        <p className="world-lede">
-          Open a service to see the work it covers.
-        </p>
+        <p className="world-kicker">{ui.renovation.schedKicker}</p>
+        <h3 id={`${uid}-h`}>{ui.renovation.schedHead}</h3>
+        <p className="world-lede">{ui.renovation.schedLede}</p>
       </div>
 
       {/* `data-draw` is what lets the nine pictures develop like a print as the
@@ -737,10 +725,10 @@ function Schedule({ onOpen }) {
                 <span className="card-body">
                   <span className="card-k">{s.name}</span>
                   <span className="card-c">
-                    {s.works.length} works
+                    {plural(s.works.length, ui.renovation.works)}
                     {s.cond && <span className="card-tag"> / {CONDS[s.cond].k}</span>}
                   </span>
-                  <span className="card-go"><span>View</span><Icon name="arrow" size={14} /></span>
+                  <span className="card-go"><span>{ui.common.view}</span><Icon name="arrow" size={14} /></span>
                 </span>
               </button>
             </li>
@@ -749,9 +737,7 @@ function Schedule({ onOpen }) {
       </ul>
 
       <p className="cards-note" data-reveal>
-        {totals.services} services and {totals.works} works in all. ORYX organises
-        delivery of every work. {totals.conditional} of them are marked, because they
-        are confirmed for each project or carried out by a qualified specialist.
+        {fmt(ui.renovation.cardsNote, { services: totals.services, works: totals.works, marked: totals.conditional })}
       </p>
 
     </section>
@@ -773,8 +759,8 @@ function ServiceSheet({ svc, onClose, onRequest }) {
           {/* The link first and the button last, on purpose. The focus trap
               wraps on the last control, and Safari does not tab to links by
               default, so a link in last place let Tab walk out of the popup. */}
-          <a className="btn" href={`/brochures/renovation-${svc.id}.pdf`} download>
-            <Icon name="download" size={16} /> Download brochure
+          <a className="btn" {...brochure(`renovation-${svc.id}`)}>
+            <Icon name="download" size={16} /> {ui.common.downloadBrochure}
           </a>
           <button type="button" className="btn btn--fill" onClick={onRequest}>
             {ctaFor('renovation')} <Icon name="arrow" size={16} />
@@ -785,13 +771,13 @@ function ServiceSheet({ svc, onClose, onRequest }) {
       <div className="sheet-head">
         <span className="sheet-badge"><Icon name={svc.id} size={24} /></span>
         <ul className="sheet-stats" role="list">
-          <li><b>{svc.no}</b>of {String(totals.services).padStart(2, '0')}</li>
-          <li><b>{svc.works.length}</b>works</li>
+          <li><b>{svc.no}</b>{fmt(ui.renovation.of, { n: String(totals.services).padStart(2, '0') })}</li>
+          <li><b>{svc.works.length}</b>{plural(svc.works.length, ui.renovation.worksWord)}</li>
         </ul>
       </div>
       <p className="sheet-lede">{svc.sub}</p>
 
-      <h4 className="sheet-h">What it covers</h4>
+      <h4 className="sheet-h">{ui.renovation.covers}</h4>
       <ul className="sheet-works" role="list">
         {svc.works.map((w) => {
           /* A service-level condition applies to every work under it. */
@@ -964,13 +950,13 @@ function Scrub({ before, after }) {
       }}
       onPointerMove={(e) => e.currentTarget.hasPointerCapture(e.pointerId) && onPointerMove(e)}
     >
-      <img className="r-scrub-after" src={after.src} alt={after.alt || 'After renovation'} loading="lazy" />
+      <img className="r-scrub-after" src={after.src} alt={after.alt || ui.renovation.afterAlt} loading="lazy" />
       <div className="r-scrub-before-wrap" aria-hidden="true">
         <img className="r-scrub-before" src={before.src} alt="" loading="lazy" />
       </div>
 
-      <span className="r-scrub-tag r-scrub-tag--before" aria-hidden="true">Before</span>
-      <span className="r-scrub-tag r-scrub-tag--after" aria-hidden="true">After</span>
+      <span className="r-scrub-tag r-scrub-tag--before" aria-hidden="true">{ui.renovation.before}</span>
+      <span className="r-scrub-tag r-scrub-tag--after" aria-hidden="true">{ui.renovation.after}</span>
 
       <span className="r-scrub-handle" aria-hidden="true">
         <i />
@@ -990,7 +976,7 @@ function Scrub({ before, after }) {
         /* Focus and keys belong to the visitor from the first moment. */
         onFocus={stopNudge}
         onKeyDown={stopNudge}
-        aria-label="Reveal the finished space"
+        aria-label={ui.renovation.reveal}
       />
     </div>
   )
@@ -1054,7 +1040,7 @@ const MARK_D = 'M38.84 2.96c-.04 5.3-.65 11.7-1.98 20.96c-.33 2.44-.61 4.45-.57 
 
 /* The Property Passport as a booklet with tabbed pages: what goes in it,
    written on the tabs. Decorative; the caption beside it carries the words. */
-const PASSPORT_TABS = ['Inspections', 'Photos', 'Works', 'Materials', 'Decisions', 'Warranties', 'Maintenance']
+const PASSPORT_TABS = ui.renovation.passportTabs
 function Passport() {
   return (
     <svg className="r-draw r-draw--passport" viewBox="0 0 300 200" aria-hidden="true" focusable="false">
@@ -1064,9 +1050,13 @@ function Passport() {
         ))}
         <rect x="52" y="14" width="150" height="150" className="r-draw-cover" />
         <path d={MARK_D} transform="translate(116.6 44) scale(0.5)" className="r-draw-mark" />
-        <text x="127" y="112" textAnchor="middle" className="r-draw-t">PROPERTY</text>
-        <text x="127" y="126" textAnchor="middle" className="r-draw-t">PASSPORT</text>
-        <text x="127" y="146" textAnchor="middle" className="r-draw-s">OBJECTPASPOORT</text>
+        <text x="127" y="112" textAnchor="middle" className="r-draw-t">{ui.renovation.passport[0]}</text>
+        <text x="127" y="126" textAnchor="middle" className="r-draw-t">{ui.renovation.passport[1]}</text>
+        {/* The Dutch name, under the title in every language but Dutch,
+            where the title already is it. */}
+        {ui.renovation.passport.join('').toUpperCase() !== 'OBJECTPASPOORT' && (
+          <text x="127" y="146" textAnchor="middle" className="r-draw-s">OBJECTPASPOORT</text>
+        )}
       </g>
       <g className="r-draw-tabs">
         {PASSPORT_TABS.map((t, i) => (
@@ -1085,7 +1075,7 @@ function Passport() {
    The levels are an illustration of the idea and say so. The source approves
    the name and forbids presenting it as software, so nothing here is a gauge,
    a needle or a number. */
-const METER_ROWS = ['Residents', 'Staff', 'Operations']
+const METER_ROWS = ui.renovation.meterRows
 const METER_LEVELS = [
   [1, 2, 3, 1],
   [1, 1, 3, 2],
@@ -1113,7 +1103,7 @@ function Meter({ phases = [] }) {
             })}
           </g>
         ))}
-        <text x="28" y="164" className="r-draw-s r-draw-note">ILLUSTRATION ONLY. THE VIEW IS BUILT PER PROPERTY.</text>
+        <text x="28" y="164" className="r-draw-s r-draw-note">{ui.renovation.meterNote}</text>
       </g>
     </svg>
   )
@@ -1141,7 +1131,7 @@ function Clients({ items }) {
             >
               <span className="r-client-i"><Icon name={CLIENT_ICONS[i] || 'building'} size={24} /></span>
               <span className="r-client-k">{c.k}</span>
-              <span className="r-client-more">{isOpen ? 'Close' : 'What we do for them'}</span>
+              <span className="r-client-more">{isOpen ? ui.renovation.close : ui.renovation.clientMore}</span>
             </button>
             <div className="r-client-d" id={`${uid}-${i}`} aria-hidden={!isOpen}>
               <p>{c.d}</p>
@@ -1227,45 +1217,45 @@ function RenovationFooter({ service, onClose, onRequest, onSwitch }) {
       <div className="r-titleblock">
         <div className="r-tb-row">
           <dl className="r-tb-cell r-tb-wide">
-            <dt>Client</dt>
+            <dt>{ui.renovation.tb.client}</dt>
             {/* Terse, the way a real title block is. The six groups are named
                 in full in the Clients section. */}
-            <dd>Housing, public sector, commercial and heritage property</dd>
+            <dd>{ui.renovation.tb.clientD}</dd>
           </dl>
           <dl className="r-tb-cell">
-            <dt>Discipline</dt>
-            <dd>Maintenance, renovation and heritage restoration</dd>
+            <dt>{ui.renovation.tb.discipline}</dt>
+            <dd>{ui.renovation.tb.disciplineD}</dd>
           </dl>
         </div>
         <div className="r-tb-row">
           <dl className="r-tb-cell">
-            <dt>Drawn</dt>
-            <dd>ORYX Projects</dd>
+            <dt>{ui.renovation.tb.drawn}</dt>
+            <dd>{ui.renovation.unit}</dd>
           </dl>
           <dl className="r-tb-cell">
-            <dt>Checked</dt>
-            <dd>Contracts</dd>
+            <dt>{ui.renovation.tb.checked}</dt>
+            <dd>{ui.renovation.tb.checkedD}</dd>
           </dl>
           <dl className="r-tb-cell">
-            <dt>Date</dt>
+            <dt>{ui.renovation.tb.date}</dt>
             <dd>{year}</dd>
           </dl>
           <dl className="r-tb-cell">
-            <dt>Sheet</dt>
+            <dt>{ui.renovation.tb.sheet}</dt>
             <dd>03 / 03</dd>
           </dl>
           <dl className="r-tb-cell">
-            <dt>Rev</dt>
+            <dt>{ui.renovation.tb.rev}</dt>
             <dd>C</dd>
           </dl>
         </div>
         <div className="r-tb-row">
           <dl className="r-tb-cell r-tb-wide">
-            <dt>Project</dt>
-            <dd>ORYX Projects, a service of ORYX GROUP</dd>
+            <dt>{ui.renovation.tb.project}</dt>
+            <dd>{ui.renovation.tb.projectD}</dd>
           </dl>
           <dl className="r-tb-cell">
-            <dt>Contact</dt>
+            <dt>{ui.renovation.tb.contact}</dt>
             <dd><a href={`mailto:${emailFor('renovation')}`}>{emailFor('renovation')}</a></dd>
           </dl>
         </div>
@@ -1273,7 +1263,7 @@ function RenovationFooter({ service, onClose, onRequest, onSwitch }) {
 
       <div className="r-foot-end">
         <button type="button" className="r-foot-back" onClick={onClose}>
-          <Icon name="back" size={16} /> All ORYX services
+          <Icon name="back" size={16} /> {ui.common.allServices}
         </button>
         <Social />
       </div>

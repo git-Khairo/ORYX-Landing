@@ -31,25 +31,27 @@
  * The sender is one small function, `src/lib/sendRequest.js`. Swapping EmailJS
  * for another provider later means editing that file and nothing else.
  */
+import { localize } from '../i18n/core.js'
+import { ui } from './ui.js'
 import { sectors } from './workforce.js'
 import { services as renovationServices } from './renovation.js'
 
-export const mail = {
+export const mail = localize('requests.mail', {
   provider: 'emailjs',
   emailjs: { serviceId: '', publicKey: '' },
-}
+})
 
 /* The five things Transport sells, named once. The Transport footer reads this
    list too, so the form and the page cannot drift apart. */
-export const transportServices = [
+export const transportServices = localize('requests.transportServices', [
   { id: 'scheduled', label: 'Scheduled routes', icon: 'calendar' },
   { id: 'on-demand', label: 'On-demand transport', icon: 'bolt' },
   { id: 'between-sites', label: 'Transfers between sites', icon: 'swap' },
   { id: 'specialist', label: 'Specialist handling', icon: 'box' },
   { id: 'cross-border', label: 'Cross-border transport', icon: 'globe' },
-]
+])
 
-export const requestServices = [
+export const requestServices = localize('requests.requestServices', [
   {
     id: 'transport',
     label: 'Transport & Logistics',
@@ -77,18 +79,18 @@ export const requestServices = [
     subLabel: 'Type of work',
     subs: renovationServices.map((s) => ({ id: s.id, label: s.name })),
   },
-]
+])
 
 /* The inbox shown in each service page's footer, read from the list above so
    there is one place to change it. */
 export const emailFor = (id) => requestServices.find((s) => s.id === id)?.email || ''
 
-export const ctaFor = (id) => requestServices.find((s) => s.id === id)?.cta || 'Request a service'
+export const ctaFor = (id) => requestServices.find((s) => s.id === id)?.cta || ui.common.requestService
 
 /* Leave `href` empty until the account exists. An empty one renders the icon
    without a link, so the footer never ships a dead or wrong address. */
-export const social = [
+export const social = localize('requests.social', [
   { id: 'instagram', label: 'Instagram', href: '' },
   { id: 'linkedin', label: 'LinkedIn', href: '' },
   { id: 'facebook', label: 'Facebook', href: '' },
-]
+])

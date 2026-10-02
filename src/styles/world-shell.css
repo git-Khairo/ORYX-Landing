@@ -160,6 +160,25 @@
 .t-open-copy h2,
 .w-open-copy h2,
 .r-open-copy h2 { font-size: var(--step-4); color: var(--oryx-white); }
+/* On a phone the headline steps down for a long word instead of breaking it:
+   "transportiert." and "leistungsfähig" are fourteen letters, and at the full
+   size German hyphenated them across three lines up to 414px. The longest word
+   (`--len`, set per headline) has to fit the width inside the gutters, at
+   about 0.86 of the font size per Cinzel capital with its tracking. English,
+   whose words are shorter, keeps the full size. */
+@media (max-width: 760px) {
+  .t-open-copy h2,
+  .w-open-copy h2,
+  .r-open-copy h2 {
+    font-size: min(var(--step-4), calc((100vw - 2 * var(--gutter)) / (var(--len, 10) * 0.86)));
+  }
+}
+/* Sized so the longest word fits, these never need a hyphen, and with one
+   allowed the balanced wrap took it anyway to even out the lines: German
+   read "LEISTUNGS- / FÄHIG BLEIBEN." where "LEISTUNGSFÄHIG / BLEIBEN." fitted. */
+.t-open-copy h2,
+.w-open-copy h2,
+.r-open-copy h2 { -webkit-hyphens: manual; hyphens: manual; }
 /* The headline is authored as two lines and set as two lines — a break that
    the copy chose rather than one the measure happened to produce. */
 .t-open-copy h2 span,

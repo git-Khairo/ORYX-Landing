@@ -2,6 +2,8 @@ import { brand, services } from '../content/copy'
 import { social } from '../content/requests'
 import Slogan from '../components/Slogan'
 import Icon from '../components/Icon'
+import { ui } from '../content/ui'
+import LangSwitch from '../components/LangSwitch'
 
 /* The three accounts, as icons. An entry with no `href` yet renders as a plain
    icon and not as a link, so the footer never ships a dead address. Exported
@@ -58,7 +60,7 @@ export default function Footer({ onOpenService }) {
             <Slogan className="foot-line" />
             <div className="foot-actions">
               <button type="button" className="foot-cta" onClick={() => onOpenService?.('')}>
-                Start a request <i aria-hidden="true"><Icon name="arrow" size={16} /></i>
+                {ui.footer.start} <i aria-hidden="true"><Icon name="arrow" size={16} /></i>
               </button>
               <a className="foot-mail" href="mailto:hello@oryx.example">
                 hello@oryx.example
@@ -66,9 +68,9 @@ export default function Footer({ onOpenService }) {
             </div>
           </div>
 
-          <nav className="foot-cols" aria-label="Footer">
+          <nav className="foot-cols" aria-label={ui.footer.label}>
             <div>
-              <h4>Services</h4>
+              <h4>{ui.footer.services}</h4>
               <ul>
                 {services.map((s) => (
                   <li key={s.id}>
@@ -81,21 +83,21 @@ export default function Footer({ onOpenService }) {
             </div>
 
             <div>
-              <h4>Group</h4>
+              <h4>{ui.footer.group}</h4>
               <ul>
-                <li><a href="#work">Purpose</a></li>
-                <li><a href="#work">Vision</a></li>
-                <li><a href="#work">Mission</a></li>
-                <li><a href="#work">Values</a></li>
+                <li><a href="#work">{ui.footer.purpose}</a></li>
+                <li><a href="#work">{ui.footer.vision}</a></li>
+                <li><a href="#work">{ui.footer.mission}</a></li>
+                <li><a href="#work">{ui.footer.values}</a></li>
               </ul>
             </div>
 
             <div>
-              <h4>Contact</h4>
+              <h4>{ui.footer.contact}</h4>
               <ul>
                 <li><a href="mailto:hello@oryx.example">hello@oryx.example</a></li>
                 <li><a href="tel:+310000000000">+31 (0)00 000 0000</a></li>
-                <li>Monday to Friday, 08:00 to 18:00</li>
+                <li>{ui.footer.hours}</li>
                 <li>{brand.region}</li>
               </ul>
             </div>
@@ -105,13 +107,14 @@ export default function Footer({ onOpenService }) {
         <div className="foot-base">
           <span>© {year} {brand.full}</span>
           <span className="foot-legal">
-            <a href="#privacy">Privacy</a>
+            <a href="#privacy">{ui.footer.privacy}</a>
             <span aria-hidden="true">/</span>
-            <a href="#terms">Terms</a>
+            <a href="#terms">{ui.footer.terms}</a>
           </span>
           {/* Where the descriptor line used to close the row. The descriptor is
               already on the purpose panel at the top of the page, so here the
               three accounts take its place at the right-hand end. */}
+          <LangSwitch variant="list" />
           <Social />
         </div>
       </div>

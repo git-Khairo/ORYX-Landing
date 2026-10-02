@@ -41,7 +41,7 @@ export default function InitialsReveal({ play, reduced }) {
   }, [play, reduced])
 
   return (
-    <h2 className="initials" ref={root} aria-label={`ORYX. ${brand.slogan}`}>
+    <h2 className="initials" ref={root} aria-label={`ORYX. ${brand.slogan}`} lang="en">
       {brand.letters.map(({ k, w }) => (
         <span className="ir-col" key={k} aria-hidden="true">
           <span className="ir-mask">
